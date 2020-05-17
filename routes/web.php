@@ -16,15 +16,3 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::post('/login', function () {
-    return view('welcome');
-});
-
-
-Route::middleware('auth:api')->group(function () {
-    Route::get('/', function () {
-        // Uses first & second Middleware
-    });
-
-});

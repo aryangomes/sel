@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -40,6 +41,12 @@ class LoginController extends Controller
 
     public function authenticate(LoginRequest $request)
     {
-        # code...
+
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+        // Authentication passed...
+        
+        return Auth::user();
+        }
     }
 }

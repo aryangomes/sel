@@ -13,6 +13,18 @@ use Illuminate\Http\Request;
 |
 */
 
+use Illuminate\Support\Facades\Route;
+
+Route::post('login', 'Api\v1\Auth\LoginController@authenticate');
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::get('/', function () {
+        // Uses first & second Middleware
+    });
+
+});
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
