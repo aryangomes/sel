@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 ### Laravel ###
-=======
->>>>>>> a28ef770d6b0a654bbb3ef150400da27b7af8448
 /vendor/
 node_modules/
 npm-debug.log
@@ -23,16 +20,15 @@ public/hot
 public_html/storage
 public_html/hot
 
->>>>>>> a28ef770d6b0a654bbb3ef150400da27b7af8448
+
 storage/*.key
 .env
 Homestead.yaml
 Homestead.json
 /.vagrant
 .phpunit.result.cache
-<<<<<<< HEAD
+
 .docker/.db
 .docker/.apache/000-default.conf
 .docker/.apache/php.ini
-=======
->>>>>>> a28ef770d6b0a654bbb3ef150400da27b7af8448
+
