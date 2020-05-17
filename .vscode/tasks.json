@@ -1,0 +1,113 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "npm",
+            "script": "dev",
+            "problemMatcher": [
+                "$node-sass"
+            ]
+        },
+        {
+            "type": "npm",
+            "script": "watch",
+            "problemMatcher": []
+        },
+        {
+            "label": "run npm watch",
+            "type": "shell",
+            "command": "sudo npm run watch",
+            "problemMatcher": []
+        },
+        {
+            "label": "iniciar server laravel",
+            "type": "shell",
+            "command": "php artisan serve",
+            "problemMatcher": []
+        },
+        {
+            "label": "git push origin vuejs",
+            "type": "shell",
+            "command": "git push origin vuejs",
+            "problemMatcher": []
+        },
+        {
+            "label": "git push origin",
+            "type": "shell",
+            "command": "git push origin ${input:branchRemote}",
+            "problemMatcher": []
+        },
+        {
+            "label": "git merge",
+            "type": "shell",
+            "command": "git merge ${input:branchMerge} --no-edit",
+            "problemMatcher": []
+        },
+        {
+            "label": "git tag create and push",
+            "type": "shell",
+            "command": "git tag -a v${input:tagVersion} -m \"Versão ${input:tagVersion}\" && git push origin v${input:tagVersion}",
+            "problemMatcher": []
+        },
+        {
+            "label": "git tag push",
+            "type": "shell",
+            "command": "git push origin v${input:tagVersion}",
+            "problemMatcher": []
+        },
+        {
+            "label": "git tag delete(local and remote)",
+            "type": "shell",
+            "command": "git tag -d v${input:tagVersion} &&  git push origin :refs/tags/v${input:tagVersion}",
+            "problemMatcher": []
+        },
+        {
+            "label": "generate changelog.md",
+            "type": "shell",
+            "command": "git log --pretty=oneline --abbrev-commit > /home/aryan/CHANGELOGS/changelog.md.${input:dataChangelog}",
+            "problemMatcher": []
+        },
+
+        {
+            "label": "update changelog.md",
+            "type": "shell",
+            "command": "git add public/CHANGELOG.txt && git commit -m 'UPDATE CHANGELOG.MD' ",
+            "problemMatcher": []
+        },
+
+        {
+            "label": "update tasks",
+            "type": "shell",
+            "command": "git add .vscode/tasks.json && git commit -m 'UPDATE tasks.json' ",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "branchRemote",
+            "description": "branch-remote:",
+            "default": "",
+            "type": "promptString"
+        },
+        {
+            "id": "branchMerge",
+            "description": "branch-merge:",
+            "default": "",
+            "type": "promptString"
+        },
+        {
+            "id": "tagVersion",
+            "description": "tag-version:(sem o 'v')",
+            "default": "",
+            "type": "promptString"
+        },
+        {
+            "id": "dataChangelog",
+            "description": "data-changelog:",
+            "default": "",
+            "type": "promptString"
+        },
+    ],
+}
