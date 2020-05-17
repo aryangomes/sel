@@ -1,0 +1,15 @@
+{
+    "sqltools.connections": [
+        {
+            "database": "sel",
+            "dialect": "MariaDB",
+            "isActive": false,
+            "isConnected": false,
+            "name": "dbsel",
+            "password": "sel4631",
+            "port": 3306,
+            "server": "localhost",
+            "username": "sel"
+        }
+    ]
+}
