@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  webserver-sel: 
+    build:
+      context: ./.apache
+    container_name: apache-sel
+    volumes:
+      - ../.:/var/www/html
+      - ./.apache/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./.apache/php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - "8042:80"
+      - "443:443"
+    networks:
+      - network-sel
+    depends_on:
+      - db-sel   
+  
+  db-sel:
+    image: mariadb:10.1.41
+    container_name: mariadb-sel
+    volumes:
+      - ./.db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: r15987
+      MYSQL_DATABASE: sel
+      MYSQL_USER: sel
+      MYSQL_PASSWORD: sel4631
+    networks:
+      - network-sel 
+
+networks:
+  network-sel:
+    driver: bridge       

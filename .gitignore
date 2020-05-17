@@ -1,0 +1,16 @@
+### Laravel ###
+/vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+public/storage
+public/hot
+storage/*.key
+.env
+Homestead.yaml
+Homestead.json
+/.vagrant
+.phpunit.result.cache
+.docker/.db
+.docker/.apache/000-default.conf
+.docker/.apache/php.ini
