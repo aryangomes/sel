@@ -15,8 +15,11 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
 
-Route::post('login', 'Api\v1\Auth\LoginController@authenticate');
+// Route::post('login', 'Api\v1\Auth\LoginController@authenticate');
 
+Route::prefix('login')->group(function () {
+    Route::post('/admin', 'Api\v1\Auth\LoginController@loginUserAdministrator');
+});
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/', function () {
@@ -25,6 +28,3 @@ Route::middleware('auth:api')->group(function () {
 
 });
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});

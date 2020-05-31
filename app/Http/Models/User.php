@@ -6,6 +6,7 @@ use App\Traits\UuidPrimaryKey;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\HasApiTokens;
 
 
@@ -46,5 +47,16 @@ class User extends Authenticatable
     protected static function boot()
     {
         parent::boot();
+    }
+
+    private function generateTokenAccess()
+    {
+        $tokenAccess = null;
+
+        if(isset($this) && (!Auth::check())){
+            $tokenAccess = $this->createToken(env('APP_NAME'))->accessToken;
+        }
+
+        return $tokenAccess;
     }
 }
