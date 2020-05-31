@@ -10,5 +10,7 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-.docker/.db
+.docker/.db/
 dbsel Session.sql
+docs/*
+.docker/.db/ib_logfile0

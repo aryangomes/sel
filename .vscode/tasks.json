@@ -82,6 +82,24 @@
             "type": "shell",
             "command": "git add .vscode/tasks.json && git commit -m 'UPDATE tasks.json' ",
             "problemMatcher": []
+        },
+        {
+            "label": "iniciar dockers web e db sel",
+            "type": "shell",
+            "command": "docker start apache-sel mariadb-sel",
+            "problemMatcher": []
+        },
+        {
+            "label": "parar dockers web e db sel",
+            "type": "shell",
+            "command": "docker stop apache-sel mariadb-sel",
+            "problemMatcher": []
+        },
+        {
+            "label": "prompt webserver",
+            "type": "shell",
+            "command": "docker exec -it 256f4fac96f0b0511794c674bed472aa66c8876382c5cdde6ec2506a875f07b4 /bin/sh -c \"[ -e /bin/bash ] && /bin/bash || /bin/sh\"",
+            "problemMatcher": []
         }
     ],
     "inputs": [
