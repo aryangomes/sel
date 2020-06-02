@@ -40,7 +40,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'email'=>$userAdmin->email,
-            'password'=>$userAdmin->password
+            'password'=>'12345678'
         ];
 
         $response = $this->postJson(  $this->urlLogin . 'admin',$credentials);
