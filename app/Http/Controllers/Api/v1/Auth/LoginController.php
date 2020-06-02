@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\v1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Login\LoginUserAdministrator;
+use App\Http\Requests\Login\LoginUserAdministratorRequest;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -46,11 +48,11 @@ class LoginController extends Controller
 
 
 
-    public function loginUserAdministrator(LoginUserAdministrator $request)
+    public function loginUserAdministrator(LoginUserAdministratorRequest $request)
     {
         $requestValidated = $request->validated();
 
-        $userWasFound = isset($this->userWasFound($requestValidated['email'], 'email'));
+        $userWasFound = ($this->userWasFound($requestValidated['email'], 'email') != null);
 
         $userWasAuthenticated = false;
 
@@ -61,7 +63,8 @@ class LoginController extends Controller
             if ($userPasswordIsCorrect) {
                 $tokenAcess['token'] = $this->authenticateUser();
 
-                $userWasAuthenticated = true;
+                $userWasAuthenticated = isset($tokenAcess['token']);
+
             }
         }
 
@@ -104,7 +107,7 @@ class LoginController extends Controller
         $tokenAcess = null;
         try {
 
-            $tokenAcess = $this->user()->generateTokenAccess();
+            $tokenAcess = $this->user->generateTokenAccess();
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);
@@ -120,11 +123,12 @@ class LoginController extends Controller
 
         try {
 
-            $this->user = User::where([
+            $this->user = User::where(
                 $credentialSearch, $credential
-            ])->first();
+            )->first();
 
             $userWasFound = (isset($this->user));
+
         } catch (\Exception $exception) {
             $this->logErrorFromException($exception);
         }
@@ -141,6 +145,7 @@ class LoginController extends Controller
         try {
 
             $checkUserPassword = Hash::check($userPlainPassword, $this->user->password);
+
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);

@@ -59,7 +59,7 @@ class Controller extends BaseController
             '[logErrorFromException] Previous .: ' . $exception->getPrevious()
         ];
 
-        Log::error(LogFormatter::montarLogDoErro($textsOfException));
+        Log::error(LogFormatter::formatTextLog($textsOfException));
 
 
         $codeStatusResponse = ($exception->getCode() <= 0 ||

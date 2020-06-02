@@ -28,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Passport::routes();
 
-        Passport::personalAccessClientId(env(''));
+        Passport::personalAccessClientId(1);
         
     }
 }
