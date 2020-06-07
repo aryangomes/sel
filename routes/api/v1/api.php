@@ -15,13 +15,17 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
 
-// Route::post('login', 'Api\v1\Auth\LoginController@authenticate');
 
 Route::prefix('login')->group(function () {
     Route::post('/admin', 'Api\v1\Auth\LoginController@loginUserAdministrator');
+    Route::post('/', 'Api\v1\Auth\LoginController@loginUserNotAdministrator');
 });
 
 Route::middleware('auth:api')->group(function () {
+
+    Route::get('/logout', 'Api\v1\Auth\LoginController@logout');
+
+
     Route::get('/', function () {
         // Uses first & second Middleware
     });

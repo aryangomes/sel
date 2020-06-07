@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api\v1\Auth;
 
+use App\Events\LoginUserEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Login\LoginUserAdministrator;
 use App\Http\Requests\Login\LoginUserAdministratorRequest;
+use App\Http\Requests\Login\LoginUserNotAdministratorRequest;
 use App\Http\Requests\LoginRequest;
+use App\Listeners\LoginUserAdministratorListener;
 use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +31,10 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
     private $user;
+    private $userWasAuthenticated;
+    private $userWasFound;
+    private $userTokenAccess;
+    private $userPasswordIsCorrect;
 
     /**
      * Where to redirect users after login.
@@ -52,68 +59,80 @@ class LoginController extends Controller
     {
         $requestValidated = $request->validated();
 
-        $userWasFound = ($this->userWasFound($requestValidated['email'], 'email') != null);
+        $this->userWasFound = ($this->userWasFound($requestValidated['email'], 'email') != null);
 
-        $userWasAuthenticated = false;
+        $this->userWasAuthenticated = false;
 
-        if ($userWasFound) {
+        $this->userPasswordIsCorrect = false;
 
-            $userPasswordIsCorrect = $this->checkUserPassword($requestValidated['password']);
+        if ($this->userWasFound) {
 
-            if ($userPasswordIsCorrect) {
-                $tokenAcess['token'] = $this->authenticateUser();
+            $this->userPasswordIsCorrect = $this->checkUserPassword($requestValidated['password']);
 
-                $userWasAuthenticated = isset($tokenAcess['token']);
+            if ($this->userPasswordIsCorrect && $this->user->isAdmin) {
 
+                $this->userTokenAccess = $this->authenticateUser();
+
+                $this->userWasAuthenticated = isset($this->userTokenAccess);
             }
         }
 
-        if ($userWasAuthenticated) {
-            $userAuthenticated['user'] = $this->user;
-
-            $successResponse = [
-                $tokenAcess,
-                $userAuthenticated
-            ];
-            $this->setSuccessResponse(
-                $successResponse
-            );
-        } else {
-            $errorMessage = 'User not was authenticated';
-            $errorStatusCode = 400;
-
-            if (!$userWasFound) {
-                $errorMessage = 'User not found';
-                $errorStatusCode = 404;
-            }
-
-            $this->setErrorResponse(
-                $errorMessage,
-                'errors',
-                $errorStatusCode
-            );
-        }
+        $this->setResponseAuthentication();
 
         return $this->responseWithJson();
     }
 
-    public function loginUserNotAdministrator()
+    public function loginUserNotAdministrator(LoginUserNotAdministratorRequest $request)
     {
-        # code...
+        $requestValidated = $request->validated();
+
+        $this->userWasFound = ($this->userWasFound($requestValidated['cpf'], 'cpf') != null);
+
+        $this->userWasAuthenticated = false;
+
+        $this->userPasswordIsCorrect = false;
+
+        if ($this->userWasFound) {
+
+            $this->userPasswordIsCorrect = $this->checkUserPassword($requestValidated['password']);
+
+            if ($this->userPasswordIsCorrect && (!$this->user->isAdmin)) {
+
+                $this->userTokenAccess = $this->authenticateUser();
+
+                $this->userWasAuthenticated = isset($this->userTokenAccess);
+            }
+        }
+
+        $this->setResponseAuthentication();
+
+        return $this->responseWithJson();
+    }
+
+    public function logout()
+    {
+        $user = Auth::user()->token();
+        $user->revoke();
+
+        // Log::debug('logout',['user'=>$user]);
+
+        $this->setSuccessResponse('User logout successfully','success',204);
+
+        return $this->responseWithJson();
     }
 
     private function authenticateUser()
     {
-        $tokenAcess = null;
+        $tokenAccess = null;
         try {
 
-            $tokenAcess = $this->user->generateTokenAccess();
+            $tokenAccess = $this->user->generateTokenAccess();
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);
         }
 
-        return $tokenAcess;
+        return $tokenAccess;
     }
 
 
@@ -124,11 +143,11 @@ class LoginController extends Controller
         try {
 
             $this->user = User::where(
-                $credentialSearch, $credential
+                $credentialSearch,
+                $credential
             )->first();
 
             $userWasFound = (isset($this->user));
-
         } catch (\Exception $exception) {
             $this->logErrorFromException($exception);
         }
@@ -145,12 +164,44 @@ class LoginController extends Controller
         try {
 
             $checkUserPassword = Hash::check($userPlainPassword, $this->user->password);
-
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);
         }
 
         return $checkUserPassword;
+    }
+
+    private function setResponseAuthentication()
+    {
+        if ($this->userWasAuthenticated) {
+            $successResponse['user'] = $this->user;
+            $successResponse['token'] = $this->userTokenAccess;
+
+          
+            $this->setSuccessResponse(
+                $successResponse
+            );
+
+            event(new LoginUserEvent($this->user));
+        } else {
+            $errorMessage = 'User not was authenticated';
+            $errorStatusCode = 400;
+
+            if (!$this->userWasFound) {
+                $errorMessage = 'User not found';
+                $errorStatusCode = 404;
+            } elseif (!$this->userPasswordIsCorrect) {
+                $errorMessage = 'Wrong password';
+                $errorStatusCode = 422;
+            }
+
+
+            $this->setErrorResponse(
+                $errorMessage,
+                'errors',
+                $errorStatusCode
+            );
+        }
     }
 }
