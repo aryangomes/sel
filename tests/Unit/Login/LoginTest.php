@@ -103,8 +103,6 @@ class LoginTest extends TestCase
             ]
         );
 
-        // Passport::actingAs($userAdmin);
-
         $credentials = [
             'email' => $userAdmin->email,
             'password' => '12345678'
@@ -119,6 +117,7 @@ class LoginTest extends TestCase
         
         $response = $this->withHeader('Authorization', 'Bearer ' . $accessToken)
         ->getJson($this->url . 'logout');
+
         $response->assertStatus(204);
     }
 
@@ -177,5 +176,27 @@ class LoginTest extends TestCase
         $response = $this->postJson($this->urlLogin . '/', $credentials);
 
         $response->assertStatus(422);
+    }
+
+    public function testLogoutUserNotAdministrator()
+    {
+        $userNotAdmin = factory(User::class)->create();
+
+        $credentials = [
+            'cpf' => $userNotAdmin->cpf,
+            'password' => '12345678'
+        ];
+
+        $response = $this->postJson($this->urlLogin , $credentials);
+
+
+        $accessToken = $response->getData()->success->token;
+
+        $response->assertOk();
+        
+        $response = $this->withHeader('Authorization', 'Bearer ' . $accessToken)
+        ->getJson($this->url . 'logout');
+        
+        $response->assertStatus(204);
     }
 }

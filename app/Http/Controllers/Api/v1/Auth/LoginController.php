@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1\Auth;
 
 use App\Events\LoginUserEvent;
+use App\Events\LogoutUserEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Login\LoginUserAdministrator;
 use App\Http\Requests\Login\LoginUserAdministratorRequest;
@@ -111,12 +112,16 @@ class LoginController extends Controller
 
     public function logout()
     {
-        $user = Auth::user()->token();
-        $user->revoke();
 
-        // Log::debug('logout',['user'=>$user]);
+        $this->user = Auth::user();
 
-        $this->setSuccessResponse('User logout successfully','success',204);
+        $tokenAccess = $this->user->token();
+
+        $tokenAccess->revoke();
+
+        $this->setSuccessResponse('User logout successfully', 'success', 204);
+
+        event(new LogoutUserEvent($this->user));
 
         return $this->responseWithJson();
     }
@@ -178,7 +183,7 @@ class LoginController extends Controller
             $successResponse['user'] = $this->user;
             $successResponse['token'] = $this->userTokenAccess;
 
-          
+
             $this->setSuccessResponse(
                 $successResponse
             );
