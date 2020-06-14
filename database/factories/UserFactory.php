@@ -22,10 +22,11 @@ $factory->define(User::class, function (Faker $faker) {
     return [
         'id' => Str::uuid(),
         'name' => $faker->name,
-        'streetAddressstreetAddress' => $faker->streetName,
+        'streetAddress' => $faker->streetName,
         'neighborhoodAddress' => $faker->citySuffix,
         'numberAddress' => (string) $faker->randomDigit,
         'phoneNumber' => $faker->phoneNumber,
+        'cellNumber' => $faker->phoneNumber,
         'cpf' => $faker->regexify(Regex::CPF),
         'email' => $faker->unique()->safeEmail,
         'email_verified_at' => now(),
