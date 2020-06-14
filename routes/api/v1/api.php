@@ -26,9 +26,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/logout', 'Api\v1\Auth\LoginController@logout');
 
 
-    Route::get('/', function () {
-        // Uses first & second Middleware
-    });
+    // Route::resource('/user', 'Api\v1\UserController');
 
 });
 

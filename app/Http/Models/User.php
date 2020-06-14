@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\LogoutUserEvent;
 use App\Traits\UuidPrimaryKey;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -26,7 +27,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'email', 'password', 'streetAddress',
         'neighborhoodAddress', 'numberAddress',
-        'phoneNumber', 'complementAddress', 'photo',
+        'phoneNumber','cellNumber', 'complementAddress', 'photo',
         'isAdmin', 'cpf'
     ];
 
@@ -62,4 +63,36 @@ class User extends Authenticatable
 
         return $tokenAccess;
     }
+
+    /* public function setPasswordAttribute($newPassword)
+    {
+        $newPasswordIsSet = isset($newPassword);
+
+        $oldPasswordIsSet = isset($this->password);
+
+        $oldAndNewPasswordAreSet =  $oldPasswordIsSet && $newPasswordIsSet;
+
+        if (!($oldAndNewPasswordAreSet)) {
+            $this->attributes['password'] = $this->getDefaultPasswordUserNotAdmin();
+        } else {
+            $this->attributes['password'] =
+                ($newPasswordIsSet) ? ($newPassword) : $this->getDefaultPasswordUserNotAdmin();
+        }
+    } */
+
+    private function getDefaultPasswordUserNotAdmin()
+    {
+        $defaultPassword = (env('DEFAULT_PASSWORD_NOT_ADMIN'));
+
+        return $defaultPassword;
+    }
+
+    /* public function logout()
+    {
+        $tokenAccess = $this->token();
+
+        $tokenAccess->revoke();
+
+        event(new LogoutUserEvent($this));
+    } */
 }

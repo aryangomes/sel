@@ -110,6 +110,7 @@ class LoginTest extends TestCase
 
         $response = $this->postJson($this->urlLogin . 'admin', $credentials);
 
+        $response->dump();
 
         $accessToken = $response->getData()->success->token;
 
