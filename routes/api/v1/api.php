@@ -21,12 +21,14 @@ Route::prefix('login')->group(function () {
     Route::post('/', 'Api\v1\Auth\LoginController@loginUserNotAdministrator');
 });
 
+Route::resource('/user', 'Api\v1\UserController');
+
 Route::middleware('auth:api')->group(function () {
 
     Route::get('/logout', 'Api\v1\Auth\LoginController@logout');
 
 
-    // Route::resource('/user', 'Api\v1\UserController');
+   
 
 });
 

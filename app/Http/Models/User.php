@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Events\LogoutUserEvent;
+use App\Http\Models\Utils\LogFormatter;
 use App\Traits\UuidPrimaryKey;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -10,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Laravel\Passport\HasApiTokens;
-
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -52,6 +53,11 @@ class User extends Authenticatable
     protected static function boot()
     {
         parent::boot();
+         
+        static::creating(function ($model) {
+            $model->{$model->getKeyName()} = (string) Str::uuid();
+            
+        });
     }
 
     public function generateTokenAccess()
@@ -64,7 +70,7 @@ class User extends Authenticatable
         return $tokenAccess;
     }
 
-    /* public function setPasswordAttribute($newPassword)
+    public function setPasswordAttribute($newPassword)
     {
         $newPasswordIsSet = isset($newPassword);
 
@@ -76,23 +82,35 @@ class User extends Authenticatable
             $this->attributes['password'] = $this->getDefaultPasswordUserNotAdmin();
         } else {
             $this->attributes['password'] =
-                ($newPasswordIsSet) ? ($newPassword) : $this->getDefaultPasswordUserNotAdmin();
+                ($newPasswordIsSet) ? bcrypt($newPassword) : $this->getDefaultPasswordUserNotAdmin();
         }
-    } */
+    }
 
     private function getDefaultPasswordUserNotAdmin()
     {
-        $defaultPassword = (env('DEFAULT_PASSWORD_NOT_ADMIN'));
+        $defaultPassword = bcrypt((env('DEFAULT_PASSWORD_NOT_ADMIN')));
 
         return $defaultPassword;
     }
 
-    /* public function logout()
+    public function logout()
     {
-        $tokenAccess = $this->token();
+        $tokenAccessWasRevoken= false;
+        try{
+            $tokenAccess = $this->token();
 
-        $tokenAccess->revoke();
+            $tokenAccessWasRevoken = $tokenAccess->revoke();
+     
+        }catch(\Exception $exception){
+            Log::error(LogFormatter::formatTextLog(['Message'=>$exception->getMessage()]));
+        }
+     
+        if( $tokenAccessWasRevoken){
+            event(new LogoutUserEvent($this));
 
-        event(new LogoutUserEvent($this));
-    } */
+        }
+
+        return $tokenAccessWasRevoken;
+
+    }
 }

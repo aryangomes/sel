@@ -115,13 +115,10 @@ class LoginController extends Controller
 
         $this->user = Auth::user();
 
-        $tokenAccess = $this->user->token();
+        $userWasLogout = $this->user->logout();
 
-        $tokenAccess->revoke();
-
-        $this->setSuccessResponse('User logout successfully', 'success', 204);
-
-        event(new LogoutUserEvent($this->user));
+        $userWasLogout ? $this->setSuccessResponse('User logout successfully', 'success', 204) :
+            $this->setErrorResponse('User logout failed', 'errors', 400);
 
         return $this->responseWithJson();
     }

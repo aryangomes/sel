@@ -7,6 +7,7 @@ use App\Http\Requests\User\UserRegisterRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
@@ -49,18 +50,15 @@ class UserController extends Controller
             $userCreated = User::create($requestValidated);
 
             $userWasCreated = isset($userCreated);
-
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);
-
         }
 
         if ($userWasCreated) {
             DB::commit();
 
             $this->setSuccessResponse($userCreated, 'user', 201);
-
         } else {
             DB::rollBack();
             $this->setErrorResponse();
@@ -108,19 +106,15 @@ class UserController extends Controller
             DB::beginTransaction();
 
             $userWasUpdated = $user::update($requestValidated);
-
-
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);
-
         }
 
         if ($userWasUpdated) {
             DB::commit();
 
             $this->setSuccessResponse($user, 'user', 200);
-
         } else {
             DB::rollBack();
             $this->setErrorResponse();
@@ -137,6 +131,28 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $userWasLogout =  $userWasDeleted = false;
+        if (Auth::check()) {
+            try {
+                DB::beginTransaction();
+                $userWasLogout = $user->logout();
+
+                $userWasDeleted = $user->delete();
+            } catch (\Exception $exception) {
+                $this->logErrorFromException($exception);
+            }
+        }
+
+        $userWasLogoutAndDeleted = ($userWasLogout ==  $userWasDeleted);
+
+        if ($userWasLogoutAndDeleted) {
+            DB::commit();
+            $this->setSuccessResponse('User deleted successfully', 'success', 204);
+        } else {
+            DB::rollBack();
+            $this->setErrorResponse('User deleted failed', 'errors', 422);
+        }
+
+        return $this->responseWithJson();
     }
 }

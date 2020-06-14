@@ -34,7 +34,7 @@ class UserRegisterRequest extends FormRequest
             'cellNumber' => 'string',
             'complementAddress' => 'string',
             'photo' => 'string',
-            'cpf' => 'required|size:14'
+            'cpf' => 'required|size:11'
         ];
     }
 
