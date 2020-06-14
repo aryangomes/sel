@@ -13,4 +13,4 @@ yarn-error.log
 .docker/.db/
 dbsel Session.sql
 docs/*
-.docker/.db/ib_logfile0
+.docker/.db/sel/

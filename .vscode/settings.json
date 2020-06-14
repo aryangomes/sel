@@ -11,5 +11,10 @@
             "server": "localhost",
             "username": "sel"
         }
+    ],
+    "cSpell.words": [
+        "authenticatable",
+        "dispatchable",
+        "laravel"
     ]
 }
