@@ -36,7 +36,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily'],
+            'channels' => (env('APP_ENV') == 'testing')?['tests','daily']: 'daily',
             'ignore_exceptions' => false,
         ],
 
@@ -51,6 +51,15 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => 'debug',
             'days' => 14,
+        ],
+
+        'tests' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel.html'),
+            'level' => 'debug',
+            'formatter' => Monolog\Formatter\HtmlFormatter::class,
+            'handler' => Monolog\Handler\BrowserConsoleHandler::class,
+            'days' => 30,
         ],
 
         'slack' => [
