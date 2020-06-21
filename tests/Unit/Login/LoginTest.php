@@ -114,7 +114,8 @@ class LoginTest extends TestCase
 
         $response->assertOk();
         
-        $response = $this->withHeader('Authorization', 'Bearer ' . $accessToken)
+        $response = $this->withHeader('Authorization',
+        $userAdmin->getAuthorizationBearerHeader($accessToken))
         ->getJson($this->url . 'logout');
 
         $response->assertStatus(204);
@@ -193,7 +194,8 @@ class LoginTest extends TestCase
 
         $response->assertOk();
         
-        $response = $this->withHeader('Authorization', 'Bearer ' . $accessToken)
+        $response = $this->withHeader('Authorization', 
+        $userNotAdmin->getAuthorizationBearerHeader($accessToken))
         ->getJson($this->url . 'logout');
         
         $response->assertStatus(204);

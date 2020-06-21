@@ -113,7 +113,7 @@ class LoginController extends Controller
     public function logout()
     {
 
-        $this->user = Auth::user();
+        $this->user = Auth::guard('api')->user();
 
         $userWasLogout = $this->user->logout();
 

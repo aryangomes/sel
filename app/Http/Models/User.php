@@ -7,6 +7,7 @@ use App\Http\Models\Utils\LogFormatter;
 use App\Traits\UuidPrimaryKey;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +16,7 @@ use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable, UuidPrimaryKey;
+    use HasApiTokens, Notifiable, UuidPrimaryKey, SoftDeletes;
 
     protected $table = 'users';
 
@@ -28,7 +29,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'email', 'password', 'streetAddress',
         'neighborhoodAddress', 'numberAddress',
-        'phoneNumber','cellNumber', 'complementAddress', 'photo',
+        'phoneNumber', 'cellNumber', 'complementAddress', 'photo',
         'isAdmin', 'cpf'
     ];
 
@@ -53,10 +54,9 @@ class User extends Authenticatable
     protected static function boot()
     {
         parent::boot();
-         
+
         static::creating(function ($model) {
             $model->{$model->getKeyName()} = (string) Str::uuid();
-            
         });
     }
 
@@ -95,22 +95,45 @@ class User extends Authenticatable
 
     public function logout()
     {
-        $tokenAccessWasRevoken= false;
-        try{
-            $tokenAccess = $this->token();
+        $tokenAccessWasRevoken = false;
+        try {
+
+            $tokenAccess = Auth::guard('api')->user()->token();
 
             $tokenAccessWasRevoken = $tokenAccess->revoke();
-     
-        }catch(\Exception $exception){
-            Log::error(LogFormatter::formatTextLog(['Message'=>$exception->getMessage()]));
+        } catch (\Exception $exception) {
+            Log::error(LogFormatter::formatTextLog(['Message' => $exception->getMessage()]));
         }
-     
-        if( $tokenAccessWasRevoken){
-            event(new LogoutUserEvent($this));
 
+        if ($tokenAccessWasRevoken) {
+            event(new LogoutUserEvent($this));
         }
 
         return $tokenAccessWasRevoken;
+    }
 
+    public function getAuthorizationBearerHeader($accessToken)
+    {
+        return "Bearer {$accessToken}";
+    }
+
+
+    /**
+     * @return boolean
+     */
+    static public function userIsAdmin()
+    {
+        $userWasAuthenticated =  Auth::guard('api')->check();
+
+        $userIsAdmin = false;
+
+        if ($userWasAuthenticated) {
+
+            $userIsAdmin = Auth::guard('api')->user()->isAdmin;
+
+        }
+
+
+        return $userIsAdmin;
     }
 }

@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -43,6 +44,8 @@ class UserController extends Controller
         $requestValidated = $request->validated();
 
         $userWasCreated = false;
+
+        $this->authorize('create', new User());
 
         try {
             DB::beginTransaction();
@@ -102,10 +105,13 @@ class UserController extends Controller
 
         $userWasUpdated = false;
 
+
+        $this->authorize('update', $user);
+
         try {
             DB::beginTransaction();
 
-            $userWasUpdated = $user::update($requestValidated);
+            $userWasUpdated = $user->update($requestValidated);
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);
@@ -131,10 +137,16 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+
         $userWasLogout =  $userWasDeleted = false;
-        if (Auth::check()) {
+       
+     
+        if (Auth::guard('api')->check()) {
+            $this->authorize('delete', $user);
+
             try {
                 DB::beginTransaction();
+
                 $userWasLogout = $user->logout();
 
                 $userWasDeleted = $user->delete();
@@ -144,7 +156,7 @@ class UserController extends Controller
         }
 
         $userWasLogoutAndDeleted = ($userWasLogout ==  $userWasDeleted);
-
+ 
         if ($userWasLogoutAndDeleted) {
             DB::commit();
             $this->setSuccessResponse('User deleted successfully', 'success', 204);

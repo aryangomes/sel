@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserRegisterRequest extends FormRequest
@@ -12,8 +13,8 @@ class UserRegisterRequest extends FormRequest
      * @return bool
      */
     public function authorize()
-    {
-        return true;
+    {   
+        return User::userIsAdmin();
     }
 
     /**
