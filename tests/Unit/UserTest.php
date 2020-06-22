@@ -143,7 +143,7 @@ class UserTest extends TestCase
     }
 
 
-    public function testUserNotAdminTryingDeleteHisRegisterWithoutPassesId()
+    public function testUserNotAdminTryingUpdateHisRegisterWithoutPassesId()
     {
         $user = factory(User::class)->create();
 
@@ -160,6 +160,24 @@ class UserTest extends TestCase
         );
 
         $response->assertStatus(405);
+    }
+
+    public function testUserNotAdminDeleteSuccessfully()
+    {
+        $user = factory(User::class)->create();
+
+
+        Passport::actingAs($user);
+        $this->assertAuthenticatedAs($user, 'api');
+
+        $response = $this->deleteJson(
+            $this->urlWithParameter($this->urlUser, $user->id)
+        );
+
+        $response->assertOk();
+
+        $userWasDeleted = isset(User::withTrashed()->find($user->id)->deleted_at);
+        $this->assertTrue($userWasDeleted);
     }
 
     public function testUserNotAdminTryingDeleteOtherUserRegisterWithInvalidDatas()

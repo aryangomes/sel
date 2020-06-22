@@ -141,25 +141,25 @@ class UserController extends Controller
         $userWasLogout =  $userWasDeleted = false;
        
      
-        if (Auth::guard('api')->check()) {
-            $this->authorize('delete', $user);
+        $this->authorize('delete', $user);
+        // if (Auth::guard('api')->check()) {
 
             try {
                 DB::beginTransaction();
 
-                $userWasLogout = $user->logout();
+                // $userWasLogout = $user->logout();
 
                 $userWasDeleted = $user->delete();
             } catch (\Exception $exception) {
                 $this->logErrorFromException($exception);
             }
-        }
+        // }
 
-        $userWasLogoutAndDeleted = ($userWasLogout ==  $userWasDeleted);
+        // $userWasLogoutAndDeleted = ($userWasLogout ==  $userWasDeleted);
  
-        if ($userWasLogoutAndDeleted) {
+        if ($userWasDeleted) {
             DB::commit();
-            $this->setSuccessResponse('User deleted successfully', 'success', 204);
+            $this->setSuccessResponse('User deleted successfully', 'success', 200);
         } else {
             DB::rollBack();
             $this->setErrorResponse('User deleted failed', 'errors', 422);
