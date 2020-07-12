@@ -34,7 +34,11 @@ class UserPolicy
      */
     public function view(User $userAuthenticated, User $user)
     {
-        return false;
+
+        $this->user = $user;
+        $this->userAuthenticated = $userAuthenticated;
+
+        return true;
     }
 
     /**

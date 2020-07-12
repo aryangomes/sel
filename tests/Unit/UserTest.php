@@ -167,13 +167,26 @@ class UserTest extends TestCase
         $user = factory(User::class)->create();
 
 
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+       /*  Passport::actingAs($user);
+        $this->assertAuthenticatedAs($user, 'api'); */
 
-        $response = $this->deleteJson(
+        $credentials = [
+            'cpf' => $user->cpf,
+            'password' => '12345678'
+        ];
+
+        $response = $this->postJson($this->url . 'login', $credentials);
+
+        $accessToken = $response->getData()->success->token;
+
+        $response->assertOk();
+
+        
+        $response = $this->withHeader('Authorization',
+        $user->getAuthorizationBearerHeader($accessToken))->deleteJson(
             $this->urlWithParameter($this->urlUser, $user->id)
         );
-
+        
         $response->assertOk();
 
         $userWasDeleted = isset(User::withTrashed()->find($user->id)->deleted_at);

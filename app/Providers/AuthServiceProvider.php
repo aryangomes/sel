@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Passport\Passport;
@@ -14,7 +16,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Models\User' => 'App\Policies\UserPolicy',
+        User::class => UserPolicy::class,
     ];
 
     /**
@@ -30,7 +32,6 @@ class AuthServiceProvider extends ServiceProvider
 
         Passport::personalAccessClientId(1);
 
-          Passport::tokensExpireIn(now()->addDays(15));
-        
+        Passport::tokensExpireIn(now()->addDays(15));
     }
 }

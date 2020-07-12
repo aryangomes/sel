@@ -78,7 +78,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        $this->authorize('view', $user);
+        return $user;
     }
 
     /**
@@ -139,25 +140,25 @@ class UserController extends Controller
     {
 
         $userWasLogout =  $userWasDeleted = false;
-       
-     
+
+
         $this->authorize('delete', $user);
-        // if (Auth::guard('api')->check()) {
+        if (Auth::guard('api')->check()) {
 
             try {
                 DB::beginTransaction();
 
-                // $userWasLogout = $user->logout();
+                $userWasLogout = $user->logout();
 
                 $userWasDeleted = $user->delete();
             } catch (\Exception $exception) {
                 $this->logErrorFromException($exception);
             }
-        // }
+        }
 
-        // $userWasLogoutAndDeleted = ($userWasLogout ==  $userWasDeleted);
- 
-        if ($userWasDeleted) {
+        $userWasLogoutAndDeleted = ($userWasLogout ==  $userWasDeleted);
+
+        if ($userWasLogoutAndDeleted) {
             DB::commit();
             $this->setSuccessResponse('User deleted successfully', 'success', 200);
         } else {
