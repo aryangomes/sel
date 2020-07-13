@@ -7,6 +7,7 @@ use App\Http\Requests\User\UserRegisterRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -141,8 +142,8 @@ class UserController extends Controller
 
         $userWasLogout =  $userWasDeleted = false;
 
-
         $this->authorize('delete', $user);
+
         if (Auth::guard('api')->check()) {
 
             try {
@@ -160,10 +161,10 @@ class UserController extends Controller
 
         if ($userWasLogoutAndDeleted) {
             DB::commit();
-            $this->setSuccessResponse('User deleted successfully', 'success', 200);
+            $this->setSuccessResponse('User deleted successfully', 'success', Response::HTTP_OK);
         } else {
             DB::rollBack();
-            $this->setErrorResponse('User deleted failed', 'errors', 422);
+            $this->setErrorResponse('User deleted failed', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
