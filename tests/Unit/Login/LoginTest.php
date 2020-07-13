@@ -43,7 +43,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'email' => $userAdmin->email,
-            'password' => '12345678'
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
         ];
 
         $response = $this->postJson($this->urlLogin . 'admin', $credentials);
@@ -57,7 +57,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'email' => $userIsNotAdmin->email,
-            'password' => '12345678'
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
         ];
 
         $response = $this->postJson($this->urlLogin . 'admin', $credentials);
@@ -69,7 +69,7 @@ class LoginTest extends TestCase
     {
         $credentials = [
             'email' => 'admin',
-            'password' => '12345678'
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
         ];
 
         $response = $this->postJson($this->urlLogin . 'admin', $credentials);
@@ -105,7 +105,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'email' => $userAdmin->email,
-            'password' => '12345678'
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
         ];
 
         $response = $this->postJson($this->urlLogin . 'admin', $credentials);
@@ -113,10 +113,12 @@ class LoginTest extends TestCase
         $accessToken = $response->getData()->success->token;
 
         $response->assertOk();
-        
-        $response = $this->withHeader('Authorization',
-        $userAdmin->getAuthorizationBearerHeader($accessToken))
-        ->getJson($this->url . 'logout');
+
+        $response = $this->withHeader(
+            'Authorization',
+            $userAdmin->getAuthorizationBearerHeader($accessToken)
+        )
+            ->getJson($this->url . 'logout');
 
         $response->assertStatus(204);
     }
@@ -128,7 +130,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'cpf' => $userNotAdmin->cpf,
-            'password' => '12345678'
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
         ];
 
         $response = $this->postJson($this->urlLogin . '/', $credentials);
@@ -142,7 +144,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'email' => $userNotAdmin->email,
-            'password' => '12345678'
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
         ];
 
         $response = $this->postJson($this->urlLogin . '/', $credentials);
@@ -156,7 +158,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'name' => $userNotAdmin->name,
-            'password' => '12345678'
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
         ];
 
         $response = $this->postJson($this->urlLogin . '/', $credentials);
@@ -184,20 +186,22 @@ class LoginTest extends TestCase
 
         $credentials = [
             'cpf' => $userNotAdmin->cpf,
-            'password' => '12345678'
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
         ];
 
-        $response = $this->postJson($this->urlLogin , $credentials);
+        $response = $this->postJson($this->urlLogin, $credentials);
 
 
         $accessToken = $response->getData()->success->token;
 
         $response->assertOk();
-        
-        $response = $this->withHeader('Authorization', 
-        $userNotAdmin->getAuthorizationBearerHeader($accessToken))
-        ->getJson($this->url . 'logout');
-        
+
+        $response = $this->withHeader(
+            'Authorization',
+            $userNotAdmin->getAuthorizationBearerHeader($accessToken)
+        )
+            ->getJson($this->url . 'logout');
+
         $response->assertStatus(204);
     }
 }

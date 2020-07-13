@@ -38,7 +38,7 @@ class UserPolicy
         $this->user = $user;
         $this->userAuthenticated = $userAuthenticated;
 
-        return true;
+        return $this->validateAction();
     }
 
     /**
@@ -49,7 +49,7 @@ class UserPolicy
      */
     public function create(User $userAuthenticated)
     {
-        return User::userIsAdmin();
+        return $userAuthenticated->isAdmin;
     }
 
     /**

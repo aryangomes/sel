@@ -79,6 +79,23 @@ class UserTest extends TestCase
         $response->assertStatus(422);
     }
 
+    public function testUserNotAdminTryingRegisterUserNotAdmin()
+    {
+        $user = factory(User::class)->create();
+
+        Passport::actingAs($user);
+        $this->assertAuthenticatedAs($user, 'api');
+
+        $userPost = factory(User::class)->make()->toArray();
+
+        $userPost['password'] = env('DEFAULT_PASSWORD_NOT_ADMIN');
+        $userPost['password_confirmation'] = $userPost['password'];
+
+        $response = $this->postJson($this->urlUser, $userPost);
+
+        $response->assertForbidden();
+    }
+
     public function testUpdateUserNotAdminSuccessfully()
     {
         $user = factory(User::class)->create();
@@ -162,17 +179,66 @@ class UserTest extends TestCase
         $response->assertStatus(405);
     }
 
+    public function testUserNotAdminViewOwnDataSuccessfully()
+    {
+        $user = factory(User::class)->create();
+
+        $credentials = [
+            'cpf' => $user->cpf,
+            'password' => env('DEFAULT_PASSWORD_NOT_ADMIN')
+        ];
+
+        $response = $this->postJson($this->url . 'login/', $credentials);
+
+        $accessToken = $response->getData()->success->token;
+
+        $response->assertOk();
+
+
+        $response = $this->withHeader(
+            'Authorization',
+            $user->getAuthorizationBearerHeader($accessToken)
+        )->getJson(
+            $this->urlWithParameter($this->urlUser, $user->id)
+        );
+
+        $response->assertOk();
+    }
+
+    public function testUserNotAdminTryingViewDataOfAnotherUserNotAdmin()
+    {
+        $user = factory(User::class)->create();
+        $otherUser = factory(User::class)->create();
+
+        $credentials = [
+            'cpf' => $user->cpf,
+            'password' => env('DEFAULT_PASSWORD_NOT_ADMIN')
+        ];
+
+        $response = $this->postJson($this->url . 'login/', $credentials);
+
+        $accessToken = $response->getData()->success->token;
+
+        $response->assertOk();
+
+
+        $response = $this->withHeader(
+            'Authorization',
+            $user->getAuthorizationBearerHeader($accessToken)
+        )->getJson(
+            $this->urlWithParameter($this->urlUser, $otherUser->id)
+        );
+
+        $response->assertForbidden();
+    }
+
     public function testUserNotAdminDeleteSuccessfully()
     {
         $user = factory(User::class)->create();
 
-
-       /*  Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api'); */
-
         $credentials = [
             'cpf' => $user->cpf,
-            'password' => '12345678'
+            'password' => env('DEFAULT_PASSWORD_NOT_ADMIN')
         ];
 
         $response = $this->postJson($this->url . 'login', $credentials);
@@ -181,12 +247,72 @@ class UserTest extends TestCase
 
         $response->assertOk();
 
-        
-        $response = $this->withHeader('Authorization',
-        $user->getAuthorizationBearerHeader($accessToken))->deleteJson(
+
+        $response = $this->withHeader(
+            'Authorization',
+            $user->getAuthorizationBearerHeader($accessToken)
+        )->deleteJson(
             $this->urlWithParameter($this->urlUser, $user->id)
         );
-        
+
+        $response->assertOk();
+
+        $userWasDeleted = isset(User::withTrashed()->find($user->id)->deleted_at);
+        $this->assertTrue($userWasDeleted);
+    }
+
+    public function testUserNotAdminTryingDeleteOtherUser()
+    {
+        $user = factory(User::class)->create();
+        $otherUser = factory(User::class)->create();
+
+        $credentials = [
+            'cpf' => $user->cpf,
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
+        ];
+
+        $response = $this->postJson($this->url . 'login', $credentials);
+
+        $accessToken = $response->getData()->success->token;
+
+        $response->assertOk();
+
+
+        $response = $this->withHeader(
+            'Authorization',
+            $user->getAuthorizationBearerHeader($accessToken)
+        )->deleteJson(
+            $this->urlWithParameter($this->urlUser, $otherUser->id)
+        );
+
+        $response->assertForbidden();
+    }
+
+    public function testUserAdminDeleteSuccessfully()
+    {
+        $user = factory(User::class)->create(
+            ['isAdmin' => 1]
+        );
+
+        $credentials = [
+            'email' => $user->email,
+            'password' => env('DEFAULT_PASSWORD_ADMIN')
+        ];
+
+        $response = $this->postJson($this->url . 'login/admin', $credentials);
+
+        $accessToken = $response->getData()->success->token;
+
+        $response->assertOk();
+
+
+        $response = $this->withHeader(
+            'Authorization',
+            $user->getAuthorizationBearerHeader($accessToken)
+        )->deleteJson(
+            $this->urlWithParameter($this->urlUser, $user->id)
+        );
+
         $response->assertOk();
 
         $userWasDeleted = isset(User::withTrashed()->find($user->id)->deleted_at);
