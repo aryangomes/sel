@@ -98,7 +98,7 @@
         {
             "label": "prompt webserver",
             "type": "shell",
-            "command": "docker exec -it 256f4fac96f0b0511794c674bed472aa66c8876382c5cdde6ec2506a875f07b4 /bin/sh -c \"[ -e /bin/bash ] && /bin/bash || /bin/sh\"",
+            "command": "docker exec -it 27b92e698aead4e1882620fe8bbc8ad9bca67fb49db87c719f3fb07f49155dfd /bin/sh -c \"[ -e /bin/bash ] && /bin/bash || /bin/sh\"",
             "problemMatcher": []
         }
     ],
