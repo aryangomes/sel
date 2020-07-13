@@ -23,12 +23,10 @@ Route::prefix('login')->group(function () {
 
 
 Route::middleware('auth:api')->group(function () {
-    
+
     Route::resource('/user', 'Api\v1\UserController');
+
+    Route::resource('/lender', 'Api\v1\LenderController');
+
     Route::get('/logout', 'Api\v1\Auth\LoginController@logout');
-
-
-   
-
 });
-

@@ -3,16 +3,14 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\User\UserRegisterRequest;
-use App\Http\Requests\User\UserUpdateRequest;
-use App\Models\User;
+use App\Http\Models\Lender;
+use App\Http\Requests\Lender\LenderRegisterRequest;
+use App\Http\Requests\Lender\LenderUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
-class UserController extends Controller
+class LenderController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -40,29 +38,29 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(UserRegisterRequest $request)
+    public function store(LenderRegisterRequest $request)
     {
         $requestValidated = $request->validated();
 
-        $userWasCreated = false;
+        $lenderWasCreated = false;
 
-        $this->authorize('create', new User());
+        // $this->authorize('create', new Lender());
 
         try {
             DB::beginTransaction();
 
-            $userCreated = User::create($requestValidated);
+            $lenderCreated = Lender::create($requestValidated);
 
-            $userWasCreated = isset($userCreated);
+            $lenderWasCreated = isset($lenderCreated);
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);
         }
 
-        if ($userWasCreated) {
+        if ($lenderWasCreated) {
             DB::commit();
 
-            $this->setSuccessResponse($userCreated, 'user', Response::HTTP_CREATED);
+            $this->setSuccessResponse($lenderCreated, 'lender',  Response::HTTP_CREATED);
         } else {
             DB::rollBack();
             $this->setErrorResponse();
@@ -74,22 +72,22 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Http\Models\Lender  $lender
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show(Lender $lender)
     {
-        $this->authorize('view', $user);
-        return $user;
+        // $this->authorize('view', $lender);
+        return $lender;
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Http\Models\Lender  $lender
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $user)
+    public function edit(Lender $lender)
     {
         //
     }
@@ -98,31 +96,30 @@ class UserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
+     * @param  \App\Http\Models\Lender  $lender
      * @return \Illuminate\Http\Response
      */
-    public function update(UserUpdateRequest $request, User $user)
+    public function update(LenderUpdateRequest $request, Lender $lender)
     {
         $requestValidated = $request->validated();
 
-        $userWasUpdated = false;
+        $lenderWasUpdated = false;
 
-
-        $this->authorize('update', $user);
+        // $this->authorize('update', $lender);
 
         try {
             DB::beginTransaction();
 
-            $userWasUpdated = $user->update($requestValidated);
+            $lenderWasUpdated = $lender->update($requestValidated);
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);
         }
 
-        if ($userWasUpdated) {
+        if ($lenderWasUpdated) {
             DB::commit();
 
-            $this->setSuccessResponse($user, 'user', 200);
+            $this->setSuccessResponse($lender, 'lender', 200);
         } else {
             DB::rollBack();
             $this->setErrorResponse();
@@ -134,37 +131,30 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Http\Models\Lender  $lender
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(Lender $lender)
     {
+        $lenderWasDeleted = false;
 
-        $userWasLogout =  $userWasDeleted = false;
+        // $this->authorize('delete', $lender);
 
-        $this->authorize('delete', $user);
+        try {
+            DB::beginTransaction();
 
-        if (Auth::guard('api')->check()) {
-
-            try {
-                DB::beginTransaction();
-
-                $userWasLogout = $user->logout();
-
-                $userWasDeleted = $user->delete();
-            } catch (\Exception $exception) {
-                $this->logErrorFromException($exception);
-            }
+            $lenderWasDeleted = $lender->delete();
+        } catch (\Exception $exception) {
+            $this->logErrorFromException($exception);
         }
 
-        $userWasLogoutAndDeleted = ($userWasLogout ==  $userWasDeleted);
 
-        if ($userWasLogoutAndDeleted) {
+        if ($lenderWasDeleted) {
             DB::commit();
-            $this->setSuccessResponse('User deleted successfully', 'success', Response::HTTP_OK);
+            $this->setSuccessResponse('Lender deleted successfully', 'success', Response::HTTP_OK);
         } else {
             DB::rollBack();
-            $this->setErrorResponse('User deleted failed', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+            $this->setErrorResponse('Lender deleted failed', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
