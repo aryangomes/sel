@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLendersTable extends Migration
+class CreateProvidersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class CreateLendersTable extends Migration
      */
     public function up()
     {
-        Schema::create('lenders', function (Blueprint $table) {
-            $table->bigIncrements('idLender');
+        Schema::create('providers', function (Blueprint $table) {
+            $table->bigIncrements('idProvider');
             $table->string('name',200);
             $table->string('streetAddress',200);
             $table->string('neighborhoodAddress',200);
@@ -22,7 +22,6 @@ class CreateLendersTable extends Migration
             $table->string('phoneNumber',30)->nullable();
             $table->string('cellNumber',30)->nullable();
             $table->string('complementAddress')->nullable();
-            $table->string('site')->nullable();
             $table->string('email')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -36,6 +35,6 @@ class CreateLendersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lenders');
+        Schema::dropIfExists('providers');
     }
 }

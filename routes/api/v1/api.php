@@ -28,5 +28,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::resource('/lender', 'Api\v1\LenderController');
 
+    Route::resource('/provider', 'Api\v1\ProviderController');
+
     Route::get('/logout', 'Api\v1\Auth\LoginController@logout');
 });
