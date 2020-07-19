@@ -2,7 +2,7 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Http\Models\Lender;
+use App\Models\Lender;
 use Faker\Generator as Faker;
 
 $factory->define(Lender::class, function (Faker $faker) {

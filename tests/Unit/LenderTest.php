@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Http\Models\Lender;
+use App\Models\Lender;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;

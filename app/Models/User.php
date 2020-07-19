@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Events\LogoutUserEvent;
-use App\Http\Models\Utils\LogFormatter;
+use App\Models\Utils\LogFormatter;
 use App\Traits\UuidPrimaryKey;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;

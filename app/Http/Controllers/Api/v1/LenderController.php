@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Models\Lender;
+use App\Models\Lender;
 use App\Http\Requests\Lender\LenderRegisterRequest;
 use App\Http\Requests\Lender\LenderUpdateRequest;
 use App\Http\Resources\LenderResource;
@@ -73,7 +73,7 @@ class LenderController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Http\Models\Lender  $lender
+     * @param  \App\Models\Lender  $lender
      * @return \Illuminate\Http\Response
      */
     public function show(Lender $lender)
@@ -88,7 +88,7 @@ class LenderController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Http\Models\Lender  $lender
+     * @param  \App\Models\Lender  $lender
      * @return \Illuminate\Http\Response
      */
     public function edit(Lender $lender)
@@ -100,7 +100,7 @@ class LenderController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Http\Models\Lender  $lender
+     * @param  \App\Models\Lender  $lender
      * @return \Illuminate\Http\Response
      */
     public function update(LenderUpdateRequest $request, Lender $lender)
@@ -135,7 +135,7 @@ class LenderController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Http\Models\Lender  $lender
+     * @param  \App\Models\Lender  $lender
      * @return \Illuminate\Http\Response
      */
     public function destroy(Lender $lender)

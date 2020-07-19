@@ -2,7 +2,7 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Http\Models\Utils\Regex;
+use App\Models\Utils\Regex;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;

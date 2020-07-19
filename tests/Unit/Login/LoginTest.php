@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Login;
 
-use App\Http\Models\Utils\Regex;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
