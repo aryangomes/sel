@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Models\Lender;
 use App\Http\Requests\Lender\LenderRegisterRequest;
 use App\Http\Requests\Lender\LenderUpdateRequest;
+use App\Http\Resources\LenderResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +45,7 @@ class LenderController extends Controller
 
         $lenderWasCreated = false;
 
-        // $this->authorize('create', new Lender());
+        $this->authorize('create', new Lender());
 
         try {
             DB::beginTransaction();
@@ -59,8 +60,8 @@ class LenderController extends Controller
 
         if ($lenderWasCreated) {
             DB::commit();
-
-            $this->setSuccessResponse($lenderCreated, 'lender',  Response::HTTP_CREATED);
+            $lenderResource = $this->getLenderResource($lenderCreated->idLender);
+            $this->setSuccessResponse($lenderResource, 'lender',  Response::HTTP_CREATED);
         } else {
             DB::rollBack();
             $this->setErrorResponse();
@@ -77,8 +78,11 @@ class LenderController extends Controller
      */
     public function show(Lender $lender)
     {
-        // $this->authorize('view', $lender);
-        return $lender;
+        $this->authorize('view', $lender);
+
+        $lenderResource = $this->getLenderResource($lender->idLender);
+
+        return $lenderResource;
     }
 
     /**
@@ -105,7 +109,7 @@ class LenderController extends Controller
 
         $lenderWasUpdated = false;
 
-        // $this->authorize('update', $lender);
+        $this->authorize('update', $lender);
 
         try {
             DB::beginTransaction();
@@ -118,8 +122,8 @@ class LenderController extends Controller
 
         if ($lenderWasUpdated) {
             DB::commit();
-
-            $this->setSuccessResponse($lender, 'lender', 200);
+            $lenderResource = $this->getLenderResource($lender->idLender);
+            $this->setSuccessResponse($lenderResource, 'lender', 200);
         } else {
             DB::rollBack();
             $this->setErrorResponse();
@@ -138,7 +142,7 @@ class LenderController extends Controller
     {
         $lenderWasDeleted = false;
 
-        // $this->authorize('delete', $lender);
+        $this->authorize('delete', $lender);
 
         try {
             DB::beginTransaction();
@@ -158,5 +162,17 @@ class LenderController extends Controller
         }
 
         return $this->responseWithJson();
+    }
+
+    /**
+     * 
+     * @param int $idLender
+     * @return  LenderResource
+     * 
+     */
+    private function getLenderResource($idLender)
+    {
+        $lenderResource = new LenderResource(Lender::find($idLender));
+        return $lenderResource;
     }
 }

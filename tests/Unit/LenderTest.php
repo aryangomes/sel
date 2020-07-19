@@ -51,6 +51,38 @@ class LenderTest extends TestCase
         $response->assertCreated();
     }
 
+    public function testRegisterLenderFailedWithInvalidData()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $postLender = factory(Lender::class)->make(
+            [
+                'name'=>null,
+                'streetAddress'=>null,
+                'email'=>'email',
+                'numberAddress'=>123,
+
+                'neighborhoodAddress' => null,
+                'phoneNumber' =>null,
+                'cellNumber' =>  null,
+                'complementAddress' =>  null,
+                'site' =>  'null',
+            ]
+        )->toArray();
+
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->postJson($this->urlLender, $postLender);
+
+        $response->assertStatus(422);
+    }
+
     public function testUpdateLenderSuccessfully()
     {
         $userAdmin = factory(User::class)->create(
@@ -100,6 +132,19 @@ class LenderTest extends TestCase
         );
 
         $response->assertOk();
+
+
+        $user = factory(User::class)->create();
+
+        Passport::actingAs($user);
+        $this->assertAuthenticatedAs($user, 'api');
+
+        $response = $this->getJson(
+            $this->urlWithParameter($this->urlLender, $lender->idLender)
+        );
+
+        $response->assertOk();
+
     }
 
     public function testDeleteLenderSuccessfully()
@@ -125,5 +170,22 @@ class LenderTest extends TestCase
         $lenderWasDeleted = isset(Lender::withTrashed()->find($lender->idLender)->deleted_at);
         
         $this->assertTrue($lenderWasDeleted);
+    }
+
+    public function testUserNotAdminTruingDeleteLenderUnsuccessfully()
+    {
+        $user = factory(User::class)->create();
+
+        $lender = factory(Lender::class)->create();
+
+
+        Passport::actingAs($user);
+        $this->assertAuthenticatedAs($user, 'api');
+
+        $response = $this->deleteJson(
+            $this->urlWithParameter($this->urlLender, $lender->idLender)
+        );
+
+        $response->assertForbidden();
     }
 }
