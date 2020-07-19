@@ -145,6 +145,16 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'name' => 'Name',
+        'email' => 'Email',
+        'streetAddress' => 'Street Address',
+        'neighborhoodAddress' => 'Neighborhood Address',
+        'numberAddress' => 'Number Address',
+        'phoneNumber' => 'Phone Number',
+        'cellNumber' =>  'Cell Number',
+        'complementAddress' =>  'Complement Address',
+        'site' =>  'Site',
+    ],
 
 ];

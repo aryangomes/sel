@@ -62,7 +62,7 @@ class UserController extends Controller
         if ($userWasCreated) {
             DB::commit();
 
-            $this->setSuccessResponse($userCreated, 'user', 201);
+            $this->setSuccessResponse($userCreated, 'user', Response::HTTP_CREATED);
         } else {
             DB::rollBack();
             $this->setErrorResponse();

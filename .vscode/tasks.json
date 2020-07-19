@@ -98,7 +98,7 @@
         {
             "label": "prompt webserver",
             "type": "shell",
-            "command": "docker exec -it 27b92e698aead4e1882620fe8bbc8ad9bca67fb49db87c719f3fb07f49155dfd /bin/sh -c \"[ -e /bin/bash ] && /bin/bash || /bin/sh\"",
+            "command": "docker exec -it apache-sel /bin/sh -c \"[ -e /bin/bash ] && /bin/bash || /bin/sh\"",
             "problemMatcher": []
         }
     ],
