@@ -76,8 +76,20 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.30.1/install.sh | b
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
+RUN echo 'alias phptest="./vendor/phpunit/phpunit/phpunit"' >> ~/.bashrc
 
+RUN apt-get update && apt-get install cron -y
 
+RUN touch /var/log/cron.log
+
+RUN  echo "ServerName localhost" >> /etc/apache2/apache2.conf
+RUN  echo "* * * * * cd /var/www/html && sudo php artisan schedule:run >> /dev/null 2>&1" >> /var/spool/cron/crontabs/root
+
+RUN sudo service apache2 restart
+
+COPY docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # ports
 EXPOSE 80 443
