@@ -2,8 +2,11 @@
 
 namespace Tests\Unit;
 
+use App\Models\JuridicPerson;
+use App\Models\NaturalPerson;
 use App\Models\Provider;
 use App\Models\User;
+use App\Models\Utils\Regex;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
@@ -32,7 +35,7 @@ class ProviderTest extends TestCase
         parent::tearDown();
     }
 
-    public function testRegisterProviderSuccessfully()
+    public function testRegisterProviderFailed()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -49,8 +52,60 @@ class ProviderTest extends TestCase
         $response = $this->postJson($this->urlProvider, $postProvider);
 
 
-        $response->assertCreated();
+        $response->assertStatus(422);
     }
+
+    public function testRegisterNaturalPersonProviderSuccessfully()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $postProvider = factory(Provider::class)->make()->toArray();
+
+        $postProvider['cpf'] = $this->faker->regexify(Regex::CPF);
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->postJson($this->urlProvider, $postProvider);
+
+        $naturalPersonCreated = $response->getData()->provider;
+
+        $response->assertCreated();
+
+        $this->assertEquals($naturalPersonCreated->naturalPerson->cpf, $postProvider['cpf']);
+    }
+
+    public function testRegisterJuridicPersonProviderSuccessfully()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $postProvider = factory(Provider::class)->make()->toArray();
+        $postProvider['cnpj'] = $this->faker->regexify(Regex::CNPJ);
+
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->postJson($this->urlProvider, $postProvider);
+
+
+        $response->assertCreated();
+
+        $naturalPersonCreated = $response->getData()->provider;
+
+        $response->assertCreated();
+
+        $this->assertEquals($naturalPersonCreated->juridicPerson->cnpj, $postProvider['cnpj']);
+    }
+    
 
     public function testRegisterProviderFailedWithInvalidData()
     {
@@ -69,7 +124,9 @@ class ProviderTest extends TestCase
                 'neighborhoodAddress' => null,
                 'phoneNumber' => null,
                 'cellNumber' =>  null,
-                'complementAddress' =>  null
+                'complementAddress' =>  null,
+                'cpf' =>  '12345678',
+                'cnpj' =>  '12345678',
             ]
         )->toArray();
 
@@ -168,6 +225,62 @@ class ProviderTest extends TestCase
         $providerWasDeleted = isset(Provider::withTrashed()->find($provider->idProvider)->deleted_at);
 
         $this->assertTrue($providerWasDeleted);
+    }
+
+    public function testDeleteNaturalPersonProviderSuccessfully()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $naturalPersonProvider = factory(NaturalPerson::class)->create();
+
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->deleteJson(
+            $this->urlWithParameter($this->urlProvider, $naturalPersonProvider->idProvider)
+        );
+
+        $response->assertOk();
+
+        $providerWasDeleted = isset(Provider::withTrashed()->find($naturalPersonProvider->idProvider)->deleted_at);
+        
+        $naturalPersonProviderWasDeleted = isset(NaturalPerson::withTrashed()->find($naturalPersonProvider->idNaturalPerson)->deleted_at);
+
+        $this->assertTrue($providerWasDeleted);
+        $this->assertTrue($naturalPersonProviderWasDeleted);
+    }
+
+    public function testDeleteJuridicPersonProviderSuccessfully()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $juridicPersonProvider = factory(JuridicPerson::class)->create();
+
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->deleteJson(
+            $this->urlWithParameter($this->urlProvider, $juridicPersonProvider->idProvider)
+        );
+
+        $response->assertOk();
+
+        $providerWasDeleted = isset(Provider::withTrashed()->find($juridicPersonProvider->idProvider)->deleted_at);
+        
+        $juridicPersonProviderWasDeleted = isset(JuridicPerson::withTrashed()->find($juridicPersonProvider->idJuridicPerson)->deleted_at);
+
+        $this->assertTrue($providerWasDeleted);
+        $this->assertTrue($juridicPersonProviderWasDeleted);
     }
 
     public function testUserNotAdminTruingDeleteProviderUnsuccessfully()

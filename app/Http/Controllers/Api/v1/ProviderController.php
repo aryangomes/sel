@@ -6,13 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Provider\RegisterProviderRequest;
 use App\Http\Requests\Provider\UpdateProviderRequest;
 use App\Http\Resources\ProviderResource;
+use App\Models\JuridicPerson;
+use App\Models\NaturalPerson;
 use App\Models\Provider;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProviderController extends Controller
 {
+
+    public $typesOfProvider = [
+        1 => 'naturalPerson',
+        2 => 'juridicPerson'
+    ];
+
     /**
      * Display a listing of the resource.
      *
@@ -43,7 +52,9 @@ class ProviderController extends Controller
     {
         $requestValidated = $request->validated();
 
-        $providerWasCreated = false;
+        $providerWasCreated = $personWasCreated = false;
+
+        $personCreated = null;
 
         $this->authorize('create', new Provider());
 
@@ -53,18 +64,42 @@ class ProviderController extends Controller
             $providerCreated = Provider::create($requestValidated);
 
             $providerWasCreated = isset($providerCreated);
+
+
+
+            if ($request->has('cpf')) {
+                $personCreated = $this->createPersonProvider(
+                    $this->typesOfProvider[1],
+                    [
+                        'idProvider' => $providerCreated->idProvider,
+                        'cpf' => $request->input('cpf'),
+                    ]
+                );
+            } else {
+                $personCreated = $this->createPersonProvider(
+                    $this->typesOfProvider[2],
+                    [
+                        'idProvider' => $providerCreated->idProvider,
+                        'cnpj' => $request->input('cnpj'),
+                    ]
+                );
+            }
+
+            $personWasCreated = isset($personCreated);
         } catch (\Exception $exception) {
 
             $this->logErrorFromException($exception);
         }
 
-        if ($providerWasCreated) {
+        $providerAndPersonProviderWasCreated  = $providerWasCreated && $personWasCreated;
+
+        if ($providerAndPersonProviderWasCreated) {
             DB::commit();
             $providerResource = $this->getProviderResource($providerCreated->idProvider);
             $this->setSuccessResponse($providerResource, 'provider',  Response::HTTP_CREATED);
         } else {
             DB::rollBack();
-            $this->setErrorResponse();
+            $this->setErrorResponse('Did not possible register the provider.', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
@@ -147,6 +182,12 @@ class ProviderController extends Controller
         try {
             DB::beginTransaction();
 
+            if (isset($provider->naturalPerson)) {
+                $provider->naturalPerson->delete();
+            } elseif (isset($provider->juridicPerson)) {
+                $provider->juridicPerson->delete();
+            }
+
             $providerWasDeleted = $provider->delete();
         } catch (\Exception $exception) {
             $this->logErrorFromException($exception);
@@ -174,5 +215,36 @@ class ProviderController extends Controller
     {
         $providerResource = new ProviderResource(Provider::find($idProvider));
         return $providerResource;
+    }
+
+    private function createPersonProvider($typeOfProvider, $dataTypeOfProvider)
+    {
+        $personCreated = null;
+
+        switch ($typeOfProvider) {
+            case $this->typesOfProvider[1]:
+                $personCreated = $this->createNaturalPerson($dataTypeOfProvider);
+                break;
+
+            case $this->typesOfProvider[2]:
+                $personCreated = $this->createJuridicPerson($dataTypeOfProvider);
+                break;
+        }
+
+        return $personCreated;
+    }
+
+    private function createNaturalPerson($dataNaturalPerson)
+    {
+        $naturalPersonCreated = NaturalPerson::create($dataNaturalPerson);
+
+        return $naturalPersonCreated;
+    }
+
+    private function createJuridicPerson($dataJuridicPerson)
+    {
+        $juridicPersonCreated = JuridicPerson::create($dataJuridicPerson);
+
+        return $juridicPersonCreated;
     }
 }

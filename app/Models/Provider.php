@@ -13,11 +13,20 @@ class Provider extends Model
 
     protected $primaryKey = 'idProvider';
 
-
     protected $fillable = [
         'name', 'email',  'streetAddress',
         'neighborhoodAddress', 'numberAddress',
         'phoneNumber', 'cellNumber', 'complementAddress'  
 
     ];
+
+    public function naturalPerson()
+    {
+        return $this->hasOne('App\Models\NaturalPerson', 'idProvider');
+    }
+
+    public function juridicPerson()
+    {
+        return $this->hasOne('App\Models\JuridicPerson', 'idProvider');
+    }
 }

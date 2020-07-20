@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 class Controller extends BaseController
@@ -63,7 +64,7 @@ class Controller extends BaseController
 
         $codeStatusResponse = ($exception->getCode() <= 0 ||
             $exception->getCode() > 600) ?
-            HttpStatusCodes::$ERRO_INTERNO_SERVIDOR :  $exception->getCode();
+            Response::HTTP_INTERNAL_SERVER_ERROR :  $exception->getCode();
 
         $this->codeStatusResponse =  $codeStatusResponse;
 

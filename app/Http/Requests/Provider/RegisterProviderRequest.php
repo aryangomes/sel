@@ -4,6 +4,7 @@ namespace App\Http\Requests\Provider;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RegisterProviderRequest extends FormRequest
 {
@@ -33,6 +34,8 @@ class RegisterProviderRequest extends FormRequest
             'phoneNumber' => 'string|max:30',
             'cellNumber' =>  'string|max:30',
             'complementAddress' =>  'string',
+            'cpf' => [Rule::requiredIf(!$this->has('cnpj')),'size:11'],
+            'cnpj' => [Rule::requiredIf(!$this->has('cpf')),'size:14'],
         ];
     }
 }
