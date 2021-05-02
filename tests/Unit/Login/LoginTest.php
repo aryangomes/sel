@@ -117,7 +117,7 @@ class LoginTest extends TestCase
             'Authorization',
             $userAdmin->getAuthorizationBearerHeader($accessToken)
         )
-            ->getJson($this->url . 'logout');
+            ->postJson($this->url . 'logout');
 
         $response->assertStatus(204);
     }
@@ -199,7 +199,7 @@ class LoginTest extends TestCase
             'Authorization',
             $userNotAdmin->getAuthorizationBearerHeader($accessToken)
         )
-            ->getJson($this->url . 'logout');
+            ->postJson($this->url . 'logout');
 
         $response->assertStatus(204);
     }

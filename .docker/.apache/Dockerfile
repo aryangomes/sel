@@ -81,7 +81,7 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.30.1/install.sh | b
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
-RUN echo 'alias phptest="./vendor/phpunit/phpunit/phpunit"' >> ~/.bashrc
+
 
 RUN apt-get update && apt-get install cron -y
 
@@ -95,6 +95,8 @@ RUN sudo service apache2 restart
 RUN useradd -G www-data,root -u $UID -d /home/$USUARIO $USUARIO
 RUN mkdir -p /home/$USUARIO/.composer && \
    chown -R $USUARIO:$USUARIO /home/$USUARIO
+
+RUN echo 'alias phptest="./vendor/phpunit/phpunit/phpunit"' >> ~/.bashrc   
 
 COPY docker-entrypoint.sh /
 
