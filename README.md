@@ -1,6 +1,6 @@
 # Introduction
 
-Bem vinda a Documentação do SEL.
+Welcome to SEL's Documentation .
 
 # Installation
 
@@ -91,3 +91,7 @@ Enter the command in the folder of your preference:
 
 -   Give read and write permission for mass storage ():  
      `chmod -R 775 storage/`
+
+# Changelog
+
+-   [Changelog](/CHANGELOG.MD)
