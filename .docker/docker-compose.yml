@@ -1,10 +1,12 @@
-version: '3'
+version: "3"
 
 services:
-  webserver-sel: 
+  apache:
     build:
+      args:
+        versao_php: 7.2
       context: ./.apache
-    container_name: apache-sel
+    container_name: sel-apache
     volumes:
       - ../.:/var/www/html
       - ./.apache/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
@@ -15,11 +17,11 @@ services:
     networks:
       - network-sel
     depends_on:
-      - db-sel   
-  
-  db-sel:
+      - db
+
+  db:
     image: mariadb:10.1.41
-    container_name: mariadb-sel
+    container_name: sel-mariadb
 
     ports:
       - "3306:3306"
@@ -29,8 +31,8 @@ services:
       MYSQL_USER: sel
       MYSQL_PASSWORD: sel4631
     networks:
-      - network-sel 
+      - network-sel
 
 networks:
   network-sel:
-    driver: bridge       
+    driver: bridge

@@ -1,8 +1,14 @@
 #!/bin/bash
+USUARIO=sel
+
+sudo -u $USUARIO /bin/bash
+
 service apache2 start
 
-/usr/sbin/cron -f
+sudo /usr/sbin/cron -f
 
-chown -R www-data storage/
 
+chown -R $USUARIO:www-data storage
+
+chown -R $USUARIO:www-data bootstrap/cache
 

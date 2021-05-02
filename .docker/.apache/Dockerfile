@@ -1,4 +1,9 @@
-FROM php:7.2-apache
+ARG versao_php
+
+FROM php:"$versao_php"-apache
+
+ENV USUARIO sel
+ENV UID 1000
 
 # replace shell with bash so we can source files
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
@@ -45,19 +50,19 @@ RUN docker-php-ext-install \
    mbstring \
    pdo_mysql \
    zip
-   
+
 
 # Instalação e configuração do XDebug
 RUN yes | pecl install xdebug \
-    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_handler=dbgp" >>  /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_port=9000" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_autostart=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_connect_back=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_log=/var/log/xdebug.log" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.default_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini
+   && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.remote_handler=dbgp" >>  /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.remote_port=9000" >> /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.remote_autostart=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.remote_connect_back=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.remote_log=/var/log/xdebug.log" >> /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.default_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 # composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -87,12 +92,18 @@ RUN  echo "* * * * * cd /var/www/html && sudo php artisan schedule:run >> /dev/n
 
 RUN sudo service apache2 restart
 
+RUN useradd -G www-data,root -u $UID -d /home/$USUARIO $USUARIO
+RUN mkdir -p /home/$USUARIO/.composer && \
+   chown -R $USUARIO:$USUARIO /home/$USUARIO
+
 COPY docker-entrypoint.sh /
+
+RUN ["chmod", "+x", "/docker-entrypoint.sh"]
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # ports
-EXPOSE 80 443
+EXPOSE 80 443 8042
 
 
 #REFS
