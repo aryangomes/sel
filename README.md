@@ -1,93 +1,93 @@
-# Introducao
+# Introduction
 
 Bem vinda a Documentação do SEL.
 
-# Instalacao
+# Installation
 
-## Pre-requisitos
+## Requirements
 
 -   Git
 -   Docker
 -   Docker-Composer
 
-## Download e Instalacao da Imagem do Docker
+## Download e Docker Image's Installation
 
-Entre com o comando na pasta de sua prefêrencia:
+Enter the command in the folder of your preference:
 
-1. Entre na sua pasta:  
-   `cd seu_diretorio/sua_pasta/`
+1. Enter yours project's folder:  
+   `cd your_directory/your_folder/`
 
-2. Faça o clone do repositório para a sua pasta (Digite a sua senha de acesso ao BitBucket quando for requisitado.):  
+2. Clone the repository to your folder (Enter your BitBucket password when prompted.):  
    `https://github.com/aryangomes/sel.git`
 
-3. Entre na pasta que foi criada:  
+3. Enter the folder that was created:  
    `cd sel`
 
-4. Construa a imagem do Docker:  
+4. Build the Docker image:  
    `docker-compose -p sel -f .docker/docker-compose.yml up -d --build`
 
-## Inciar Docker do Apache e do MariaDB(Mysql)
+## Start Apache and MariaDB Docker (Mysql)
 
 ### Apache
 
 -   `docker start sel-apache`
 
-### MariaDB(Banco de dados Mysql)
+### MariaDB (Mysql database)
 
 -   `docker start sel-mariadb`
 
-## Acessar o prompt do Apache
+## Access the Apache prompt
 
--   `docker exec -it sel-apache bash -c "/docker-entrypoint.sh"`
+-   `docker exec -it sel-apache bash -c"/docker-entrypoint.sh"`
 
-## Acessar o prompt do MariaDB(Banco de dados Mysql)
+## Access the MariaDB prompt (Mysql database)
 
 -   `docker exec -it sel-mariadb bash`
 
-## Instalar dependencias do Laravel
+## Install Laravel dependencies
 
-**Lembre-se de executar os seguintes comandos pelo prompt do Apache!**
+**Remember to run the following commands from the Apache prompt!**
 
-1. Crie o arquivo de variáveis de desenvolvimento do Laravel copiando ele de um examplo já pré definido:  
+1. Create the Laravel development variables file by copying it from a pre-defined example:  
    `cp .env.example .env`
 
-2. Instale as dependências do Laravel com o composer:  
-   `composer install`
+2. Install the Laravel facilities with the composer:  
+   composer install
 
-3. Gere a chave da aplicação local do Laravel:  
-   `php artisan key:generate`
+3. Generate the Laravel local application key:  
+   `php artisan key: generate`
 
-## Migrar/Gerar banco de dados
+## Migrate / Generate database
 
-**Copie e cole as seguintes variáveis no arquivo** **_.env_**
+**Copy and paste the following variables into the file** _.env_
 
-1. Copie e cole as configurações de variáveis do banco de dados:  
+1. Copy and paste according to the database variable settings:  
    `DB_CONNECTION=mysql`  
-    `DB_HOST=db`  
-    `DB_PORT=3306`  
-    `DB_DATABASE=sel`  
-    `DB_USERNAME=sel`  
-    `DB_PASSWORD=`
+   `DB_HOST=db-app-leilao-skysoft`  
+   `DB_PORT=3306`  
+   `DB_DATABASE=leilao_skysoft`  
+   `DB_USERNAME=skysoft`  
+   `DB_PASSWORD=localskysoft`
 
-2. Copie e cole as configurações de variáveis do padrão da senha dos usuários(as senhas padrões podem ser alteradas):  
-   `APP_URL=http://localhost:8042`
+2. Copy and paste as variable settings from the default password of users (how default passwords can be changed):  
+   `APP_URL = http://localhost:8042`
 
-3. Rode o comando para gerar o banco de dados com algumas informações já previamente criadas:  
+3. Run the command to generate the database with some information already prepared:  
    `php artisan migrate --seed`
 
-4. Instale o pacote Passport para a geração do token para a autenticação do Usuário:  
-   `php artisan passport:install`
+4. Install the Passport package for generating the token for User authentication:  
+   `php artisan passport: install`
 
-## Comandos Uteis
+## Useful Commands
 
--   Deletar e criar novamente o banco de dados:  
-     `php artisan migrate:fresh`
+-   Delete and re-create the database:  
+     `php artisan migrate: fresh`
 
--   Deletar e criar novamente o banco de dados, populando o banco com algumas informações previamente cadastradas:  
-     `php artisan migrate:fresh --seed`
+-   Delete and re-create the database, populating the bank with some previously registered information:  
+     `php artisan migrate --seed`
 
--   Popular o banco de dados com algumas informações previamente cadastradas:  
-     `php artisan db:seed`
+-   Populate the database with some previously registered information:  
+     `php artisan db: seed`
 
--   Dar permissão de escrita e leitura para a pasta storage():  
+-   Give read and write permission for mass storage ():  
      `chmod -R 775 storage/`
