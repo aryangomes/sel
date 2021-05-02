@@ -25,16 +25,16 @@ class UserUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'string',
-            'email' => 'email',
-            'streetAddress' => 'string',
-            'neighborhoodAddress' => 'string',
-            'numberAddress' => 'string',
-            'phoneNumber' => 'string',
-            'cellNumber' => 'string',
-            'complementAddress' => 'string',
-            'photo' => 'string',
-            'cpf' => 'size:14'
+            'name' => 'sometimes|string',
+            'email' => 'sometimes|email',
+            'streetAddress' => 'sometimes|string',
+            'neighborhoodAddress' => 'sometimes|string',
+            'numberAddress' => 'sometimes|string',
+            'phoneNumber' => 'sometimes|string',
+            'cellNumber' => 'sometimes|string',
+            'complementAddress' => 'sometimes|string',
+            'photo' => 'sometimes|string',
+            'cpf' => 'sometimes|size:14'
         ];
     }
 

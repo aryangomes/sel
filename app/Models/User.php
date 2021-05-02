@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Events\LogoutUserEvent;
 use App\Models\Utils\LogFormatter;
 use App\Traits\UuidPrimaryKey;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -39,7 +40,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 
+        'password',
         'remember_token',
     ];
 
@@ -100,11 +101,12 @@ class User extends Authenticatable
         try {
 
             $tokenAccess = Auth::guard('api')->user()->token();
-            Log::info(get_class($this),
-            [
-                'variavel'=>Auth::guard('api')->user(),
-                ' $tokenAccess'=> $tokenAccess,
-            ]
+            Log::info(
+                get_class($this),
+                [
+                    'variavel' => Auth::guard('api')->user(),
+                    ' $tokenAccess' => $tokenAccess,
+                ]
             );
             $tokenAccessWasRevoken = $tokenAccess->revoke();
         } catch (\Exception $exception) {
@@ -136,10 +138,28 @@ class User extends Authenticatable
         if ($userWasAuthenticated) {
 
             $userIsAdmin = Auth::guard('api')->user()->isAdmin;
-
         }
 
 
         return $userIsAdmin;
+    }
+
+
+    /**
+     * 
+     * @return Illuminate\Auth\Access\Response
+     */
+    static public function userMayToDoThisAction()
+    {
+        return (self::userIsAdmin()) ? Response::allow() : Response::deny('User should Administrator to do this action.');
+    }
+
+    /**
+     * 
+     * @return Illuminate\Auth\Access\Response
+     */
+    public function mayToDoThisAction()
+    {
+        return ($this->isAdmin) ? Response::allow() : Response::deny('User should Administrator to do this action.');
     }
 }

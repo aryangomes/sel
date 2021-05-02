@@ -9,6 +9,8 @@ use App\Http\Requests\Login\LoginUserAdministrator;
 use App\Http\Requests\Login\LoginUserAdministratorRequest;
 use App\Http\Requests\Login\LoginUserNotAdministratorRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Resources\User\UserLoginUserAdminResource;
+use App\Http\Resources\User\UserLoginUserNotAdminResource;
 use App\Listeners\LoginUserAdministratorListener;
 use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -32,6 +34,7 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
     private $user;
+    private $userResource;
     private $userWasAuthenticated;
     private $userWasFound;
     private $userTokenAccess;
@@ -75,6 +78,8 @@ class LoginController extends Controller
                 $this->userTokenAccess = $this->authenticateUser();
 
                 $this->userWasAuthenticated = isset($this->userTokenAccess);
+
+                $this->userResource = new UserLoginUserAdminResource($this->user);
             }
         }
 
@@ -102,6 +107,7 @@ class LoginController extends Controller
                 $this->userTokenAccess = $this->authenticateUser();
 
                 $this->userWasAuthenticated = isset($this->userTokenAccess);
+                $this->userResource = new UserLoginUserNotAdminResource($this->user);
             }
         }
 
@@ -149,6 +155,7 @@ class LoginController extends Controller
                 $credential
             )->first();
 
+
             $userWasFound = (isset($this->user));
         } catch (\Exception $exception) {
             $this->logErrorFromException($exception);
@@ -177,7 +184,7 @@ class LoginController extends Controller
     private function setResponseAuthentication()
     {
         if ($this->userWasAuthenticated) {
-            $successResponse['user'] = $this->user;
+            $successResponse['user'] = $this->userResource;
             $successResponse['token'] = $this->userTokenAccess;
 
 

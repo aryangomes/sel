@@ -25,14 +25,14 @@ class UserRegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
+            'name' => 'required|max:200',
             'email' => 'email',
             'password' => 'confirmed|min:8',
-            'streetAddress' => 'string',
-            'neighborhoodAddress' => 'string',
-            'numberAddress' => 'string',
-            'phoneNumber' => 'string',
-            'cellNumber' => 'string',
+            'streetAddress' => 'string|max:200',
+            'neighborhoodAddress' => 'string|max:200',
+            'numberAddress' => 'string|max:30',
+            'phoneNumber' => 'string|max:30',
+            'cellNumber' => 'string|max:30',
             'complementAddress' => 'string',
             'photo' => 'string',
             'cpf' => 'required|size:11'

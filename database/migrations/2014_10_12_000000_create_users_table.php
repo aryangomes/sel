@@ -15,12 +15,12 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
-            $table->string('streetAddress');
-            $table->string('neighborhoodAddress');
-            $table->string('numberAddress');
-            $table->string('phoneNumber')->nullable();
-            $table->string('cellNumber')->nullable();
+            $table->string('name',200);
+            $table->string('streetAddress',200);
+            $table->string('neighborhoodAddress',200);
+            $table->string('numberAddress',30);
+            $table->string('phoneNumber',30)->nullable();
+            $table->string('cellNumber',30)->nullable();
             $table->string('complementAddress')->nullable();
             $table->string('cpf',11);
             $table->boolean('isAdmin')->default(0);

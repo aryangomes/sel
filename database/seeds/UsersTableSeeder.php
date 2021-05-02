@@ -14,22 +14,33 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-       /*  DB::table('users')->insert([
-            'id' => Str::uuid(),
-            'name' => 'admin',
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('123456'),
-        ]); */
 
-        $user =factory(User::class)->make(
+
+        $userAdmin = factory(User::class)->make(
             [
                 'email' => 'admin@email.com',
-                'isAdmin' =>1,
+                'isAdmin' => 1,
             ]
         )->toArray();
 
-        $user['password']=bcrypt('12345678');
-        DB::table('users')->insert($user);
+        $userNotAdmin
+            = factory(User::class)->make(
+                [
+                    'email' => 'user@email.com',
+                    'isAdmin' => 0,
+                ]
+            )->toArray();
 
+        $userAdmin['password'] = bcrypt(env('DEFAULT_PASSWORD_ADMIN'));
+        $userNotAdmin['password'] = bcrypt(env('DEFAULT_PASSWORD_ADMIN'));
+
+
+        $this->insertUserDatabase($userAdmin);
+        $this->insertUserDatabase($userNotAdmin);
+    }
+
+    private function insertUserDatabase($user)
+    {
+        DB::table('users')->insert($user);
     }
 }

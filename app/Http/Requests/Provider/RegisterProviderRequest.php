@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Lender;
+namespace App\Http\Requests\Provider;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class LenderRegisterRequest extends FormRequest
+class RegisterProviderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,22 +31,11 @@ class LenderRegisterRequest extends FormRequest
             'streetAddress' => 'required|string|max:200',
             'neighborhoodAddress' => 'required|string|max:200',
             'numberAddress' =>'required|string|max:20',
-            'cellNumber' =>  'string|max:30',
             'phoneNumber' => 'string|max:30',
+            'cellNumber' =>  'string|max:30',
             'complementAddress' =>  'string',
-            'site' =>  'url',
-        ];
-    }
-
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array
-     */
-    public function attributes()
-    {
-        return [
-            // 
+            'cpf' => [Rule::requiredIf(!$this->has('cnpj')),'size:11'],
+            'cnpj' => [Rule::requiredIf(!$this->has('cpf')),'size:14'],
         ];
     }
 }
