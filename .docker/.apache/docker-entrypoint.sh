@@ -9,7 +9,5 @@ sudo /usr/sbin/cron -f
 
 alias phptest="./vendor/phpunit/phpunit/phpunit"
 
-chown -R $USUARIO:www-data storage
-
-chown -R $USUARIO:www-data bootstrap/cache
+chmod -R 775 storage/logs
 

@@ -30,5 +30,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::resource('/provider', 'Api\v1\ProviderController');
 
+    Route::resource('/acquisitionType', 'Api\v1\AcquisitionTypeController');
+
     Route::post('/logout', 'Api\v1\Auth\LoginController@logout');
 });
