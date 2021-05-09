@@ -14,7 +14,7 @@ class AcquisitionType extends Model
      *
      * @var string
      */
-    protected $table = 'acquisition_type';
+    protected $table = 'acquisition_types';
 
     /**
      * The primary key associated with the table.

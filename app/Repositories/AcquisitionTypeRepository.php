@@ -22,7 +22,7 @@ class AcquisitionTypeRepository  extends ModelRepository implements AcquisitionT
     }
 
     /**
-     * @param $id
+     * 
      * @return ResourceCollection
      */
     public function getResourceCollectionModel()
