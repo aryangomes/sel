@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Interfaces;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * Interface RepositoryEloquentInterface
  * @package App\Repositories
@@ -17,13 +19,13 @@ interface RepositoryEloquentInterface
     public function create(array $attributes);
 
     /**
-     * @param $id
+     * @param Model $model
      * @return void
      */
-    public function delete($id);
+    public function delete(Model $model);
 
     /**
-     * @param $id
+     * @param mixed $id
      * @return Model
      */
     public function findById($id);
@@ -35,9 +37,22 @@ interface RepositoryEloquentInterface
     public function findAll();
 
     /**
-     * @param  $id
+     * @param  Model $model
      * @param array $attributes
      * @return Model
      */
-    public function update($id, array $attributes);
+    public function update(array $attributes, Model $model);
+
+
+    /**
+     * @param $id
+     * @return Resource
+     */
+    public function getResourceModel($id);
+
+    /**
+     * @param mixed $id
+     * @return ResourceCollection
+     */
+    public function getResourceCollectionModel();
 }

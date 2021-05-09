@@ -31,7 +31,7 @@ class Controller extends BaseController
     protected function setSuccessResponse(
         $successContent = 'Request Processed',
         $keySuccessContent = 'success',
-        $codeStatusSuccessResponse = 200
+        $codeStatusSuccessResponse = Response::HTTP_OK
     ) {
         $this->codeStatusResponse =  $codeStatusSuccessResponse;
 
@@ -42,7 +42,7 @@ class Controller extends BaseController
     protected function setErrorResponse(
         $errorContent = 'Request Not Processed.',
         $keyErrorContent = 'errors',
-        $codeStatusErrorResponse = 400
+        $codeStatusErrorResponse =  Response::HTTP_BAD_REQUEST
     ) {
         $this->codeStatusResponse =  $codeStatusErrorResponse;
 

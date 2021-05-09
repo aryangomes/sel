@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\AcquisitionType;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
-class AcquisitionTypeRequest extends FormRequest
+class RegisterAcquisitionTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +14,7 @@ class AcquisitionTypeRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return User::userMayToDoThisAction();
     }
 
     /**
@@ -24,7 +25,7 @@ class AcquisitionTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'type' => 'required|max:60'
         ];
     }
 }

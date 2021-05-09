@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AcquisitionType\RegisterAcquisitionTypeRequest;
+use App\Http\Requests\AcquisitionType\UpdateAcquisitionTypeRequest;
 use App\Models\AcquisitionType;
 use App\Repositories\Interfaces\AcquisitionTypeRepositoryInterface;
-use App\Repositories\AcquisitionTypeRepository;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class AcquisitionTypeController extends Controller
 {
 
     private $acquisitionTypeRepository;
 
-    public function __construct(AcquisitionTypeRepository $acquisitionTypeRepository)
+    public function __construct(AcquisitionTypeRepositoryInterface $acquisitionTypeRepository)
     {
         $this->acquisitionTypeRepository = $acquisitionTypeRepository;
     }
@@ -25,8 +28,16 @@ class AcquisitionTypeController extends Controller
      */
     public function index()
     {
-        $acquisitionTypes = $this->acquisitionTypeRepository->findAll();
-        return $acquisitionTypes;
+        try {
+            $acquisitionTypes = $this->acquisitionTypeRepository->getResourceCollectionModel();
+
+            $this->setSuccessResponse($acquisitionTypes);
+        } catch (\Exception $exception) {
+            $this->logErrorFromException($exception);
+            $this->setErrorResponse();
+        }
+
+        return $this->responseWithJson();
     }
 
     /**
@@ -45,10 +56,37 @@ class AcquisitionTypeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(RegisterAcquisitionTypeRequest $request)
     {
-        $acquisitionTypes = $this->acquisitionTypeRepository->create($request->all());
-        return $acquisitionTypes;
+        $this->authorize('create', new AcquisitionType());
+        $acquisitionTypeWasCreated = false;
+
+
+        try {
+            $acquisitionTypeCreated = $this->acquisitionTypeRepository->create($request->all());
+
+            $acquisitionTypeWasCreated = isset($acquisitionTypeCreated);
+        } catch (\Exception $exception) {
+            $this->logErrorFromException($exception);
+        }
+
+        if ($acquisitionTypeWasCreated) {
+
+            DB::commit();
+
+            $acquisitionTypeCreated =
+                $this->acquisitionTypeRepository->getResourceModel($acquisitionTypeCreated);
+
+            $this->setSuccessResponse($acquisitionTypeCreated, 'acquisitionType', Response::HTTP_CREATED);
+        } else {
+
+            DB::rollBack();
+
+            $this->setErrorResponse('Acquisition Type create failed!', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+
+        return $this->responseWithJson();
     }
 
     /**
@@ -80,9 +118,39 @@ class AcquisitionTypeController extends Controller
      * @param  \App\Models\AcquisitionType  $acquisitionType
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, AcquisitionType $acquisitionType)
+    public function update(UpdateAcquisitionTypeRequest $request, AcquisitionType $acquisitionType)
     {
-        //
+        $this->authorize('update', $acquisitionType);
+
+        $acquisitionTypeWasUpdated = false;
+
+        $requestValidated = $request->validated();
+
+        try {
+
+            DB::beginTransaction();
+
+            $acquisitionTypeWasUpdated = $this->acquisitionTypeRepository->update($requestValidated, $acquisitionType);
+        } catch (\Exception $exception) {
+            $this->logErrorFromException($exception);
+        }
+
+        if ($acquisitionTypeWasUpdated) {
+
+            DB::commit();
+
+            $acquisitionTypeUpdated =
+                $this->acquisitionTypeRepository->getResourceModel($acquisitionType);
+
+            $this->setSuccessResponse($acquisitionTypeUpdated, 'acquisitionType', Response::HTTP_OK);
+        } else {
+
+            DB::rollBack();
+
+            $this->setErrorResponse('Acquisition Type update failed!', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return $this->responseWithJson();
     }
 
     /**
@@ -93,6 +161,30 @@ class AcquisitionTypeController extends Controller
      */
     public function destroy(AcquisitionType $acquisitionType)
     {
-        //
+        $this->authorize('delete', $acquisitionType);
+
+        $acquisitionTypeWasDeleted = false;
+        try {
+
+            DB::beginTransaction();
+
+            $acquisitionTypeWasDeleted = $this->acquisitionTypeRepository->delete($acquisitionType);
+        } catch (\Exception $exception) {
+            $this->logErrorFromException($exception);
+        }
+
+        if ($acquisitionTypeWasDeleted) {
+
+            DB::commit();
+
+            $this->setSuccessResponse('Acquisition Type deleted successfully!');
+        } else {
+
+            DB::rollBack();
+
+            $this->setErrorResponse('Acquisition Type deleted failed!', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return $this->responseWithJson();
     }
 }

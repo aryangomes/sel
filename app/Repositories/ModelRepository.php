@@ -3,8 +3,10 @@
 namespace App\Repositories;
 
 use App\Repositories\Interfaces\RepositoryEloquentInterface as InterfacesRepositoryEloquentInterface;
-use App\Repositories\RepositoryEloquentInterface;
+
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ModelRepository implements InterfacesRepositoryEloquentInterface
 {
@@ -31,13 +33,12 @@ class ModelRepository implements InterfacesRepositoryEloquentInterface
     }
 
     /**
-     * @param $id
-     * @return Model
+     * @param Model $model
+     * @return void
      */
-    public function delete($id)
+    public function delete($model)
     {
-        $modelForDelete = $this->model->findById($id);
-        return $modelForDelete->delete();
+        return $model->delete();
     }
 
     /**
@@ -46,7 +47,7 @@ class ModelRepository implements InterfacesRepositoryEloquentInterface
      */
     public function findById($id)
     {
-        $this->model->find($id);
+        return $this->model->find($id);
     }
 
     /**
@@ -59,13 +60,32 @@ class ModelRepository implements InterfacesRepositoryEloquentInterface
     }
 
     /**
-     * @param  $id
-     * @param array $attributes
+     * @param Model $model
+     * @param array $attributesForUpdate
      * @return Model
      */
-    public function update($id, array $attributesForUpdate)
+    public function update(array $attributesForUpdate, Model $model)
     {
-        $modelForUpdate = $this->model->findById($id);
-        return $modelForUpdate->update($attributesForUpdate);
+
+        return $model->update($attributesForUpdate);
+    }
+
+
+    /**
+     * @param Model $model
+     * @return Resource
+     */
+    public function getResourceModel($model)
+    {
+        return new Resource($model);
+    }
+
+    /**
+     * @param $id
+     * @return ResourceCollection
+     */
+    public function getResourceCollectionModel()
+    {
+        return new ResourceCollection($this->model->all());
     }
 }

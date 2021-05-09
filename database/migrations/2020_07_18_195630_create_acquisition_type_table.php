@@ -15,8 +15,9 @@ class CreateAcquisitionTypeTable extends Migration
     {
         Schema::create('acquisition_type', function (Blueprint $table) {
             $table->bigIncrements('idAcquisitionType');
-            $table->string('type',60);
+            $table->string('type', 60);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
