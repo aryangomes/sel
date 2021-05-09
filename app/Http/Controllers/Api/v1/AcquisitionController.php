@@ -14,7 +14,7 @@ class AcquisitionController extends Controller
      */
     public function index()
     {
-        //
+        return 200;
     }
 
     /**
