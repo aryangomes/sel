@@ -92,11 +92,16 @@ RUN  echo "* * * * * cd /var/www/html && sudo php artisan schedule:run >> /dev/n
 
 RUN sudo service apache2 restart
 
+
+
 RUN useradd -G www-data,root -u $UID -d /home/$USUARIO $USUARIO
 RUN mkdir -p /home/$USUARIO/.composer && \
    chown -R $USUARIO:$USUARIO /home/$USUARIO
 
-RUN echo 'alias phptest="./vendor/phpunit/phpunit/phpunit"' >> ~/.bashrc   
+
+RUN touch /home/$USUARIO/.bashrc
+
+RUN echo alias phpunit="./vendor/phpunit/phpunit/phpunit" >> /home/$USUARIO/.bashrc
 
 COPY docker-entrypoint.sh /
 
