@@ -14,14 +14,13 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected $codeStatusResponse = 200;
+    protected $codeStatusResponse = Response::HTTP_OK;
 
-    protected $keyErrorContent = 'errors';
+    const KEY_ERROR_CONTENT = 'errors';
 
-    protected $keySuccessContent = 'success';
+    const KEY_SUCCESS_CONTENT = 'success';
 
     protected $requestResponse = [];
-
 
     protected function responseWithJson()
     {
@@ -30,7 +29,7 @@ class Controller extends BaseController
 
     protected function setSuccessResponse(
         $successContent = 'Request Processed',
-        $keySuccessContent = 'success',
+        $keySuccessContent = Controller::KEY_SUCCESS_CONTENT,
         $codeStatusSuccessResponse = Response::HTTP_OK
     ) {
         $this->codeStatusResponse =  $codeStatusSuccessResponse;
@@ -41,7 +40,7 @@ class Controller extends BaseController
 
     protected function setErrorResponse(
         $errorContent = 'Request Not Processed.',
-        $keyErrorContent = 'errors',
+        $keyErrorContent = Controller::KEY_ERROR_CONTENT,
         $codeStatusErrorResponse =  Response::HTTP_BAD_REQUEST
     ) {
         $this->codeStatusResponse =  $codeStatusErrorResponse;

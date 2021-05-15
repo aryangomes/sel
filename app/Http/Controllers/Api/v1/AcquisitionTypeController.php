@@ -14,11 +14,16 @@ use Illuminate\Support\Facades\DB;
 class AcquisitionTypeController extends Controller
 {
 
+    private $acquisitionType;
+
     private $acquisitionTypeRepository;
 
-    public function __construct(AcquisitionTypeRepositoryInterface $acquisitionTypeRepository)
-    {
+    public function __construct(
+        AcquisitionTypeRepositoryInterface $acquisitionTypeRepository,
+        AcquisitionType $acquisitionType
+    ) {
         $this->acquisitionTypeRepository = $acquisitionTypeRepository;
+        $this->acquisitionType = $acquisitionType;
     }
 
     /**
@@ -28,12 +33,13 @@ class AcquisitionTypeController extends Controller
      */
     public function index()
     {
-        try {
-            $acquisitionTypes = $this->acquisitionTypeRepository->getResourceCollectionModel();
+        $this->acquisitionTypeRepository->getResourceCollectionModel();
 
-            $this->setSuccessResponse($acquisitionTypes);
-        } catch (\Exception $exception) {
-            $this->logErrorFromException($exception);
+        if ($this->acquisitionTypeRepository->transactionIsSuccessfully) {
+
+            $this->setSuccessResponse($this->acquisitionTypeRepository->responseFromTransaction);
+        } else {
+            $this->logErrorFromException($this->acquisitionTypeRepository->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -58,33 +64,23 @@ class AcquisitionTypeController extends Controller
      */
     public function store(RegisterAcquisitionTypeRequest $request)
     {
-        $this->authorize('create', new AcquisitionType());
-        $acquisitionTypeWasCreated = false;
+        $this->authorize('create', $this->acquisitionType);
 
+        $requestValidated = $request->validated();
 
-        try {
-            $acquisitionTypeCreated = $this->acquisitionTypeRepository->create($request->all());
+        $this->acquisitionTypeRepository->create($requestValidated);
 
-            $acquisitionTypeWasCreated = isset($acquisitionTypeCreated);
-        } catch (\Exception $exception) {
-            $this->logErrorFromException($exception);
-        }
-
-        if ($acquisitionTypeWasCreated) {
-
-            DB::commit();
-
+        if ($this->acquisitionTypeRepository->transactionIsSuccessfully) {
             $acquisitionTypeCreated =
-                $this->acquisitionTypeRepository->getResourceModel($acquisitionTypeCreated);
+                $this->acquisitionTypeRepository->getResourceModel($this->acquisitionTypeRepository->responseFromTransaction);
 
             $this->setSuccessResponse($acquisitionTypeCreated, 'acquisitionType', Response::HTTP_CREATED);
         } else {
-
-            DB::rollBack();
-
-            $this->setErrorResponse('Acquisition Type create failed!', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+            $this->setErrorResponse(__(
+                'httpResponses.created.error',
+                ['resource' => $this->acquisitionTypeRepository->resourceName]
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
 
         return $this->responseWithJson();
     }
@@ -120,34 +116,25 @@ class AcquisitionTypeController extends Controller
      */
     public function update(UpdateAcquisitionTypeRequest $request, AcquisitionType $acquisitionType)
     {
-        $this->authorize('update', $acquisitionType);
+        $this->acquisitionType = $acquisitionType;
 
-        $acquisitionTypeWasUpdated = false;
+        $this->authorize('update',  $this->acquisitionType);
 
         $requestValidated = $request->validated();
 
-        try {
+        $this->acquisitionTypeRepository->update($requestValidated, $this->acquisitionType);
 
-            DB::beginTransaction();
-
-            $acquisitionTypeWasUpdated = $this->acquisitionTypeRepository->update($requestValidated, $acquisitionType);
-        } catch (\Exception $exception) {
-            $this->logErrorFromException($exception);
-        }
-
-        if ($acquisitionTypeWasUpdated) {
-
-            DB::commit();
+        if ($this->acquisitionTypeRepository->transactionIsSuccessfully) {
 
             $acquisitionTypeUpdated =
-                $this->acquisitionTypeRepository->getResourceModel($acquisitionType);
+                $this->acquisitionTypeRepository->getResourceModel($this->acquisitionType);
 
             $this->setSuccessResponse($acquisitionTypeUpdated, 'acquisitionType', Response::HTTP_OK);
         } else {
-
-            DB::rollBack();
-
-            $this->setErrorResponse('Acquisition Type update failed!', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+            $this->setErrorResponse(__(
+                'httpResponses.updated.error',
+                ['resource' => $this->acquisitionTypeRepository->resourceName]
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
@@ -161,28 +148,28 @@ class AcquisitionTypeController extends Controller
      */
     public function destroy(AcquisitionType $acquisitionType)
     {
-        $this->authorize('delete', $acquisitionType);
+        $this->acquisitionType = $acquisitionType;
 
-        $acquisitionTypeWasDeleted = false;
-        try {
+        $this->authorize('delete',  $this->acquisitionType);
 
-            DB::beginTransaction();
+        $this->acquisitionTypeRepository->delete($this->acquisitionType);
 
-            $acquisitionTypeWasDeleted = $this->acquisitionTypeRepository->delete($acquisitionType);
-        } catch (\Exception $exception) {
-            $this->logErrorFromException($exception);
-        }
+        if ($this->acquisitionTypeRepository->transactionIsSuccessfully) {
 
-        if ($acquisitionTypeWasDeleted) {
 
-            DB::commit();
-
-            $this->setSuccessResponse('Acquisition Type deleted successfully!');
+            $this->setSuccessResponse(
+                __(
+                    'httpResponses.deleted.success',
+                    ['resource' => $this->acquisitionTypeRepository->resourceName]
+                ),
+                Controller::KEY_SUCCESS_CONTENT,
+                Response::HTTP_OK
+            );
         } else {
-
-            DB::rollBack();
-
-            $this->setErrorResponse('Acquisition Type deleted failed!', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+            $this->setErrorResponse(__(
+                'httpResponses.deleted.error',
+                $this->acquisitionTypeRepository->resourceName
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();

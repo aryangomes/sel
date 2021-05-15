@@ -3,19 +3,38 @@
 namespace App\Repositories;
 
 use App\Repositories\Interfaces\RepositoryEloquentInterface as InterfacesRepositoryEloquentInterface;
-
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class ModelRepository implements InterfacesRepositoryEloquentInterface
 {
 
     /** 
      * @var Model $model Base Model of Repository 
-     * 
      */
     protected $model;
+
+    /** @var Type $resourceName Name of resource */
+    public $resourceName;
+
+    /** 
+     * @var mixed $responseFromTransaction 
+     */
+    public $responseFromTransaction;
+
+
+    /** 
+     * @var Exception $exceptionFromTransaction
+     */
+    public $exceptionFromTransaction;
+
+    /** 
+     * @var boolean $transactionIsSuccessfully
+     */
+    public $transactionIsSuccessfully;
 
 
     public function __construct(Model $model)
@@ -29,7 +48,19 @@ class ModelRepository implements InterfacesRepositoryEloquentInterface
      */
     public function create(array $attributes)
     {
-        return $this->model->create($attributes);
+        $this->transactionIsSuccessfully = true;
+
+        DB::beginTransaction();
+
+        try {
+
+            $this->responseFromTransaction = $this->model->create($attributes);
+
+            DB::commit();
+        } catch (\Exception $exception) {
+
+            $this->setTransactionExceptionResponse($exception);
+        }
     }
 
     /**
@@ -38,7 +69,19 @@ class ModelRepository implements InterfacesRepositoryEloquentInterface
      */
     public function delete($model)
     {
-        return $model->delete();
+        $this->transactionIsSuccessfully = true;
+
+        DB::beginTransaction();
+
+        try {
+
+            $this->responseFromTransaction = $model->delete();
+
+            DB::commit();
+        } catch (\Exception $exception) {
+
+            $this->setTransactionExceptionResponse($exception);
+        }
     }
 
     /**
@@ -47,16 +90,32 @@ class ModelRepository implements InterfacesRepositoryEloquentInterface
      */
     public function findById($id)
     {
-        return $this->model->find($id);
+        $this->transactionIsSuccessfully = true;
+
+        try {
+
+            $this->responseFromTransaction = $this->model->find($id);
+        } catch (\Exception $exception) {
+
+            $this->setTransactionExceptionResponse($exception);
+        }
     }
 
     /**
      * 
-     * @return Collection 
+     *  
      */
     public function findAll()
     {
-        return $this->model->all();
+        $this->transactionIsSuccessfully = true;
+
+        try {
+
+            $this->responseFromTransaction = $this->model->all();
+        } catch (\Exception $exception) {
+
+            $this->setTransactionExceptionResponse($exception);
+        }
     }
 
     /**
@@ -67,7 +126,19 @@ class ModelRepository implements InterfacesRepositoryEloquentInterface
     public function update(array $attributesForUpdate, Model $model)
     {
 
-        return $model->update($attributesForUpdate);
+        $this->transactionIsSuccessfully = true;
+
+        DB::beginTransaction();
+
+        try {
+
+            $this->responseFromTransaction = $model->update($attributesForUpdate);
+
+            DB::commit();
+        } catch (\Exception $exception) {
+
+            $this->setTransactionExceptionResponse($exception);
+        }
     }
 
 
@@ -86,6 +157,24 @@ class ModelRepository implements InterfacesRepositoryEloquentInterface
      */
     public function getResourceCollectionModel()
     {
-        return new ResourceCollection($this->model->all());
+
+        $this->transactionIsSuccessfully = true;
+
+        try {
+
+            $this->responseFromTransaction = new ResourceCollection($this->model->all());
+        } catch (\Exception $exception) {
+
+            $this->setTransactionExceptionResponse($exception);
+        }
+    }
+
+    protected function setTransactionExceptionResponse(Exception $exception)
+    {
+        $this->transactionIsSuccessfully = false;
+
+        DB::rollBack();
+
+        $this->exceptionFromTransaction = $exception;
     }
 }
