@@ -12,7 +12,7 @@ class CreateRepositoryEloquentInterface extends Command
      *
      * @var string
      */
-    protected $signature = 'make:repositoryEloquentInterface';
+    protected $signature = 'make:repositoryEloquentInterface {--resource}';
 
     /**
      * The console command description.
@@ -22,7 +22,7 @@ class CreateRepositoryEloquentInterface extends Command
     protected $description = 'Command description';
 
     /** @var String $interfaceRepositoryName interfaceRepositoryName */
-    private $interfaceRepositoryName;
+    public $interfaceRepositoryName;
 
     /** @var String $classModelName classModelName */
     private $classModelName;
@@ -30,8 +30,8 @@ class CreateRepositoryEloquentInterface extends Command
     /** @var Filesystem $filesystem filesystem */
     private $filesystem;
 
-    /** @var String $interfaceRepositoryName interfaceRepositoryName */
-    private static $pathRepositories = './app/Repositories/Interfaces';
+    /** @var String $pathRepositories pathRepositories */
+    public static $pathRepositories = './app/Repositories/Interfaces';
 
     /** @var Boolean $createRepositoryEloquentInterfaceWasSuccessfully createRepositoryEloquentInterfaceWasSuccessfully */
     private  $createRepositoryEloquentInterfaceWasSuccessfully;
@@ -62,7 +62,7 @@ class CreateRepositoryEloquentInterface extends Command
      */
     public function handle()
     {
-        $this->createResourceMethods = isset($this->option('resource'));
+        $this->createResourceMethods = ($this->option('resource') != null);
 
         $this->makeDirectoryRepositories();
 
@@ -121,7 +121,7 @@ class CreateRepositoryEloquentInterface extends Command
             "\tpublic function update(array \$attributes, Model \$model);",
             "\n",
 
-            "}\n",
+
         ];
 
         $lineGetResourceModel = [
@@ -142,6 +142,15 @@ class CreateRepositoryEloquentInterface extends Command
             "\n",
         ];
 
+        if ($this->createResourceMethods) {
+
+            $linesBodyContentClass = array_merge(
+                $linesBodyContentClass,
+                $lineGetResourceModel,
+                $lineGetResourceCollectionModel
+            );
+        }
+        array_push($linesBodyContentClass, "}\n");
 
         $linesContentClass = array_merge($linesHeaderContentClass, $linesBodyContentClass);
 
@@ -183,7 +192,9 @@ class CreateRepositoryEloquentInterface extends Command
                 $this->logErrorFromException($exception);
             }
         } else {
-            $this->warn("Interface already exists!");
+            $this->warn(__('files.alreadyExists', [
+                'file' => $this->interfaceRepositoryName
+            ]));
         }
     }
 
@@ -201,14 +212,13 @@ class CreateRepositoryEloquentInterface extends Command
 
     private function resultOfCommand()
     {
-        $resultOfCommand = "Not was possible create the Interface";
 
         if ($this->createRepositoryEloquentInterfaceWasSuccessfully) {
 
-            $resultOfCommand = "Interface was created successfully!";
+            $resultOfCommand = __('files.createdSuccessfully', [
+                'file' => $this->interfaceRepositoryName
+            ]);
             $this->info($resultOfCommand);
-        } else {
-            $this->error($resultOfCommand);
         }
     }
 }

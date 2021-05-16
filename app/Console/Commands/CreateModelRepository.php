@@ -22,7 +22,7 @@ class CreateModelRepository extends Command
     protected $description = 'Command description';
 
     /** @var String $classRepositoryName classRepositoryName */
-    private $classRepositoryName;
+    public $classRepositoryName;
 
     /** @var String $classModelName classModelName */
     private $classModelName;
@@ -36,7 +36,8 @@ class CreateModelRepository extends Command
     /** @var Boolean $createModelRepositoryWasSuccessfully createModelRepositoryWasSuccessfully */
     private  $createModelRepositoryWasSuccessfully;
 
-
+    /** @var Boolean $createResourceMethods createResourceMethods */
+    private  $createResourceMethods;
 
     /**
      * Create a new command instance.
@@ -61,7 +62,16 @@ class CreateModelRepository extends Command
      */
     public function handle()
     {
+        $this->createResourceMethods = ($this->option('resource') != null);
 
+        if (!$this->repositoryEloquentInterfaceFileExists()) {
+            $createRepositoryEloquentInterfaceCommand = "make:repositoryEloquentInterface";
+            if ($this->createResourceMethods) {
+                $createRepositoryEloquentInterfaceCommand .= " --{resource}";
+            }
+
+            $this->call($createRepositoryEloquentInterfaceCommand);
+        }
 
 
         $this->makeDirectoryRepositories();
@@ -105,6 +115,8 @@ class CreateModelRepository extends Command
         ];
 
 
+
+
         $linesContentClass = array_merge($linesHeaderContentClass, $linesBodyContentClass);
 
         $classContent = "";
@@ -145,7 +157,9 @@ class CreateModelRepository extends Command
                 $this->logErrorFromException($exception);
             }
         } else {
-            $this->warn("Class already exists!");
+            $this->warn(__('files.alreadyExists', [
+                'file' => $this->classRepositoryName
+            ]));
         }
     }
 
@@ -163,14 +177,28 @@ class CreateModelRepository extends Command
 
     private function resultOfCommand()
     {
-        $resultOfCommand = "Not was possible create the Class Model Repository";
 
         if ($this->createModelRepositoryWasSuccessfully) {
 
-            $resultOfCommand = "Class Model Repository was created successfully!";
+            $resultOfCommand = __('files.createdSuccessfully', [
+                'file' => $this->classRepositoryName
+            ]);
             $this->info($resultOfCommand);
-        } else {
-            $this->error($resultOfCommand);
         }
+    }
+
+    private function repositoryEloquentInterfaceFileExists()
+    {
+        $createRepositoryEloquentInterface =
+            new CreateRepositoryEloquentInterface($this->filesystem);
+
+        $repositoryEloquentInterfacePath = $createRepositoryEloquentInterface::$pathRepositories;
+
+        $repositoryEloquentInterfaceFile =
+            "{$repositoryEloquentInterfacePath}/{$createRepositoryEloquentInterface->interfaceRepositoryName}";
+
+        $repositoryEloquentInterfaceFileExists = $this->filesystem->exists($repositoryEloquentInterfaceFile);
+
+        return $repositoryEloquentInterfaceFileExists;
     }
 }
