@@ -45,13 +45,13 @@ interface RepositoryEloquentInterface
 
 
     /**
-     * @param $id
+     * @param Model $model
      * @return Resource
      */
-    public function getResourceModel($id);
+    public function getResourceModel(Model $model);
 
     /**
-     * @param mixed $id
+     * 
      * @return ResourceCollection
      */
     public function getResourceCollectionModel();

@@ -5,21 +5,21 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class CreateRepository extends Command
+class CreateModelRepository extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'make:repository {classRepositoryName} {--model=}';
+    protected $signature = 'make:modelRepository {--resource}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a Repository';
+    protected $description = 'Command description';
 
     /** @var String $classRepositoryName classRepositoryName */
     private $classRepositoryName;
@@ -33,10 +33,9 @@ class CreateRepository extends Command
     /** @var String $classRepositoryName classRepositoryName */
     private static $pathRepositories = './app/Repositories';
 
-    private static $pathModels = './app/Models';
+    /** @var Boolean $createModelRepositoryWasSuccessfully createModelRepositoryWasSuccessfully */
+    private  $createModelRepositoryWasSuccessfully;
 
-    /** @var Boolean $createRepositoryWasSuccessfully createRepositoryWasSuccessfully */
-    private  $createRepositoryWasSuccessfully;
 
 
     /**
@@ -46,9 +45,12 @@ class CreateRepository extends Command
      */
     public function __construct(Filesystem $filesystem)
     {
+        $this->createModelRepositoryWasSuccessfully = false;
 
-        $this->createRepositoryWasSuccessfully = false;
         $this->filesystem = $filesystem;
+
+        $this->classRepositoryName = 'ModelRepositoryTeste';
+
         parent::__construct();
     }
 
@@ -59,9 +61,8 @@ class CreateRepository extends Command
      */
     public function handle()
     {
-        $this->classModelName = $this->option('model');
 
-        $this->generateNameRepositoryClass($this->argument('classRepositoryName'));
+
 
         $this->makeDirectoryRepositories();
 
@@ -71,14 +72,14 @@ class CreateRepository extends Command
     }
 
 
+
     private function generateClassContent()
     {
-
 
         $linesHeaderContentClass = [
             "<?php\n",
             "namespace App\Repositories;\n",
-            "use App\Repositories\Interfaces\AcquisitionRepositoryInterface;\n",
+            "use Illuminate\Database\Eloquent\Model;\n",
             "use App\Repositories\ModelRepository;\n",
         ];
 
@@ -88,22 +89,24 @@ class CreateRepository extends Command
 
 
         $linesBodyContentClass = [
-
-            "class {$this->classRepositoryName} extends ModelRepository implements AcquisitionRepositoryInterface",
+            "class {$this->classRepositoryName} extends InterfacesRepositoryEloquentInterface",
             "{",
             "\t/**",
-            "\t*",
-            "\t*",
-            "\t* @param {$this->argument('classRepositoryName')} {$this->generateNameRepositoryClassModel($this->argument('classRepositoryName'))}",
+            "\t* @var Model \$model Base Model of Repository",
             "\t*/",
-            "\tpublic function __construct({$this->argument('classRepositoryName')} \${$this->generateNameRepositoryClassModel($this->argument('classRepositoryName'))})",
+            "\tprotected \$model;",
+            "\n",
+            "\tpublic function __construct(Model \$model)",
             "\t{",
-            "\t\tparent::__construct(\${$this->generateNameRepositoryClassModel($this->argument('classRepositoryName'))});",
+            "\t\t\$this->model = \$model;",
             "\t}",
 
             "}\n",
         ];
+
+
         $linesContentClass = array_merge($linesHeaderContentClass, $linesBodyContentClass);
+
         $classContent = "";
         foreach ($linesContentClass as  $line) {
             $classContent .= "{$line}\n";
@@ -113,17 +116,6 @@ class CreateRepository extends Command
     }
 
 
-    private function generateNameRepositoryClass($nameClass)
-    {
-        $nameRepositoryClass =  "{$nameClass}Repository";
-        $this->classRepositoryName = $nameRepositoryClass;
-    }
-
-    private function generateNameRepositoryClassModel($nameClass)
-    {
-        $nameRepositoryClassModel =  lcfirst("{$nameClass}Model");
-        return  $nameRepositoryClassModel;
-    }
 
     private function makeDirectoryRepositories()
     {
@@ -147,7 +139,7 @@ class CreateRepository extends Command
 
                 $this->filesystem->put($fullPathOfFileRepositoryClass, $this->generateClassContent());
 
-                $this->createRepositoryWasSuccessfully = true;
+                $this->createModelRepositoryWasSuccessfully = true;
             } catch (\Exception $exception) {
 
                 $this->logErrorFromException($exception);
@@ -171,11 +163,11 @@ class CreateRepository extends Command
 
     private function resultOfCommand()
     {
-        $resultOfCommand = "Not was possible create the Class Repository";
+        $resultOfCommand = "Not was possible create the Class Model Repository";
 
-        if ($this->createRepositoryWasSuccessfully) {
+        if ($this->createModelRepositoryWasSuccessfully) {
 
-            $resultOfCommand = "Class Repository was created successfully!";
+            $resultOfCommand = "Class Model Repository was created successfully!";
             $this->info($resultOfCommand);
         } else {
             $this->error($resultOfCommand);
