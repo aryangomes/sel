@@ -70,7 +70,7 @@ class CreateModelRepository extends Command
                 $createRepositoryEloquentInterfaceCommand .= " --{resource}";
             }
 
-            $this->call($createRepositoryEloquentInterfaceCommand);
+            $this->callSilent($createRepositoryEloquentInterfaceCommand);
         }
 
 
@@ -90,7 +90,8 @@ class CreateModelRepository extends Command
             "<?php\n",
             "namespace App\Repositories;\n",
             "use Illuminate\Database\Eloquent\Model;\n",
-            "use App\Repositories\ModelRepository;\n",
+            "use App\Repositories\Interfaces\RepositoryEloquentInterface as InterfacesRepositoryEloquentInterface;\n",
+
         ];
 
         if (isset($this->classModelName)) {
@@ -106,16 +107,100 @@ class CreateModelRepository extends Command
             "\t*/",
             "\tprotected \$model;",
             "\n",
+
             "\tpublic function __construct(Model \$model)",
             "\t{",
             "\t\t\$this->model = \$model;",
             "\t}",
 
-            "}\n",
+
+
+            "\t/**",
+            "\t* @param array \$attributes",
+            "\t* @return Model",
+            "\t*/",
+            "\tpublic function create(array \$attributes)",
+            "\t{",
+            "\t\treturn \$this->model->create(\$attributes);",
+            "\t}",
+
+            "\t/**",
+            "\t* @param Model \$model",
+            "\t* @return void",
+            "\t*/",
+            "\tpublic function delete(\$model)",
+            "\t{",
+            "\t\treturn \$this->model->delete();",
+            "\t}",
+
+            "\t/**",
+            "\t* @param mixed \$id",
+            "\t* @return Model",
+            "\t*/",
+            "\tpublic function findById(\$id)",
+            "\t{",
+            "\t\treturn \$this->model->find(\$id);",
+            "\t}",
+
+
+
+            "\t/**",
+            "\t* ",
+            "\t* @return Collection",
+            "\t*/",
+            "\tpublic function findAll()",
+            "\t{",
+            "\t\treturn \$this->model->findAll();",
+            "\t}",
+
+
+            "\t/**",
+            "\t* @param Model \$model",
+            "\t* @param array \$attributes",
+            "\t* @return Model",
+            "\t*/",
+            "\tpublic function update(array \$attributes)",
+            "\t{",
+            "\t\treturn \$this->model->update(\$attributes);",
+            "\t}",
+
+
         ];
 
 
+        $lineGetResourceModel = [
+            "\t/**",
+            "\t* @param Model \$model",
+            "\t* @return Resource",
+            "\t*/",
+            "\tpublic function getResourceModel(Model \$model);",
+            "\t{",
+            "\t\treturn new Resource(\$model);",
+            "\t}",
+            "\n",
+        ];
 
+        $lineGetResourceCollectionModel = [
+            "\t/**",
+            "\t* ",
+            "\t* @return ResourceCollection",
+            "\t*/",
+            "\tpublic function getResourceCollectionModel();",
+            "\t{",
+            "\t\treturn new ResourceCollection(\$this->model->all());",
+            "\t}",
+            "\n",
+        ];
+
+        if ($this->createResourceMethods) {
+
+            $linesBodyContentClass = array_merge(
+                $linesBodyContentClass,
+                $lineGetResourceModel,
+                $lineGetResourceCollectionModel
+            );
+        }
+        array_push($linesBodyContentClass, "}\n");
 
         $linesContentClass = array_merge($linesHeaderContentClass, $linesBodyContentClass);
 
