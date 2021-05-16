@@ -62,7 +62,7 @@ class CreateRepositoryEloquentInterface extends Command
      */
     public function handle()
     {
-        $this->createResourceMethods = ($this->option('resource') != null);
+        $this->createResourceMethods = ($this->option('resource'));
 
         $this->makeDirectoryRepositories();
 

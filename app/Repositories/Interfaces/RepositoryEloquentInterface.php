@@ -3,6 +3,8 @@
 namespace App\Repositories\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 /**
  * Interface RepositoryEloquentInterface

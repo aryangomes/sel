@@ -31,7 +31,7 @@ class CreateModelRepository extends Command
     private $filesystem;
 
     /** @var String $classRepositoryName classRepositoryName */
-    private static $pathRepositories = './app/Repositories';
+    public static $pathRepositories = './app/Repositories';
 
     /** @var Boolean $createModelRepositoryWasSuccessfully createModelRepositoryWasSuccessfully */
     private  $createModelRepositoryWasSuccessfully;
@@ -62,15 +62,22 @@ class CreateModelRepository extends Command
      */
     public function handle()
     {
-        $this->createResourceMethods = ($this->option('resource') != null);
+        $this->createResourceMethods = ($this->option('resource'));
 
         if (!$this->repositoryEloquentInterfaceFileExists()) {
-            $createRepositoryEloquentInterfaceCommand = "make:repositoryEloquentInterface";
-            if ($this->createResourceMethods) {
-                $createRepositoryEloquentInterfaceCommand .= " --{resource}";
-            }
 
-            $this->callSilent($createRepositoryEloquentInterfaceCommand);
+            $createRepositoryEloquentInterfaceCommand = "make:repositoryEloquentInterface";
+
+            if ($this->createResourceMethods) {
+
+                $this->callSilent(
+                    $createRepositoryEloquentInterfaceCommand,
+                    ['--resource' => true]
+                );
+            } else {
+
+                $this->callSilent($createRepositoryEloquentInterfaceCommand);
+            }
         }
 
 
@@ -94,9 +101,17 @@ class CreateModelRepository extends Command
 
         ];
 
+        if ($this->createResourceMethods) {
+
+            array_push($linesHeaderContentClass, "use Illuminate\Http\Resources\Json\Resource;\n");
+            array_push($linesHeaderContentClass, "use Illuminate\Http\Resources\Json\ResourceCollection;\n");
+        }
+
         if (isset($this->classModelName)) {
             array_push($linesHeaderContentClass, "use App\Models\\{$this->classModelName};\n");
         }
+
+
 
 
         $linesBodyContentClass = [
@@ -173,7 +188,7 @@ class CreateModelRepository extends Command
             "\t* @param Model \$model",
             "\t* @return Resource",
             "\t*/",
-            "\tpublic function getResourceModel(Model \$model);",
+            "\tpublic function getResourceModel(Model \$model)",
             "\t{",
             "\t\treturn new Resource(\$model);",
             "\t}",
@@ -185,7 +200,7 @@ class CreateModelRepository extends Command
             "\t* ",
             "\t* @return ResourceCollection",
             "\t*/",
-            "\tpublic function getResourceCollectionModel();",
+            "\tpublic function getResourceCollectionModel()",
             "\t{",
             "\t\treturn new ResourceCollection(\$this->model->all());",
             "\t}",

@@ -12,7 +12,7 @@ class CreateRepository extends Command
      *
      * @var string
      */
-    protected $signature = 'make:repository {classRepositoryName} {--model=}';
+    protected $signature = 'make:repository {classRepositoryName} {--model=?} {--resource?}';
 
     /**
      * The console command description.
@@ -59,7 +59,21 @@ class CreateRepository extends Command
      */
     public function handle()
     {
+
+
         $this->classModelName = $this->option('model');
+
+        $this->createResourceMethods = ($this->option('resource') != null);
+
+
+        if (!$this->modelRepositoryFileExists()) {
+            $createmodelRepositoryCommand = "make:modelRepository";
+            if ($this->createResourceMethods) {
+                $createmodelRepositoryCommand .= " --{resource}";
+            }
+
+            $this->callSilent($createmodelRepositoryCommand);
+        }
 
         $this->generateNameRepositoryClass($this->argument('classRepositoryName'));
 
@@ -180,5 +194,20 @@ class CreateRepository extends Command
         } else {
             $this->error($resultOfCommand);
         }
+    }
+
+    private function modelRepositoryFileExists()
+    {
+        $createmodelRepository =
+            new CreateModelRepository($this->filesystem);
+
+        $modelRepositoryPath = $createmodelRepository::$pathRepositories;
+
+        $modelRepositoryFile =
+            "{$modelRepositoryPath}/{$createmodelRepository->interfaceRepositoryName}";
+
+        $modelRepositoryExists = $this->filesystem->exists($modelRepositoryFile);
+
+        return $modelRepositoryExists;
     }
 }
