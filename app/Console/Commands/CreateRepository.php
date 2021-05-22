@@ -36,7 +36,6 @@ class CreateRepository extends Command
     /** @var String $classRepositoryName classRepositoryName */
     private static $pathRepositories = './app/Repositories';
 
-    private static $pathModels = './app/Models';
 
     /** @var Boolean $createRepositoryWasSuccessfully createRepositoryWasSuccessfully */
     private  $createRepositoryWasSuccessfully;
@@ -80,8 +79,7 @@ class CreateRepository extends Command
 
         $this->classModelName = $this->option('model');
 
-        $this->createResourceMethods = ($this->option('resource'));
-
+        $this->createResourceMethods = ($this->option('resource') != null);
 
         if (!$this->repositoryModelFileExists()) {
             $createRepositoryModelCommand = "make:repositoryModel";
@@ -122,17 +120,18 @@ class CreateRepository extends Command
             "<?php\n",
             "namespace App\Repositories;\n",
             "use App\Repositories\Interfaces\\{$repositoryNameInterface};\n",
-            "use App\Repositories\ModelRepository;\n",
+            "use App\Repositories\RepositoryModel;\n",
         ];
 
         if (isset($this->classModelName)) {
+
             array_push($linesHeaderContentClass, "use App\Models\\{$this->classModelName};\n");
         }
 
 
         $linesBodyContentClass = [
 
-            "class {$this->classRepositoryName} extends ModelRepository implements {$repositoryNameInterface}",
+            "class {$this->classRepositoryName} extends RepositoryModel implements {$repositoryNameInterface}",
             "{",
             "\t/**",
             "\t*",
@@ -214,7 +213,11 @@ class CreateRepository extends Command
 
         if ($this->createRepositoryWasSuccessfully) {
 
-            $commandResult = "Class Repository was created successfully!";
+
+            $commandResult = __('files.createdSuccessfully', [
+                'file' => $this->classRepositoryName
+            ]);
+
             $this->info($commandResult);
         } else {
             $this->error($commandResult);

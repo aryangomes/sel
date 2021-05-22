@@ -100,7 +100,7 @@ class CreateRepositoryModel extends Command
 
 
         $linesBodyContentClass = [
-            "class {$this->classRepositoryModelName} extends InterfacesRepositoryEloquentInterface",
+            "class {$this->classRepositoryModelName} implements InterfacesRepositoryEloquentInterface",
             "{",
             "\t/**",
             "\t* @var Model \$model Base Model of Repository",
@@ -159,7 +159,7 @@ class CreateRepositoryModel extends Command
             "\t* @param array \$attributes",
             "\t* @return Model",
             "\t*/",
-            "\tpublic function update(array \$attributes)",
+            "\tpublic function update(array \$attributes, Model \$model)",
             "\t{",
             "\t\treturn \$this->model->update(\$attributes);",
             "\t}",
