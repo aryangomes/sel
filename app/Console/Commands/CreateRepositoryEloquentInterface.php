@@ -24,8 +24,6 @@ class CreateRepositoryEloquentInterface extends Command
     /** @var String $interfaceRepositoryName interfaceRepositoryName */
     public $interfaceRepositoryName;
 
-    /** @var String $classModelName classModelName */
-    private $classModelName;
 
     /** @var Filesystem $filesystem filesystem */
     private $filesystem;
@@ -38,6 +36,9 @@ class CreateRepositoryEloquentInterface extends Command
 
     /** @var Boolean $createResourceMethods createResourceMethods */
     private  $createResourceMethods;
+
+    /** @var Exception $exception exception */
+    private  $exception;
 
     /**
      * Create a new command instance.
@@ -64,13 +65,23 @@ class CreateRepositoryEloquentInterface extends Command
     {
         $this->createResourceMethods = ($this->option('resource'));
 
+
+        if ($this->repositoryEloquentInterfaceFileExists()) {
+            $this->warn(__('files.alreadyExists', [
+                'file' => $this->interfaceRepositoryName
+            ]));
+        } else {
+            $this->generateRepositoryEloquentInterfaceFile();
+        }
+    }
+    private function generateRepositoryEloquentInterfaceFile()
+    {
         $this->makeDirectoryRepositories();
 
-        $this->makeRepositoryClass();
+        $this->makeRepositoryEloquentInterface();
 
-        $this->resultOfCommand();
+        $this->commandResult();
     }
-
 
 
     private function generateClassContent()
@@ -176,49 +187,66 @@ class CreateRepositoryEloquentInterface extends Command
         }
     }
 
-    private function makeRepositoryClass()
+    public function generateRepositoryEloquentInterfaceFileFullPath()
     {
-        $fullPathOfFileRepositoryClass = "{$this::$pathRepositories}/{$this->interfaceRepositoryName}.php";
+        $repositoryEloquentInterfaceFileFullPath =
+            "{$this::$pathRepositories}/{$this->interfaceRepositoryName}.php";
 
-        $repositoryClassExists = $this->filesystem->exists($fullPathOfFileRepositoryClass);
-        if (!$repositoryClassExists) {
-            try {
+        return $repositoryEloquentInterfaceFileFullPath;
+    }
 
-                $this->filesystem->put($fullPathOfFileRepositoryClass, $this->generateClassContent());
+    private function makeRepositoryEloquentInterface()
+    {
+        $repositoryEloquentInterfaceFileFullPath =
+            $this->generateRepositoryEloquentInterfaceFileFullPath($this->interfaceRepositoryName);
 
-                $this->createRepositoryEloquentInterfaceWasSuccessfully = true;
-            } catch (\Exception $exception) {
 
-                $this->logErrorFromException($exception);
-            }
-        } else {
-            $this->warn(__('files.alreadyExists', [
-                'file' => $this->interfaceRepositoryName
-            ]));
+        try {
+
+            $this->filesystem->put($repositoryEloquentInterfaceFileFullPath, $this->generateClassContent());
+
+            $this->createRepositoryEloquentInterfaceWasSuccessfully = true;
+        } catch (\Exception $exception) {
+            $this->exception = $exception;
+            $this->logErrorFromException();
         }
     }
 
-    private function logErrorFromException(\Exception $exception)
+
+    public function repositoryEloquentInterfaceFileExists()
     {
-        $this->warn($exception);
+        $repositoryEloquentInterfaceFileFullPath =
+            $this->generateRepositoryEloquentInterfaceFileFullPath();
+
+        $repositoryEloquentInterfaceFileExists = $this->filesystem->exists($repositoryEloquentInterfaceFileFullPath);
+
+        return $repositoryEloquentInterfaceFileExists;
+    }
+
+    private function logErrorFromException()
+    {
         logger(
             get_class($this),
             [
-                'exception' => $exception
+                'exception' => $this->exception
             ]
         );
     }
 
 
-    private function resultOfCommand()
+
+
+    private function commandResult()
     {
 
         if ($this->createRepositoryEloquentInterfaceWasSuccessfully) {
 
-            $resultOfCommand = __('files.createdSuccessfully', [
+            $commandResult = __('files.createdSuccessfully', [
                 'file' => $this->interfaceRepositoryName
             ]);
-            $this->info($resultOfCommand);
+            $this->info($commandResult);
+        } else {
+            $this->error($this->exception);
         }
     }
 }

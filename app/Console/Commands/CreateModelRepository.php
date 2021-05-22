@@ -39,6 +39,9 @@ class CreateModelRepository extends Command
     /** @var Boolean $createResourceMethods createResourceMethods */
     private  $createResourceMethods;
 
+    /** @var Exception $exception exception */
+    private  $exception;
+
     /**
      * Create a new command instance.
      *
@@ -62,33 +65,15 @@ class CreateModelRepository extends Command
      */
     public function handle()
     {
-        $this->createResourceMethods = ($this->option('resource'));
 
-        if (!$this->repositoryEloquentInterfaceFileExists()) {
-
-            $createRepositoryEloquentInterfaceCommand = "make:repositoryEloquentInterface";
-
-            if ($this->createResourceMethods) {
-
-                $this->callSilent(
-                    $createRepositoryEloquentInterfaceCommand,
-                    ['--resource' => true]
-                );
-            } else {
-
-                $this->callSilent($createRepositoryEloquentInterfaceCommand);
-            }
+        if ($this->modelRepositoryFileExists()) {
+            $this->warn(__('files.alreadyExists', [
+                'file' => $this->classRepositoryName
+            ]));
+        } else {
+            $this->generateModelRepositoryFile();
         }
-
-
-        $this->makeDirectoryRepositories();
-
-        $this->makeRepositoryClass();
-
-        $this->resultOfCommand();
     }
-
-
 
     private function generateClassContent()
     {
@@ -227,7 +212,32 @@ class CreateModelRepository extends Command
         return $classContent;
     }
 
+    private function generateModelRepositoryFile()
+    {
+        $this->createResourceMethods = ($this->option('resource'));
 
+        if (!$this->repositoryEloquentInterfaceFileExists()) {
+
+            $createRepositoryEloquentInterfaceCommand = "make:repositoryEloquentInterface";
+
+            if ($this->createResourceMethods) {
+
+                $this->callSilent(
+                    $createRepositoryEloquentInterfaceCommand,
+                    ['--resource' => true]
+                );
+            } else {
+
+                $this->callSilent($createRepositoryEloquentInterfaceCommand);
+            }
+        }
+
+        $this->makeDirectoryRepositories();
+
+        $this->makeRepositoryClass();
+
+        $this->commandResult();
+    }
 
     private function makeDirectoryRepositories()
     {
@@ -240,50 +250,49 @@ class CreateModelRepository extends Command
             }
         }
     }
+    public function generateModelRepositoryFileFullPath()
+    {
+        $modelRepositoryFileFullPath = "{$this::$pathRepositories}/{$this->classRepositoryName}.php";
+        return $modelRepositoryFileFullPath;
+    }
+
+
 
     private function makeRepositoryClass()
     {
-        $fullPathOfFileRepositoryClass = "{$this::$pathRepositories}/{$this->classRepositoryName}.php";
+        $modelRepositoryFileFullPath =
+            $this->generateModelRepositoryFileFullPath();
+        try {
 
-        $repositoryClassExists = $this->filesystem->exists($fullPathOfFileRepositoryClass);
-        if (!$repositoryClassExists) {
-            try {
+            $this->filesystem->put($modelRepositoryFileFullPath, $this->generateClassContent());
 
-                $this->filesystem->put($fullPathOfFileRepositoryClass, $this->generateClassContent());
-
-                $this->createModelRepositoryWasSuccessfully = true;
-            } catch (\Exception $exception) {
-
-                $this->logErrorFromException($exception);
-            }
-        } else {
-            $this->warn(__('files.alreadyExists', [
-                'file' => $this->classRepositoryName
-            ]));
+            $this->createModelRepositoryWasSuccessfully = true;
+        } catch (\Exception $exception) {
+            $this->exception = $exception;
+            $this->logErrorFromException();
         }
     }
 
-    private function logErrorFromException(\Exception $exception)
+    private function logErrorFromException()
     {
-        $this->warn($exception);
         logger(
             get_class($this),
             [
-                'exception' => $exception
+                'exception' => $this->exception
             ]
         );
     }
 
 
-    private function resultOfCommand()
+    private function commandResult()
     {
 
         if ($this->createModelRepositoryWasSuccessfully) {
 
-            $resultOfCommand = __('files.createdSuccessfully', [
+            $commandResult = __('files.createdSuccessfully', [
                 'file' => $this->classRepositoryName
             ]);
-            $this->info($resultOfCommand);
+            $this->info($commandResult);
         }
     }
 
@@ -300,5 +309,16 @@ class CreateModelRepository extends Command
         $repositoryEloquentInterfaceFileExists = $this->filesystem->exists($repositoryEloquentInterfaceFile);
 
         return $repositoryEloquentInterfaceFileExists;
+    }
+
+    public function modelRepositoryFileExists()
+    {
+
+
+        $modelRepositoryFileFullPath =
+            $this->generateModelRepositoryFileFullPath($this->classRepositoryName);
+
+        $modelRepositoryExists = $this->filesystem->exists($modelRepositoryFileFullPath);
+        return $modelRepositoryExists;
     }
 }

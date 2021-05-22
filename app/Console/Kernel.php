@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         Commands\CreateRepository::class,
         Commands\CreateRepositoryEloquentInterface::class,
         Commands\CreateModelRepository::class,
+        Commands\CreateModelRepositoryInterface::class,
     ];
 
     /**

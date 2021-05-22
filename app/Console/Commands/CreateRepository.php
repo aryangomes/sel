@@ -12,7 +12,7 @@ class CreateRepository extends Command
      *
      * @var string
      */
-    protected $signature = 'make:repository {classRepositoryName} {--model=?} {--resource?}';
+    protected $signature = 'make:repository {classRepositoryName} {--resource} {--model=} ';
 
     /**
      * The console command description.
@@ -23,6 +23,9 @@ class CreateRepository extends Command
 
     /** @var String $classRepositoryName classRepositoryName */
     private $classRepositoryName;
+
+    /** @var String $argumentRepositoryName argumentRepositoryName */
+    private $argumentRepositoryName;
 
     /** @var String $classModelName classModelName */
     private $classModelName;
@@ -59,40 +62,49 @@ class CreateRepository extends Command
      */
     public function handle()
     {
+        $this->argumentRepositoryName = $this->argument('classRepositoryName');
+        $this->generateNameRepositoryClass($this->argumentRepositoryName);
 
+        $this->generateRepositoryFile();
+    }
+
+    private function generateRepositoryFile()
+    {
 
         $this->classModelName = $this->option('model');
 
-        $this->createResourceMethods = ($this->option('resource') != null);
+        $this->createResourceMethods = ($this->option('resource'));
 
 
         if (!$this->modelRepositoryFileExists()) {
             $createmodelRepositoryCommand = "make:modelRepository";
             if ($this->createResourceMethods) {
-                $createmodelRepositoryCommand .= " --{resource}";
-            }
+                $this->callSilent($createmodelRepositoryCommand, [
+                    '--resource' => true
+                ]);
+            } else {
 
-            $this->callSilent($createmodelRepositoryCommand);
+                $this->callSilent($createmodelRepositoryCommand);
+            }
         }
 
-        $this->generateNameRepositoryClass($this->argument('classRepositoryName'));
 
         $this->makeDirectoryRepositories();
 
         $this->makeRepositoryClass();
 
-        $this->resultOfCommand();
+        $this->commandResult();
     }
-
 
     private function generateClassContent()
     {
 
+        $repositoryNameInterface = "{$this->argumentRepositoryName}RepositoryInterface";
 
         $linesHeaderContentClass = [
             "<?php\n",
             "namespace App\Repositories;\n",
-            "use App\Repositories\Interfaces\AcquisitionRepositoryInterface;\n",
+            "use App\Repositories\Interfaces\\{$repositoryNameInterface};\n",
             "use App\Repositories\ModelRepository;\n",
         ];
 
@@ -103,16 +115,16 @@ class CreateRepository extends Command
 
         $linesBodyContentClass = [
 
-            "class {$this->classRepositoryName} extends ModelRepository implements AcquisitionRepositoryInterface",
+            "class {$this->classRepositoryName} extends ModelRepository implements {$repositoryNameInterface}",
             "{",
             "\t/**",
             "\t*",
             "\t*",
-            "\t* @param {$this->argument('classRepositoryName')} {$this->generateNameRepositoryClassModel($this->argument('classRepositoryName'))}",
+            "\t* @param {$this->argumentRepositoryName} {$this->generateNameRepositoryClassModel($this->argumentRepositoryName)}",
             "\t*/",
-            "\tpublic function __construct({$this->argument('classRepositoryName')} \${$this->generateNameRepositoryClassModel($this->argument('classRepositoryName'))})",
+            "\tpublic function __construct({$this->argumentRepositoryName} \${$this->generateNameRepositoryClassModel($this->argumentRepositoryName)})",
             "\t{",
-            "\t\tparent::__construct(\${$this->generateNameRepositoryClassModel($this->argument('classRepositoryName'))});",
+            "\t\tparent::__construct(\${$this->generateNameRepositoryClassModel($this->argumentRepositoryName)});",
             "\t}",
 
             "}\n",
@@ -183,30 +195,26 @@ class CreateRepository extends Command
     }
 
 
-    private function resultOfCommand()
+    private function commandResult()
     {
-        $resultOfCommand = "Not was possible create the Class Repository";
+        $commandResult = "Not was possible create the Class Repository";
 
         if ($this->createRepositoryWasSuccessfully) {
 
-            $resultOfCommand = "Class Repository was created successfully!";
-            $this->info($resultOfCommand);
+            $commandResult = "Class Repository was created successfully!";
+            $this->info($commandResult);
         } else {
-            $this->error($resultOfCommand);
+            $this->error($commandResult);
         }
     }
 
     private function modelRepositoryFileExists()
     {
-        $createmodelRepository =
+        $createModelRepository =
             new CreateModelRepository($this->filesystem);
 
-        $modelRepositoryPath = $createmodelRepository::$pathRepositories;
 
-        $modelRepositoryFile =
-            "{$modelRepositoryPath}/{$createmodelRepository->interfaceRepositoryName}";
-
-        $modelRepositoryExists = $this->filesystem->exists($modelRepositoryFile);
+        $modelRepositoryExists = $createModelRepository->modelRepositoryFileExists();
 
         return $modelRepositoryExists;
     }
