@@ -10,78 +10,176 @@ use Illuminate\Http\Resources\Json\Resource;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class RepositoryModel extends InterfacesRepositoryEloquentInterface
+use Exception;
+
+use Illuminate\Support\Facades\DB;
+
+class RepositoryModel implements InterfacesRepositoryEloquentInterface
 {
-	/**
-	* @var Model $model Base Model of Repository
-	*/
+
+	/** 
+	 * @var Model $model Base Model of Repository 
+	 */
 	protected $model;
+
+	/** @var Type $resourceName Name of resource */
+	public $resourceName;
+
+	/** 
+	 * @var mixed $responseFromTransaction 
+	 */
+	public $responseFromTransaction;
+
+
+	/** 
+	 * @var Exception $exceptionFromTransaction
+	 */
+	public $exceptionFromTransaction;
+
+	/** 
+	 * @var boolean $transactionIsSuccessfully
+	 */
+	public $transactionIsSuccessfully;
 
 
 	public function __construct(Model $model)
 	{
 		$this->model = $model;
 	}
+
 	/**
-	* @param array $attributes
-	* @return Model
-	*/
+	 * @param array $attributes
+	 * @return Model
+	 */
 	public function create(array $attributes)
 	{
-		return $this->model->create($attributes);
+		$this->transactionIsSuccessfully = true;
+
+		DB::beginTransaction();
+
+		try {
+
+			$this->responseFromTransaction = $this->model->create($attributes);
+
+			DB::commit();
+		} catch (\Exception $exception) {
+
+			$this->setTransactionExceptionResponse($exception);
+		}
 	}
+
 	/**
-	* @param Model $model
-	* @return void
-	*/
+	 * @param Model $model
+	 * @return void
+	 */
 	public function delete($model)
 	{
-		return $this->model->delete();
+		$this->transactionIsSuccessfully = true;
+
+		DB::beginTransaction();
+
+		try {
+
+			$this->responseFromTransaction = $model->delete();
+
+			DB::commit();
+		} catch (\Exception $exception) {
+
+			$this->setTransactionExceptionResponse($exception);
+		}
 	}
+
 	/**
-	* @param mixed $id
-	* @return Model
-	*/
+	 * @param $id
+	 * @return Model
+	 */
 	public function findById($id)
 	{
-		return $this->model->find($id);
+		$this->transactionIsSuccessfully = true;
+
+		try {
+
+			$this->responseFromTransaction = $this->model->find($id);
+		} catch (\Exception $exception) {
+
+			$this->setTransactionExceptionResponse($exception);
+		}
 	}
+
 	/**
-	* 
-	* @return Collection
-	*/
+	 * 
+	 *  
+	 */
 	public function findAll()
 	{
-		return $this->model->findAll();
+		$this->transactionIsSuccessfully = true;
+
+		try {
+
+			$this->responseFromTransaction = $this->model->all();
+		} catch (\Exception $exception) {
+
+			$this->setTransactionExceptionResponse($exception);
+		}
 	}
+
 	/**
-	* @param Model $model
-	* @param array $attributes
-	* @return Model
-	*/
-	public function update(array $attributes)
+	 * @param Model $model
+	 * @param array $attributesForUpdate
+	 * @return Model
+	 */
+	public function update(array $attributesForUpdate, Model $model)
 	{
-		return $this->model->update($attributes);
+
+		$this->transactionIsSuccessfully = true;
+
+		DB::beginTransaction();
+
+		try {
+
+			$this->responseFromTransaction = $model->update($attributesForUpdate);
+
+			DB::commit();
+		} catch (\Exception $exception) {
+
+			$this->setTransactionExceptionResponse($exception);
+		}
 	}
+
+
 	/**
-	* @param Model $model
-	* @return Resource
-	*/
-	public function getResourceModel(Model $model)
+	 * @param Model $model
+	 * @return Resource
+	 */
+	public function getResourceModel($model)
 	{
 		return new Resource($model);
 	}
 
-
 	/**
-	* 
-	* @return ResourceCollection
-	*/
+	 * @param $id
+	 * @return ResourceCollection
+	 */
 	public function getResourceCollectionModel()
 	{
-		return new ResourceCollection($this->model->all());
+
+		$this->transactionIsSuccessfully = true;
+
+		try {
+
+			$this->responseFromTransaction = new ResourceCollection($this->model->all());
+		} catch (\Exception $exception) {
+
+			$this->setTransactionExceptionResponse($exception);
+		}
 	}
 
+	protected function setTransactionExceptionResponse(Exception $exception)
+	{
+		$this->transactionIsSuccessfully = false;
 
+		DB::rollBack();
+
+		$this->exceptionFromTransaction = $exception;
+	}
 }
-
