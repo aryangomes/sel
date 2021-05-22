@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\CreateRepository::class,
         Commands\CreateRepositoryEloquentInterface::class,
-        Commands\CreateModelRepository::class,
+        Commands\CreateRepositoryModel::class,
         Commands\CreateModelRepositoryInterface::class,
     ];
 

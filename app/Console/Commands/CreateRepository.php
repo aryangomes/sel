@@ -65,6 +65,12 @@ class CreateRepository extends Command
         $this->argumentRepositoryName = $this->argument('classRepositoryName');
         $this->generateNameRepositoryClass($this->argumentRepositoryName);
 
+        if ($this->repositoryFileExists()) {
+            $this->warn(__('files.alreadyExists', [
+                'file' => $this->classRepositoryName
+            ]));
+        }
+
         $this->generateRepositoryFile();
     }
 
@@ -76,16 +82,26 @@ class CreateRepository extends Command
         $this->createResourceMethods = ($this->option('resource'));
 
 
-        if (!$this->modelRepositoryFileExists()) {
-            $createmodelRepositoryCommand = "make:modelRepository";
+        if (!$this->repositoryModelFileExists()) {
+            $createRepositoryModelCommand = "make:repositoryModel";
             if ($this->createResourceMethods) {
-                $this->callSilent($createmodelRepositoryCommand, [
+                $this->callSilent($createRepositoryModelCommand, [
                     '--resource' => true
                 ]);
             } else {
 
-                $this->callSilent($createmodelRepositoryCommand);
+                $this->callSilent($createRepositoryModelCommand);
             }
+        }
+
+
+        if (!$this->repositoryModelInterfaceExists()) {
+
+            $createRepositoryModelInterfaceCommand = "make:modelNameRepositoryInterface";
+
+            $this->callSilent($createRepositoryModelInterfaceCommand, [
+                'modelNameRepositoryInterface' => $this->argumentRepositoryName
+            ]);
         }
 
 
@@ -208,14 +224,40 @@ class CreateRepository extends Command
         }
     }
 
-    private function modelRepositoryFileExists()
+    private function repositoryFileExists()
+    {
+        $repositoryFileFullPath =
+            $this->generateRepositoryFileFullPath($this->classRepositoryName);
+
+        $repositoryExists = $this->filesystem->exists($repositoryFileFullPath);
+
+        return $repositoryExists;
+    }
+
+    public function generateRepositoryFileFullPath()
+    {
+        $repositoryFileFullPath = "{$this::$pathRepositories}/{$this->classRepositoryName}.php";
+        return $repositoryFileFullPath;
+    }
+
+    private function repositoryModelFileExists()
     {
         $createModelRepository =
-            new CreateModelRepository($this->filesystem);
+            new CreateRepositoryModel($this->filesystem);
+
+        $repositoryModelExists = $createModelRepository->repositoryModelFileExists();
+
+        return $repositoryModelExists;
+    }
+
+    public function repositoryModelInterfaceExists()
+    {
+        $repositoryModelInterfaceExists = new CreateModelRepositoryInterface(
+            $this->filesystem
+        );
 
 
-        $modelRepositoryExists = $createModelRepository->modelRepositoryFileExists();
-
-        return $modelRepositoryExists;
+        $repositoryModelInterfaceExists = $repositoryModelInterfaceExists->repositoryModelInterfaceExists();
+        return $repositoryModelInterfaceExists;
     }
 }

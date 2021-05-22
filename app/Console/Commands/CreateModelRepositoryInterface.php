@@ -60,7 +60,7 @@ class CreateModelRepositoryInterface extends Command
     {
         $this->generateModelNameRepositoryInterface($this->argument('modelNameRepositoryInterface'));
 
-        if ($this->modelRepositoryInterfaceExists()) {
+        if ($this->repositoryModelInterfaceExists()) {
             $this->warn(__('files.alreadyExists', [
                 'file' => $this->modelNameRepositoryInterface
             ]));
@@ -166,13 +166,13 @@ class CreateModelRepositoryInterface extends Command
     }
 
 
-    private function modelRepositoryInterfaceExists()
+    public function repositoryModelInterfaceExists()
     {
         $fullPathOfFileModelRepositoryInterface =
             $this->generateFullPathOfFileModelRepositoryInterface($this->modelNameRepositoryInterface);
 
-        $modelRepositoryInterfaceExists = $this->filesystem->exists($fullPathOfFileModelRepositoryInterface);
-        return $modelRepositoryInterfaceExists;
+        $repositoryModelInterfaceExists = $this->filesystem->exists($fullPathOfFileModelRepositoryInterface);
+        return $repositoryModelInterfaceExists;
     }
 
     private function logErrorFromException()

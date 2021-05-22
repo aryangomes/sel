@@ -5,14 +5,14 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class CreateModelRepository extends Command
+class CreateRepositoryModel extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'make:modelRepository {--resource}';
+    protected $signature = 'make:repositoryModel {--resource}';
 
     /**
      * The console command description.
@@ -21,8 +21,8 @@ class CreateModelRepository extends Command
      */
     protected $description = 'Command description';
 
-    /** @var String $classRepositoryName classRepositoryName */
-    public $classRepositoryName;
+    /** @var String $classRepositoryModelName classRepositoryModelName */
+    public $classRepositoryModelName;
 
     /** @var String $classModelName classModelName */
     private $classModelName;
@@ -30,11 +30,11 @@ class CreateModelRepository extends Command
     /** @var Filesystem $filesystem filesystem */
     private $filesystem;
 
-    /** @var String $classRepositoryName classRepositoryName */
+    /** @var String $pathRepositories pathRepositories */
     public static $pathRepositories = './app/Repositories';
 
-    /** @var Boolean $createModelRepositoryWasSuccessfully createModelRepositoryWasSuccessfully */
-    private  $createModelRepositoryWasSuccessfully;
+    /** @var Boolean $createRepositoryModelWasSuccessfully createRepositoryModelWasSuccessfully */
+    private  $createRepositoryModelWasSuccessfully;
 
     /** @var Boolean $createResourceMethods createResourceMethods */
     private  $createResourceMethods;
@@ -49,11 +49,11 @@ class CreateModelRepository extends Command
      */
     public function __construct(Filesystem $filesystem)
     {
-        $this->createModelRepositoryWasSuccessfully = false;
+        $this->createRepositoryModelWasSuccessfully = false;
 
         $this->filesystem = $filesystem;
 
-        $this->classRepositoryName = 'ModelRepositoryTeste';
+        $this->classRepositoryModelName = 'RepositoryModelTeste';
 
         parent::__construct();
     }
@@ -66,12 +66,12 @@ class CreateModelRepository extends Command
     public function handle()
     {
 
-        if ($this->modelRepositoryFileExists()) {
+        if ($this->repositoryModelFileExists()) {
             $this->warn(__('files.alreadyExists', [
-                'file' => $this->classRepositoryName
+                'file' => $this->classRepositoryModelName
             ]));
         } else {
-            $this->generateModelRepositoryFile();
+            $this->generateRepositoryModelFile();
         }
     }
 
@@ -100,7 +100,7 @@ class CreateModelRepository extends Command
 
 
         $linesBodyContentClass = [
-            "class {$this->classRepositoryName} extends InterfacesRepositoryEloquentInterface",
+            "class {$this->classRepositoryModelName} extends InterfacesRepositoryEloquentInterface",
             "{",
             "\t/**",
             "\t* @var Model \$model Base Model of Repository",
@@ -212,9 +212,10 @@ class CreateModelRepository extends Command
         return $classContent;
     }
 
-    private function generateModelRepositoryFile()
+    private function generateRepositoryModelFile()
     {
         $this->createResourceMethods = ($this->option('resource'));
+
 
         if (!$this->repositoryEloquentInterfaceFileExists()) {
 
@@ -239,6 +240,7 @@ class CreateModelRepository extends Command
         $this->commandResult();
     }
 
+
     private function makeDirectoryRepositories()
     {
         $directoryRepositoriesExists = $this->filesystem->exists($this::$pathRepositories);
@@ -250,23 +252,23 @@ class CreateModelRepository extends Command
             }
         }
     }
-    public function generateModelRepositoryFileFullPath()
+    private function generateRepositoryModelFileFullPath()
     {
-        $modelRepositoryFileFullPath = "{$this::$pathRepositories}/{$this->classRepositoryName}.php";
-        return $modelRepositoryFileFullPath;
+        $repositoryModelFileFullPath = "{$this::$pathRepositories}/{$this->classRepositoryModelName}.php";
+        return $repositoryModelFileFullPath;
     }
 
 
 
     private function makeRepositoryClass()
     {
-        $modelRepositoryFileFullPath =
-            $this->generateModelRepositoryFileFullPath();
+        $repositoryModelFileFullPath =
+            $this->generateRepositoryModelFileFullPath();
         try {
 
-            $this->filesystem->put($modelRepositoryFileFullPath, $this->generateClassContent());
+            $this->filesystem->put($repositoryModelFileFullPath, $this->generateClassContent());
 
-            $this->createModelRepositoryWasSuccessfully = true;
+            $this->createRepositoryModelWasSuccessfully = true;
         } catch (\Exception $exception) {
             $this->exception = $exception;
             $this->logErrorFromException();
@@ -287,10 +289,10 @@ class CreateModelRepository extends Command
     private function commandResult()
     {
 
-        if ($this->createModelRepositoryWasSuccessfully) {
+        if ($this->createRepositoryModelWasSuccessfully) {
 
             $commandResult = __('files.createdSuccessfully', [
-                'file' => $this->classRepositoryName
+                'file' => $this->classRepositoryModelName
             ]);
             $this->info($commandResult);
         }
@@ -311,14 +313,13 @@ class CreateModelRepository extends Command
         return $repositoryEloquentInterfaceFileExists;
     }
 
-    public function modelRepositoryFileExists()
+    public function repositoryModelFileExists()
     {
 
+        $repositoryModelFileFullPath =
+            $this->generateRepositoryModelFileFullPath($this->classRepositoryModelName);
 
-        $modelRepositoryFileFullPath =
-            $this->generateModelRepositoryFileFullPath($this->classRepositoryName);
-
-        $modelRepositoryExists = $this->filesystem->exists($modelRepositoryFileFullPath);
-        return $modelRepositoryExists;
+        $repositoryModelExists = $this->filesystem->exists($repositoryModelFileFullPath);
+        return $repositoryModelExists;
     }
 }
