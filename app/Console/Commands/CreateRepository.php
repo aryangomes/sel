@@ -69,9 +69,10 @@ class CreateRepository extends Command
             $this->warn(__('files.alreadyExists', [
                 'file' => $this->classRepositoryName
             ]));
-        }
+        } else {
 
-        $this->generateRepositoryFile();
+            $this->generateRepositoryFile();
+        }
     }
 
     private function generateRepositoryFile()
@@ -181,21 +182,16 @@ class CreateRepository extends Command
 
     private function makeRepositoryClass()
     {
-        $fullPathOfFileRepositoryClass = "{$this::$pathRepositories}/{$this->classRepositoryName}.php";
+        $repositoryFileFullPath =
+            $this->generateRepositoryFileFullPath();
+        try {
 
-        $repositoryClassExists = $this->filesystem->exists($fullPathOfFileRepositoryClass);
-        if (!$repositoryClassExists) {
-            try {
+            $this->filesystem->put($repositoryFileFullPath, $this->generateClassContent());
 
-                $this->filesystem->put($fullPathOfFileRepositoryClass, $this->generateClassContent());
+            $this->createRepositoryWasSuccessfully = true;
+        } catch (\Exception $exception) {
 
-                $this->createRepositoryWasSuccessfully = true;
-            } catch (\Exception $exception) {
-
-                $this->logErrorFromException($exception);
-            }
-        } else {
-            $this->warn("Class already exists!");
+            $this->logErrorFromException($exception);
         }
     }
 
@@ -209,6 +205,7 @@ class CreateRepository extends Command
             ]
         );
     }
+
 
 
     private function commandResult()

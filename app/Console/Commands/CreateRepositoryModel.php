@@ -53,7 +53,7 @@ class CreateRepositoryModel extends Command
 
         $this->filesystem = $filesystem;
 
-        $this->classRepositoryModelName = 'RepositoryModelTeste';
+        $this->classRepositoryModelName = 'RepositoryModel';
 
         parent::__construct();
     }

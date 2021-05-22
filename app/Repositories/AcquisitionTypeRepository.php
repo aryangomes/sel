@@ -6,10 +6,10 @@ use App\Http\Resources\AcquisitionType\AcquisitionTypeCollection;
 use App\Http\Resources\AcquisitionType\AcquisitionTypeResource;
 use App\Models\AcquisitionType;
 use App\Repositories\Interfaces\AcquisitionTypeRepositoryInterface;
-use App\Repositories\ModelRepository;
+use App\Repositories\RepositoryModel;
 
 
-class AcquisitionTypeRepository  extends ModelRepository implements AcquisitionTypeRepositoryInterface
+class AcquisitionTypeRepository  extends RepositoryModel implements AcquisitionTypeRepositoryInterface
 {
 
 

@@ -51,7 +51,7 @@ class CreateRepositoryEloquentInterface extends Command
 
         $this->filesystem = $filesystem;
 
-        $this->interfaceRepositoryName = 'RepositoryEloquentInterfaceTeste';
+        $this->interfaceRepositoryName = 'RepositoryEloquentInterface';
 
         parent::__construct();
     }
