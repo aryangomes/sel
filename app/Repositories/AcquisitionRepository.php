@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\AcquisitionCollection;
-use App\Http\Resources\AcquisitionResource;
+use App\Http\Resources\Acquisition\AcquisitionCollection;
+use App\Http\Resources\Acquisition\AcquisitionResource;
 use App\Repositories\Interfaces\AcquisitionRepositoryInterface;
 
 use App\Repositories\RepositoryModel;

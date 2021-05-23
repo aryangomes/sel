@@ -18,7 +18,7 @@ class AcquisitionPolicy
      */
     public function viewAny(User $user)
     {
-        return true;
+        return $user->mayToDoThisAction();
     }
 
     /**

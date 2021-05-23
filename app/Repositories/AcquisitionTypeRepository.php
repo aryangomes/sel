@@ -22,7 +22,6 @@ class AcquisitionTypeRepository  extends RepositoryModel implements AcquisitionT
         parent::__construct($acquisitionTypeModel);
     }
 
-
     /**
      * 
      * @return ResourceCollection

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Acquisition;
+namespace App\Http\Requests\CollectionType;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateAcquisitionRequest extends FormRequest
+class CollectionTypeUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +25,7 @@ class UpdateAcquisitionRequest extends FormRequest
     public function rules()
     {
         return [
-            'price' => 'required|numeric|min:0|max:1000000',
-            'quantity' => 'required|numeric|min:1|max:1000000',
-
+            'type' => 'required|max:60'
         ];
     }
 }

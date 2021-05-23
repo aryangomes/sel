@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Acquisition;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterAcquisitionRequest extends FormRequest
@@ -13,9 +14,8 @@ class RegisterAcquisitionRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return User::userMayToDoThisAction();
     }
-
     /**
      * Get the validation rules that apply to the request.
      *
