@@ -13,7 +13,7 @@ class RegisterAcquisitionRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,11 @@ class RegisterAcquisitionRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'price' => 'required|numeric|min:0|max:1000000',
+            'quantity' => 'required|numeric|min:1|max:1000000',
+            'idLender' => 'required',
+            'idProvider' => 'required',
+            'idAcquisitionType' => 'required',
         ];
     }
 }

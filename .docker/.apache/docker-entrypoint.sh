@@ -1,11 +1,10 @@
 #!/bin/bash
 USUARIO=sel
 
-sudo -u $USUARIO /bin/bash
-
 service apache2 start
 
 sudo /usr/sbin/cron -f
 
-chmod -R 775 storage/logs
+sudo chmod -R 775 storage/logs
 
+sudo -u $USUARIO /bin/bash

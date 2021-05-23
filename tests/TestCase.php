@@ -11,7 +11,7 @@ abstract class TestCase extends BaseTestCase
 
     public $url = 'api/v1/';
 
-    public function urlWithParameter($url, $parameter=null)
+    public function urlWithParameter($url, $parameter = null)
     {
         $urlWithParameter = $url;
 
@@ -20,5 +20,10 @@ abstract class TestCase extends BaseTestCase
         }
 
         return $urlWithParameter;
+    }
+
+    public function printContentResponse($response)
+    {
+        print_r($response->getContent());
     }
 }

@@ -6,10 +6,10 @@ use App\Http\Resources\AcquisitionType\AcquisitionTypeCollection;
 use App\Http\Resources\AcquisitionType\AcquisitionTypeResource;
 use App\Models\AcquisitionType;
 use App\Repositories\Interfaces\AcquisitionTypeRepositoryInterface;
-use App\Repositories\ModelRepository;
+use App\Repositories\RepositoryModel;
 
 
-class AcquisitionTypeRepository  extends ModelRepository implements AcquisitionTypeRepositoryInterface
+class AcquisitionTypeRepository  extends RepositoryModel implements AcquisitionTypeRepositoryInterface
 {
     /**
      *
@@ -18,16 +18,24 @@ class AcquisitionTypeRepository  extends ModelRepository implements AcquisitionT
      */
     public function __construct(AcquisitionType $acquisitionTypeModel)
     {
+        $this->resourceName = 'Acquisition Type';
         parent::__construct($acquisitionTypeModel);
     }
 
+
     /**
-     * @param $id
+     * 
      * @return ResourceCollection
      */
     public function getResourceCollectionModel()
     {
-        return new AcquisitionTypeCollection($this->findAll());
+
+        $this->findAll();
+
+        if ($this->transactionIsSuccessfully) {
+
+            $this->responseFromTransaction = new AcquisitionTypeCollection($this->responseFromTransaction);
+        }
     }
 
     /**
