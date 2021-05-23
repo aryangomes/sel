@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Models\Acquisition;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Model\Acquisition;
 
 class AcquisitionPolicy
 {
@@ -18,19 +18,19 @@ class AcquisitionPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return true;
     }
 
     /**
      * Determine whether the user can view the acquisition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Model\Acquisition  $acquisition
+     * @param  \App\Model\Acquisition  $acquisition
      * @return mixed
      */
     public function view(User $user, Acquisition $acquisition)
     {
-        //
+        return $user->mayToDoThisAction();
     }
 
     /**
@@ -41,38 +41,38 @@ class AcquisitionPolicy
      */
     public function create(User $user)
     {
-        //
+        return $user->mayToDoThisAction();
     }
 
     /**
      * Determine whether the user can update the acquisition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Model\Acquisition  $acquisition
+     * @param  \App\Model\Acquisition  $acquisition
      * @return mixed
      */
     public function update(User $user, Acquisition $acquisition)
     {
-        //
+        return $user->mayToDoThisAction();
     }
 
     /**
      * Determine whether the user can delete the acquisition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Model\Acquisition  $acquisition
+     * @param  \App\Model\Acquisition  $acquisition
      * @return mixed
      */
     public function delete(User $user, Acquisition $acquisition)
     {
-        //
+        return $user->mayToDoThisAction();
     }
 
     /**
      * Determine whether the user can restore the acquisition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Model\Acquisition  $acquisition
+     * @param  \App\Model\Acquisition  $acquisition
      * @return mixed
      */
     public function restore(User $user, Acquisition $acquisition)
@@ -84,7 +84,7 @@ class AcquisitionPolicy
      * Determine whether the user can permanently delete the acquisition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Model\Acquisition  $acquisition
+     * @param  \App\Model\Acquisition  $acquisition
      * @return mixed
      */
     public function forceDelete(User $user, Acquisition $acquisition)

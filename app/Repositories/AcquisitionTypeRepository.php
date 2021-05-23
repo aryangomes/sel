@@ -11,9 +11,6 @@ use App\Repositories\RepositoryModel;
 
 class AcquisitionTypeRepository  extends RepositoryModel implements AcquisitionTypeRepositoryInterface
 {
-
-
-
     /**
      *
      *

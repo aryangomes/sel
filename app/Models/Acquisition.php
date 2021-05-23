@@ -22,8 +22,9 @@ class Acquisition extends Model
      *
      * @var array
      */
-    protected $fillable = ['
-    price', 'quantity', 'idLender', 'idProvider', 'idAcquisitionType'];
+    protected $fillable = [
+        'price', 'quantity', 'idLender', 'idProvider', 'idAcquisitionType'
+    ];
 
     /**
      * The table associated with the model.

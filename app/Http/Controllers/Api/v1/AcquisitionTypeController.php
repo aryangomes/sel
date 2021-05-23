@@ -7,9 +7,8 @@ use App\Http\Requests\AcquisitionType\RegisterAcquisitionTypeRequest;
 use App\Http\Requests\AcquisitionType\UpdateAcquisitionTypeRequest;
 use App\Models\AcquisitionType;
 use App\Repositories\Interfaces\AcquisitionTypeRepositoryInterface;
-use Illuminate\Http\Request;
+
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 
 class AcquisitionTypeController extends Controller
 {
