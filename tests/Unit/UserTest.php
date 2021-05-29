@@ -19,7 +19,7 @@ class UserTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->urlUser = $this->url . 'user';
+        $this->urlUser = "{$this->url}users";
         parent::setUp();
     }
 

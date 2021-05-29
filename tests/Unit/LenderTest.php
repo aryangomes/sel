@@ -20,7 +20,7 @@ class LenderTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->urlLender = $this->url . 'lender';
+        $this->urlLender = "{$this->url}lenders";
         parent::setUp();
     }
 
@@ -61,13 +61,13 @@ class LenderTest extends TestCase
 
         $postLender = factory(Lender::class)->make(
             [
-                'name'=>null,
-                'streetAddress'=>null,
-                'email'=>'email',
-                'numberAddress'=>123,
+                'name' => null,
+                'streetAddress' => null,
+                'email' => 'email',
+                'numberAddress' => 123,
 
                 'neighborhoodAddress' => null,
-                'phoneNumber' =>null,
+                'phoneNumber' => null,
                 'cellNumber' =>  null,
                 'complementAddress' =>  null,
                 'site' =>  'null',
@@ -144,7 +144,6 @@ class LenderTest extends TestCase
         );
 
         $response->assertOk();
-
     }
 
     public function testDeleteLenderSuccessfully()
@@ -168,7 +167,7 @@ class LenderTest extends TestCase
         $response->assertOk();
 
         $lenderWasDeleted = isset(Lender::withTrashed()->find($lender->idLender)->deleted_at);
-        
+
         $this->assertTrue($lenderWasDeleted);
     }
 

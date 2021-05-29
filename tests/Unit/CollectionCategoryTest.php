@@ -20,7 +20,7 @@ class CollectionCategoryTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->urlCollectionCategory = "{$this->url}collectionCategory";
+        $this->urlCollectionCategory = "{$this->url}collectionCategories";
         parent::setUp();
     }
 

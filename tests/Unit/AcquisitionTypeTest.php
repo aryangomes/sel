@@ -20,7 +20,7 @@ class AcquisitionTypeTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->urlAcquisitionType = "{$this->url}acquisitionType";
+        $this->urlAcquisitionType = "{$this->url}acquisitionTypes";
         parent::setUp();
     }
 

@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\CollectionCategoryCollection;
-use App\Http\Resources\CollectionCategoryResource;
+use App\Http\Resources\CollectionCategory\CollectionCategoryCollection;
+use App\Http\Resources\CollectionCategory\CollectionCategoryResource;
 use App\Repositories\Interfaces\CollectionCategoryRepositoryInterface;
 
 use App\Repositories\RepositoryModel;
@@ -19,6 +19,7 @@ class CollectionCategoryRepository extends RepositoryModel implements Collection
 	 */
 	public function __construct(CollectionCategory $collectionCategoryModel)
 	{
+		$this->resourceName = 'Collection Category';
 		parent::__construct($collectionCategoryModel);
 	}
 

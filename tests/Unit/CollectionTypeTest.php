@@ -20,7 +20,7 @@ class CollectionTypeTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->urlCollectionType = "{$this->url}collectionType";
+        $this->urlCollectionType = "{$this->url}collectionTypes";
         parent::setUp();
     }
 

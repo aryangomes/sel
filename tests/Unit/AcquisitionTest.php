@@ -20,7 +20,7 @@ class AcquisitionTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->urlAcquisition = "{$this->url}acquisition";
+        $this->urlAcquisition = "{$this->url}acquisitions";
         parent::setUp();
     }
 
