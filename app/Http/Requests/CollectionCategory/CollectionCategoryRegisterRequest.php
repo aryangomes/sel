@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\AcquisitionType;
+namespace App\Http\Requests\CollectionCategory;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterAcquisitionTypeRequest extends FormRequest
+class CollectionCategoryRegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +13,7 @@ class RegisterAcquisitionTypeRequest extends FormRequest
      */
     public function authorize()
     {
-        return User::userMayToDoThisAction();
+        return true;
     }
 
     /**

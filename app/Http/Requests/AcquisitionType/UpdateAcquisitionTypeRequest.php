@@ -25,7 +25,7 @@ class UpdateAcquisitionTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => 'required|max:60'
+            'type' => 'required|max:100'
         ];
     }
 }

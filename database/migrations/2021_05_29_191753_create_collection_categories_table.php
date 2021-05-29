@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAcquisitionTypesTable extends Migration
+class CreateCollectionCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class CreateAcquisitionTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('acquisition_types', function (Blueprint $table) {
-            $table->bigIncrements('idAcquisitionType');
+        Schema::create('collection_categories', function (Blueprint $table) {
+            $table->bigIncrements('idCollectionCategory');
             $table->string('type', 100);
             $table->timestamps();
             $table->softDeletes();
@@ -28,6 +28,6 @@ class CreateAcquisitionTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('acquisition_types');
+        Schema::dropIfExists('collection_categories');
     }
 }

@@ -21,6 +21,7 @@ class AuthServiceProvider extends ServiceProvider
         'App\Models\AcquisitionType' => 'App\Policies\AcquisitionTypePolicy',
         'App\Models\Acquisition' => 'App\Policies\AcquisitionPolicy',
         'App\Models\CollectionType' => 'App\Policies\CollectionTypePolicy',
+        'App\Models\CollectionCategory' => 'App\Policies\CollectionCategoryPolicy',
     ];
 
     /**

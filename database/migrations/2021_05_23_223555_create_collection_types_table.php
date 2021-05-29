@@ -15,7 +15,7 @@ class CreateCollectionTypesTable extends Migration
     {
         Schema::create('collection_types', function (Blueprint $table) {
             $table->bigIncrements('idCollectionType');
-            $table->string('type', 60);
+            $table->string('type', 100);
             $table->timestamps();
             $table->softDeletes();
         });
