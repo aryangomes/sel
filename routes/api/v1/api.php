@@ -42,5 +42,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::resource('/collectionCopies', 'Api\v1\CollectionCopyController');
 
+    Route::resource('/loans', 'Api\v1\LoanController');
+
     Route::post('/logout', 'Api\v1\Auth\LoginController@logout');
 });

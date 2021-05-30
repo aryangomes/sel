@@ -1,0 +1,187 @@
+<?php
+
+namespace Tests\Unit;
+
+use App\Models\Loan;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Passport\Passport;
+use Tests\TestCase;
+
+class LoanTest extends TestCase
+{
+    use RefreshDatabase, WithFaker;
+
+    private $urlLoan;
+
+    /**
+     * @override
+     */
+    public function setUp(): void
+    {
+        $this->urlLoan = "{$this->url}loans";
+        parent::setUp();
+    }
+
+    /**
+     * @override
+     */
+    public function tearDown(): void
+    {
+        parent::tearDown();
+    }
+
+    public function testRegisterLoanSuccessfully()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $postLoan = factory(Loan::class)->make()->toArray();
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->postJson($this->urlLoan, $postLoan);
+
+        $response->assertCreated();
+    }
+
+    public function testRegisterLoanFailedWithInvalidData()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $postLoan = factory(Loan::class)->make(
+            [
+                'loansIdentifier' => $this->faker->text(100),
+                'returnDate' => $this->faker->dateTimeInInterval('now', '-5 days'),
+                'expectedReturnDate' => $this->faker->dateTimeInInterval('now', '-7 days'),
+                'observation' => $this->faker->randomNumber(5),
+                'idOperatorUser' => factory(User::class),
+                'idBorrowerUser' => factory(User::class),
+            ]
+        )->toArray();
+
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->postJson($this->urlLoan, $postLoan);
+
+        $response->assertStatus(422);
+    }
+
+    public function testUpdateLoanSuccessfully()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $loan = factory(Loan::class)->create();
+
+        $dataUpdateForLoan = [
+            'returnDate' => Carbon::now()->addDays(4)->toDateTimeString(),
+            'observation' => $this->faker->text(),
+        ];
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->putJson(
+            $this->urlWithParameter($this->urlLoan, $loan->idLoan),
+            $dataUpdateForLoan
+        );
+
+        $response->assertOk();
+
+        $getLoan = $response->getData()->loan;
+
+        $this->assertEquals($getLoan->returnDate, $dataUpdateForLoan['returnDate']);
+        $this->assertEquals($getLoan->observation, $dataUpdateForLoan['observation']);
+    }
+
+    public function testViewLoanDataSuccessfully()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $loan = factory(Loan::class)->create();
+
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->getJson(
+            $this->urlWithParameter($this->urlLoan, $loan->idLoan)
+        );
+
+        $response->assertOk();
+
+
+        $user = factory(User::class)->create();
+
+        Passport::actingAs($user);
+        $this->assertAuthenticatedAs($user, 'api');
+
+        $response = $this->getJson(
+            $this->urlWithParameter($this->urlLoan, $loan->idLoan)
+        );
+
+        $response->assertOk();
+    }
+
+    public function testDeleteLoanSuccessfully()
+    {
+        $userAdmin = factory(User::class)->create(
+            [
+                'isAdmin' => 1
+            ]
+        );
+
+        $loan = factory(Loan::class)->create();
+
+
+        Passport::actingAs($userAdmin);
+        $this->assertAuthenticatedAs($userAdmin, 'api');
+
+        $response = $this->deleteJson(
+            $this->urlWithParameter($this->urlLoan, $loan->idLoan)
+        );
+
+        $response->assertOk();
+
+        $loanWasDeleted = isset(Loan::withTrashed()->find($loan->idLoan)->deleted_at);
+
+        $this->assertTrue($loanWasDeleted);
+    }
+
+    public function testUserNotAdminTruingDeleteLoanUnsuccessfully()
+    {
+        $user = factory(User::class)->create();
+
+        $loan = factory(Loan::class)->create();
+
+
+        Passport::actingAs($user);
+        $this->assertAuthenticatedAs($user, 'api');
+
+        $response = $this->deleteJson(
+            $this->urlWithParameter($this->urlLoan, $loan->idLoan)
+        );
+
+        $response->assertForbidden();
+    }
+}
