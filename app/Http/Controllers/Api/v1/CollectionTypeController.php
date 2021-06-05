@@ -10,7 +10,7 @@ use App\Repositories\Interfaces\CollectionTypeRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class CollectionTypeController extends Controller
+class CollectionTypeController extends ApiController
 {
 
     private $collectionType;
@@ -161,7 +161,7 @@ class CollectionTypeController extends Controller
                     'httpResponses.deleted.success',
                     ['resource' => $this->collectionTypeRepository->resourceName]
                 ),
-                Controller::KEY_SUCCESS_CONTENT,
+                ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
             );
         } else {

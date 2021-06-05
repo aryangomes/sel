@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1\Auth;
 
 use App\Events\LoginUserEvent;
 use App\Events\LogoutUserEvent;
+use App\Http\Controllers\Api\v1\ApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Login\LoginUserAdministrator;
 use App\Http\Requests\Login\LoginUserAdministratorRequest;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
-class LoginController extends Controller
+class LoginController extends ApiController
 {
     /*
     |--------------------------------------------------------------------------

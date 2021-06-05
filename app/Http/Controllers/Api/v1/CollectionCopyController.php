@@ -10,7 +10,7 @@ use App\Repositories\Interfaces\CollectionCopyRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class CollectionCopyController extends Controller
+class CollectionCopyController extends ApiController
 {
 
     private $collectionCopy;
@@ -161,7 +161,7 @@ class CollectionCopyController extends Controller
                     'httpResponses.deleted.success',
                     ['resource' => $this->collectionCopyRepository->resourceName]
                 ),
-                Controller::KEY_SUCCESS_CONTENT,
+                ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
             );
         } else {

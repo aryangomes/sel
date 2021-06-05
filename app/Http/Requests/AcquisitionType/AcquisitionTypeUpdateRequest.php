@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Acquisition;
+namespace App\Http\Requests\AcquisitionType;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterAcquisitionRequest extends FormRequest
+class AcquisitionTypeUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -16,6 +16,7 @@ class RegisterAcquisitionRequest extends FormRequest
     {
         return User::userMayToDoThisAction();
     }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -24,11 +25,7 @@ class RegisterAcquisitionRequest extends FormRequest
     public function rules()
     {
         return [
-            'price' => 'required|numeric|min:0|max:1000000',
-            'quantity' => 'required|numeric|min:1|max:1000000',
-            'idLender' => 'required',
-            'idProvider' => 'required',
-            'idAcquisitionType' => 'required',
+            'type' => 'required|max:100'
         ];
     }
 }
