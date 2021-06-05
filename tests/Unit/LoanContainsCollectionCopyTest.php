@@ -120,26 +120,14 @@ class LoanContainsCollectionCopyTest extends TestCase
             ]
         );
 
-        $loan = factory(LoanContainsCollectionCopy::class)->create();
+        $loanContainsCollectionCopy = factory(LoanContainsCollectionCopy::class)->create();
 
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson(
-            $this->urlWithParameter($this->urlLoanContainsCollectionCopy, $loan->idLoanContainsCollectionCopy)
-        );
-
-        $response->assertOk();
-
-
-        $user = factory(User::class)->create();
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
-
-        $response = $this->getJson(
-            $this->urlWithParameter($this->urlLoanContainsCollectionCopy, $loan->idLoanContainsCollectionCopy)
+            $this->urlWithParameter($this->urlLoanContainsCollectionCopy, $loanContainsCollectionCopy->idLoanContainsCollectionCopy)
         );
 
         $response->assertOk();

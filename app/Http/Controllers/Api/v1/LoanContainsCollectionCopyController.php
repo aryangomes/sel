@@ -19,6 +19,7 @@ class LoanContainsCollectionCopyController extends ApiController
         LoanContainsCollectionCopyRepositoryInterface $loanContainsCollectionCopyRepository,
         LoanContainsCollectionCopy $loanContainsCollectionCopy
     ) {
+        $this->authorizeResource(LoanContainsCollectionCopy::class, 'loanContainsCollectionCopy');
         $this->loanContainsCollectionCopyRepository = $loanContainsCollectionCopyRepository;
         $this->loanContainsCollectionCopy = $loanContainsCollectionCopy;
     }
@@ -61,7 +62,6 @@ class LoanContainsCollectionCopyController extends ApiController
      */
     public function store(LoanContainsCollectionCopyRegisterRequest $request)
     {
-        $this->authorize('create', $this->loanContainsCollectionCopy);
 
         $requestValidated = $request->validated();
 
@@ -90,7 +90,7 @@ class LoanContainsCollectionCopyController extends ApiController
      */
     public function show(LoanContainsCollectionCopy $loanContainsCollectionCopy)
     {
-        //
+        return $this->loanContainsCollectionCopyRepository->getResourceModel($loanContainsCollectionCopy);
     }
 
     /**
@@ -115,7 +115,6 @@ class LoanContainsCollectionCopyController extends ApiController
     {
         $this->loanContainsCollectionCopy = $loanContainsCollectionCopy;
 
-        $this->authorize('update',  $this->loanContainsCollectionCopy);
 
         $requestValidated = $request->validated();
 
@@ -147,7 +146,6 @@ class LoanContainsCollectionCopyController extends ApiController
     {
         $this->loanContainsCollectionCopy = $loanContainsCollectionCopy;
 
-        $this->authorize('delete',  $this->loanContainsCollectionCopy);
 
         $this->loanContainsCollectionCopyRepository->delete($this->loanContainsCollectionCopy);
 
