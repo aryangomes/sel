@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
-class LenderController extends Controller
+class LenderController extends ApiController
 {
     /**
      * Display a listing of the resource.

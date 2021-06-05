@@ -10,7 +10,7 @@ use App\Repositories\Interfaces\AcquisitionRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class AcquisitionController extends Controller
+class AcquisitionController extends ApiController
 {
 
     private $acquisition;
@@ -161,7 +161,7 @@ class AcquisitionController extends Controller
                     'httpResponses.deleted.success',
                     ['resource' => $this->acquisitionRepository->resourceName]
                 ),
-                Controller::KEY_SUCCESS_CONTENT,
+                ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
             );
         } else {

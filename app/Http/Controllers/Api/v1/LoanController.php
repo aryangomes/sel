@@ -10,7 +10,7 @@ use App\Repositories\Interfaces\LoanRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class LoanController extends Controller
+class LoanController extends ApiController
 {
 
     private $loan;
@@ -161,7 +161,7 @@ class LoanController extends Controller
                     'httpResponses.deleted.success',
                     ['resource' => $this->loanRepository->resourceName]
                 ),
-                Controller::KEY_SUCCESS_CONTENT,
+                ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
             );
         } else {

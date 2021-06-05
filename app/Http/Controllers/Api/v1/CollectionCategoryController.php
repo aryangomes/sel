@@ -9,7 +9,7 @@ use App\Models\CollectionCategory;
 use App\Repositories\Interfaces\CollectionCategoryRepositoryInterface;
 use Illuminate\Http\Response;
 
-class CollectionCategoryController extends Controller
+class CollectionCategoryController extends ApiController
 {
 
     private $collectionCategory;
@@ -160,7 +160,7 @@ class CollectionCategoryController extends Controller
                     'httpResponses.deleted.success',
                     ['resource' => $this->collectionCategoryRepository->resourceName]
                 ),
-                Controller::KEY_SUCCESS_CONTENT,
+                ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
             );
         } else {

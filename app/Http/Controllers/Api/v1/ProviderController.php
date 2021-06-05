@@ -14,7 +14,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ProviderController extends Controller
+class ProviderController extends ApiController
 {
 
     public $typesOfProvider = [
