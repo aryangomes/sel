@@ -69,6 +69,11 @@ class RepositoryServiceProvider extends ServiceProvider
             'App\Repositories\Interfaces\LoanContainsCollectionCopyRepositoryInterface',
             'App\Repositories\LoanContainsCollectionCopyRepository'
         );
+
+        $this->app->bind(
+            'App\Repositories\Interfaces\UserRepositoryInterface',
+            'App\Repositories\UserRepository'
+        );
     }
 
     /**

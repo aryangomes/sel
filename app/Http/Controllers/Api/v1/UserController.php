@@ -2,18 +2,29 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
+
 use App\Http\Requests\User\UserRegisterRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class UserController extends ApiController
 {
+
+    private $user;
+
+    private $userRepository;
+
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        User $user
+    ) {
+        $this->userRepository = $userRepository;
+        $this->user = $user;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -21,7 +32,17 @@ class UserController extends ApiController
      */
     public function index()
     {
-        //
+        $this->userRepository->getResourceCollectionModel();
+
+        if ($this->userRepository->transactionIsSuccessfully) {
+
+            $this->setSuccessResponse($this->userRepository->responseFromTransaction);
+        } else {
+            $this->logErrorFromException($this->userRepository->exceptionFromTransaction);
+            $this->setErrorResponse();
+        }
+
+        return $this->responseWithJson();
     }
 
     /**
@@ -42,30 +63,22 @@ class UserController extends ApiController
      */
     public function store(UserRegisterRequest $request)
     {
+        $this->authorize('create', $this->user);
+
         $requestValidated = $request->validated();
 
-        $userWasCreated = false;
+        $this->userRepository->create($requestValidated);
 
-        $this->authorize('create', new User());
-
-        try {
-            DB::beginTransaction();
-
-            $userCreated = User::create($requestValidated);
-
-            $userWasCreated = isset($userCreated);
-        } catch (\Exception $exception) {
-
-            $this->logErrorFromException($exception);
-        }
-
-        if ($userWasCreated) {
-            DB::commit();
+        if ($this->userRepository->transactionIsSuccessfully) {
+            $userCreated =
+                $this->userRepository->getResourceModel($this->userRepository->responseFromTransaction);
 
             $this->setSuccessResponse($userCreated, 'user', Response::HTTP_CREATED);
         } else {
-            DB::rollBack();
-            $this->setErrorResponse();
+            $this->setErrorResponse(__(
+                'httpResponses.created.error',
+                ['resource' => $this->userRepository->resourceName]
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
@@ -79,8 +92,10 @@ class UserController extends ApiController
      */
     public function show(User $user)
     {
-        $this->authorize('view', $user);
-        return $user;
+        $this->user = $user;
+        $this->authorize('view', $this->user);
+
+        return $this->userRepository->getResourceModel($user);
     }
 
     /**
@@ -103,29 +118,25 @@ class UserController extends ApiController
      */
     public function update(UserUpdateRequest $request, User $user)
     {
+        $this->user = $user;
+
+        $this->authorize('update',  $this->user);
+
         $requestValidated = $request->validated();
 
-        $userWasUpdated = false;
+        $this->userRepository->update($requestValidated, $this->user);
 
+        if ($this->userRepository->transactionIsSuccessfully) {
 
-        $this->authorize('update', $user);
+            $userUpdated =
+                $this->userRepository->getResourceModel($this->user);
 
-        try {
-            DB::beginTransaction();
-
-            $userWasUpdated = $user->update($requestValidated);
-        } catch (\Exception $exception) {
-
-            $this->logErrorFromException($exception);
-        }
-
-        if ($userWasUpdated) {
-            DB::commit();
-
-            $this->setSuccessResponse($user, 'user', 200);
+            $this->setSuccessResponse($userUpdated, 'user', Response::HTTP_OK);
         } else {
-            DB::rollBack();
-            $this->setErrorResponse();
+            $this->setErrorResponse(__(
+                'httpResponses.updated.error',
+                ['resource' => $this->userRepository->resourceName]
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
@@ -139,32 +150,28 @@ class UserController extends ApiController
      */
     public function destroy(User $user)
     {
+        $this->user = $user;
 
-        $userWasLogout =  $userWasDeleted = false;
+        $this->authorize('delete',  $this->user);
 
-        $this->authorize('delete', $user);
+        $this->userRepository->delete($this->user);
 
-        if (Auth::guard('api')->check()) {
+        if ($this->userRepository->transactionIsSuccessfully) {
 
-            try {
-                DB::beginTransaction();
 
-                $userWasLogout = $user->logout();
-
-                $userWasDeleted = $user->delete();
-            } catch (\Exception $exception) {
-                $this->logErrorFromException($exception);
-            }
-        }
-
-        $userWasLogoutAndDeleted = ($userWasLogout ==  $userWasDeleted);
-
-        if ($userWasLogoutAndDeleted) {
-            DB::commit();
-            $this->setSuccessResponse('User deleted successfully', 'success', Response::HTTP_OK);
+            $this->setSuccessResponse(
+                __(
+                    'httpResponses.deleted.success',
+                    ['resource' => $this->userRepository->resourceName]
+                ),
+                ApiController::KEY_SUCCESS_CONTENT,
+                Response::HTTP_OK
+            );
         } else {
-            DB::rollBack();
-            $this->setErrorResponse('User deleted failed', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+            $this->setErrorResponse(__(
+                'httpResponses.deleted.error',
+                $this->userRepository->resourceName
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
