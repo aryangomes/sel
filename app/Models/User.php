@@ -8,6 +8,7 @@ use App\Traits\UuidPrimaryKey;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,7 @@ class User extends Authenticatable
         'name', 'email', 'password', 'streetAddress',
         'neighborhoodAddress', 'numberAddress',
         'phoneNumber', 'cellNumber', 'complementAddress', 'photo',
-        'isAdmin', 'cpf'
+        'isAdmin', 'cpf', 'idUserProfile'
     ];
 
     /**
@@ -161,5 +162,15 @@ class User extends Authenticatable
     public function mayToDoThisAction()
     {
         return ($this->isAdmin) ? Response::allow() : Response::deny('User should Administrator to do this action.');
+    }
+
+    /**
+     * Get the profile associated with the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function profile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class, 'idProfile', 'idUserProfile');
     }
 }
