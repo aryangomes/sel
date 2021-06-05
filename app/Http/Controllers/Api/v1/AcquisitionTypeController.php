@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AcquisitionType\RegisterAcquisitionTypeRequest;
-use App\Http\Requests\AcquisitionType\UpdateAcquisitionTypeRequest;
+use App\Http\Requests\AcquisitionType\AcquisitionTypeRegisterRequest;
+use App\Http\Requests\AcquisitionType\AcquisitionTypeUpdateRequest;
 use App\Models\AcquisitionType;
 use App\Repositories\Interfaces\AcquisitionTypeRepositoryInterface;
 
@@ -61,7 +61,7 @@ class AcquisitionTypeController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(RegisterAcquisitionTypeRequest $request)
+    public function store(AcquisitionTypeRegisterRequest $request)
     {
         $this->authorize('create', $this->acquisitionType);
 
@@ -113,7 +113,7 @@ class AcquisitionTypeController extends ApiController
      * @param  \App\Models\AcquisitionType  $acquisitionType
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateAcquisitionTypeRequest $request, AcquisitionType $acquisitionType)
+    public function update(AcquisitionTypeUpdateRequest $request, AcquisitionType $acquisitionType)
     {
         $this->acquisitionType = $acquisitionType;
 

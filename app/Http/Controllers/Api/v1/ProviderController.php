@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Provider\RegisterProviderRequest;
-use App\Http\Requests\Provider\UpdateProviderRequest;
+use App\Http\Requests\Provider\ProviderRegisterRequest;
+use App\Http\Requests\Provider\ProviderUpdateRequest;
 use App\Http\Resources\ProviderResource;
 use App\Models\JuridicPerson;
 use App\Models\NaturalPerson;
@@ -48,7 +48,7 @@ class ProviderController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(RegisterProviderRequest $request)
+    public function store(ProviderRegisterRequest $request)
     {
         $requestValidated = $request->validated();
 
@@ -138,7 +138,7 @@ class ProviderController extends ApiController
      * @param  \App\Models\Provider  $provider
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateProviderRequest $request, Provider $provider)
+    public function update(ProviderUpdateRequest $request, Provider $provider)
     {
         $requestValidated = $request->validated();
 

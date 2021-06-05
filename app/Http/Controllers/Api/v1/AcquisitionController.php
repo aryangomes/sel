@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Acquisition\RegisterAcquisitionRequest;
-use App\Http\Requests\Acquisition\UpdateAcquisitionRequest;
+use App\Http\Requests\Acquisition\AcquisitionRegisterRequest;
+use App\Http\Requests\Acquisition\AcquisitionUpdateRequest;
 use App\Models\Acquisition;
 use App\Repositories\Interfaces\AcquisitionRepositoryInterface;
 use Illuminate\Http\Request;
@@ -61,7 +61,7 @@ class AcquisitionController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(RegisterAcquisitionRequest $request)
+    public function store(AcquisitionRegisterRequest $request)
     {
         $this->authorize('create', $this->acquisition);
 
@@ -113,7 +113,7 @@ class AcquisitionController extends ApiController
      * @param  \App\Models\Acquisition  $acquisition
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateAcquisitionRequest $request, Acquisition $acquisition)
+    public function update(AcquisitionUpdateRequest $request, Acquisition $acquisition)
     {
         $this->acquisition = $acquisition;
 
