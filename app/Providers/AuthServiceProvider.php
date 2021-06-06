@@ -16,8 +16,18 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         'App\Models\User' => 'App\Policies\UserPolicy',
-       'App\Models\Lender' => 'App\Policies\LenderPolicy',
-       'App\Models\Provider' => 'App\Policies\ProviderPolicy',
+        'App\Models\Lender' => 'App\Policies\LenderPolicy',
+        'App\Models\Provider' => 'App\Policies\ProviderPolicy',
+        'App\Models\AcquisitionType' => 'App\Policies\AcquisitionTypePolicy',
+        'App\Models\Acquisition' => 'App\Policies\AcquisitionPolicy',
+        'App\Models\CollectionType' => 'App\Policies\CollectionTypePolicy',
+        'App\Models\CollectionCategory' => 'App\Policies\CollectionCategoryPolicy',
+        'App\Models\Collection' => 'App\Policies\CollectionPolicy',
+        'App\Models\CollectionCopy' => 'App\Policies\CollectionCopyPolicy',
+        'App\Models\Loan' => 'App\Policies\LoanPolicy',
+        'App\Models\LoanContainsCollectionCopy' => 'App\Policies\LoanContainsCollectionCopyPolicy',
+        'App\Models\UserProfile' => 'App\Policies\UserProfilePolicy',
+        'App\Models\Rule' => 'App\Policies\RulePolicy',
     ];
 
     /**

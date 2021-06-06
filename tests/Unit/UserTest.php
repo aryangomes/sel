@@ -19,7 +19,7 @@ class UserTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->urlUser = $this->url . 'user';
+        $this->urlUser = "{$this->url}users";
         parent::setUp();
     }
 
@@ -228,7 +228,12 @@ class UserTest extends TestCase
         )->getJson(
             $this->urlWithParameter($this->urlUser, $otherUser->id)
         );
-
+        logger(
+            get_class($this),
+            [
+                'response' => $response
+            ]
+        );
         $response->assertForbidden();
     }
 

@@ -1,15 +1,10 @@
 #!/bin/bash
 USUARIO=sel
 
-sudo -u $USUARIO /bin/bash
-
 service apache2 start
 
 sudo /usr/sbin/cron -f
 
-alias phptest="./vendor/phpunit/phpunit/phpunit"
+sudo chmod -R 775 storage/logs
 
-chown -R $USUARIO:www-data storage
-
-chown -R $USUARIO:www-data bootstrap/cache
-
+sudo -u $USUARIO /bin/bash

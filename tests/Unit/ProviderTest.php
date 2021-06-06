@@ -23,7 +23,7 @@ class ProviderTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->urlProvider = $this->url . 'provider';
+        $this->urlProvider = "{$this->url}providers";
         parent::setUp();
     }
 
@@ -105,7 +105,7 @@ class ProviderTest extends TestCase
 
         $this->assertEquals($naturalPersonCreated->juridicPerson->cnpj, $postProvider['cnpj']);
     }
-    
+
 
     public function testRegisterProviderFailedWithInvalidData()
     {
@@ -248,7 +248,7 @@ class ProviderTest extends TestCase
         $response->assertOk();
 
         $providerWasDeleted = isset(Provider::withTrashed()->find($naturalPersonProvider->idProvider)->deleted_at);
-        
+
         $naturalPersonProviderWasDeleted = isset(NaturalPerson::withTrashed()->find($naturalPersonProvider->idNaturalPerson)->deleted_at);
 
         $this->assertTrue($providerWasDeleted);
@@ -276,7 +276,7 @@ class ProviderTest extends TestCase
         $response->assertOk();
 
         $providerWasDeleted = isset(Provider::withTrashed()->find($juridicPersonProvider->idProvider)->deleted_at);
-        
+
         $juridicPersonProviderWasDeleted = isset(JuridicPerson::withTrashed()->find($juridicPersonProvider->idJuridicPerson)->deleted_at);
 
         $this->assertTrue($providerWasDeleted);

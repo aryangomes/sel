@@ -24,11 +24,31 @@ Route::prefix('login')->group(function () {
 
 Route::middleware('auth:api')->group(function () {
 
-    Route::resource('/user', 'Api\v1\UserController');
+    Route::resource('/users', 'Api\v1\UserController');
 
-    Route::resource('/lender', 'Api\v1\LenderController');
+    Route::resource('/lenders', 'Api\v1\LenderController');
 
-    Route::resource('/provider', 'Api\v1\ProviderController');
+    Route::resource('/providers', 'Api\v1\ProviderController');
+
+    Route::resource('/acquisitionTypes', 'Api\v1\AcquisitionTypeController');
+
+    Route::resource('/acquisitions', 'Api\v1\AcquisitionController');
+
+    Route::resource('/collectionTypes', 'Api\v1\CollectionTypeController');
+
+    Route::resource('/collectionCategories', 'Api\v1\CollectionCategoryController');
+
+    Route::resource('/collections', 'Api\v1\CollectionController');
+
+    Route::resource('/collectionCopies', 'Api\v1\CollectionCopyController');
+
+    Route::resource('/loans', 'Api\v1\LoanController');
+
+    Route::resource('/loanContainsCollectionCopies', 'Api\v1\LoanContainsCollectionCopyController');
+
+    Route::resource('/userProfiles', 'Api\v1\UserProfileController');
+
+    Route::resource('/rules', 'Api\v1\RuleController');
 
     Route::post('/logout', 'Api\v1\Auth\LoginController@logout');
 });

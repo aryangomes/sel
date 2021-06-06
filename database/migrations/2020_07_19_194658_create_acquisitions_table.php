@@ -13,12 +13,12 @@ class CreateAcquisitionsTable extends Migration
      */
     public function up()
     {
-     /*    Schema::create('acquisitions', function (Blueprint $table) {
+        Schema::create('acquisitions', function (Blueprint $table) {
             $table->bigIncrements('idAcquisition');
             $table->double('price')->default(0);
             $table->integer('quantity')->default(1);
             $table->timestamps();
-             $table->softDeletes();
+            $table->softDeletes();
 
             $table->unsignedBigInteger('idLender');
 
@@ -39,7 +39,7 @@ class CreateAcquisitionsTable extends Migration
             $table->foreign('idAcquisitionType')
                 ->references('idAcquisitionType')
                 ->on('acquisition_types');
-        }); */
+        });
     }
 
     /**

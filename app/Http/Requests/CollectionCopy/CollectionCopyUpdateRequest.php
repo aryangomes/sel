@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Acquisition;
+namespace App\Http\Requests\CollectionCopy;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateAcquisitionRequest extends FormRequest
+class CollectionCopyUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class UpdateAcquisitionRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,8 @@ class UpdateAcquisitionRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'reference' => 'string|max:50',
+            'isAvailable' => 'required|boolean',
         ];
     }
 }

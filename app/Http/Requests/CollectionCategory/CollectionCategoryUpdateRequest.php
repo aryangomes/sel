@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Acquisition;
+namespace App\Http\Requests\CollectionCategory;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterAcquisitionRequest extends FormRequest
+class CollectionCategoryUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class RegisterAcquisitionRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,7 @@ class RegisterAcquisitionRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'type' => 'required|max:100'
         ];
     }
 }
