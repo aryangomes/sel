@@ -27,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         'App\Models\Loan' => 'App\Policies\LoanPolicy',
         'App\Models\LoanContainsCollectionCopy' => 'App\Policies\LoanContainsCollectionCopyPolicy',
         'App\Models\UserProfile' => 'App\Policies\UserProfilePolicy',
+        'App\Models\Rule' => 'App\Policies\RulePolicy',
     ];
 
     /**

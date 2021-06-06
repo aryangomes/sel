@@ -48,5 +48,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::resource('/userProfiles', 'Api\v1\UserProfileController');
 
+    Route::resource('/rules', 'Api\v1\RuleController');
+
     Route::post('/logout', 'Api\v1\Auth\LoginController@logout');
 });
