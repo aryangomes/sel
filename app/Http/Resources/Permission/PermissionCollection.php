@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources\UserProfile;
+namespace App\Http\Resources\Permission;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class UserProfileCollection extends ResourceCollection
+class PermissionCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.

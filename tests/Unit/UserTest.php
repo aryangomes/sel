@@ -228,12 +228,7 @@ class UserTest extends TestCase
         )->getJson(
             $this->urlWithParameter($this->urlUser, $otherUser->id)
         );
-        logger(
-            get_class($this),
-            [
-                'response' => $response
-            ]
-        );
+      
         $response->assertForbidden();
     }
 

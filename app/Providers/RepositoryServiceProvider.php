@@ -76,13 +76,13 @@ class RepositoryServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            'App\Repositories\Interfaces\UserProfileRepositoryInterface',
-            'App\Repositories\UserProfileRepository'
+            'App\Repositories\Interfaces\ProfileRepositoryInterface',
+            'App\Repositories\ProfileRepository'
         );
 
         $this->app->bind(
-            'App\Repositories\Interfaces\RuleRepositoryInterface',
-            'App\Repositories\RuleRepository'
+            'App\Repositories\Interfaces\PermissionRepositoryInterface',
+            'App\Repositories\PermissionRepository'
         );
     }
 

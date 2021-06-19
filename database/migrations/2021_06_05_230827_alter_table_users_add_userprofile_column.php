@@ -14,11 +14,11 @@ class AlterTableUsersAddUserprofileColumn extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('idUserProfile')->nullable();
+            $table->unsignedBigInteger('idProfile')->nullable();
 
-            $table->foreign('idUserProfile')
+            $table->foreign('idProfile')
                 ->references('idProfile')
-                ->on('user_profiles');
+                ->on('profiles');
         });
     }
 
@@ -30,7 +30,7 @@ class AlterTableUsersAddUserprofileColumn extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('idUserProfile');
+            $table->dropColumn('idProfile');
         });
     }
 }

@@ -32,7 +32,7 @@ class User extends Authenticatable
         'name', 'email', 'password', 'streetAddress',
         'neighborhoodAddress', 'numberAddress',
         'phoneNumber', 'cellNumber', 'complementAddress', 'photo',
-        'isAdmin', 'cpf', 'idUserProfile'
+        'isAdmin', 'cpf', 'idProfile'
     ];
 
     /**
@@ -171,6 +171,6 @@ class User extends Authenticatable
      */
     public function profile(): HasOne
     {
-        return $this->hasOne(UserProfile::class, 'idProfile', 'idUserProfile');
+        return $this->hasOne(Profile::class, 'idProfile', 'idProfile');
     }
 }

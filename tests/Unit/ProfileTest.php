@@ -3,25 +3,25 @@
 namespace Tests\Unit;
 
 use App\Models\User;
-use App\Models\UserProfile;
+use App\Models\Profile;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
-class UserProfileTest extends TestCase
+class ProfileTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    private $urlUserProfile;
+    private $urlProfile;
 
     /**
      * @override
      */
     public function setUp(): void
     {
-        $this->urlUserProfile = "{$this->url}userProfiles";
+        $this->urlProfile = "{$this->url}profiles";
         parent::setUp();
     }
 
@@ -33,7 +33,7 @@ class UserProfileTest extends TestCase
         parent::tearDown();
     }
 
-    public function testRegisterUserProfileSuccessfully()
+    public function testRegisterProfileSuccessfully()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -41,17 +41,17 @@ class UserProfileTest extends TestCase
             ]
         );
 
-        $postUserProfile = factory(UserProfile::class)->make()->toArray();
+        $postProfile = factory(Profile::class)->make()->toArray();
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
-        $response = $this->postJson($this->urlUserProfile, $postUserProfile);
+        $response = $this->postJson($this->urlProfile, $postProfile);
 
         $response->assertCreated();
     }
 
-    public function testRegisterUserProfileFailedWithInvalidData()
+    public function testRegisterProfileFailedWithInvalidData()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -59,7 +59,7 @@ class UserProfileTest extends TestCase
             ]
         );
 
-        $postUserProfile = factory(UserProfile::class)->make(
+        $postProfile = factory(Profile::class)->make(
             [
                 'profile' => $this->faker->randomDigit,
 
@@ -70,12 +70,12 @@ class UserProfileTest extends TestCase
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
-        $response = $this->postJson($this->urlUserProfile, $postUserProfile);
+        $response = $this->postJson($this->urlProfile, $postProfile);
 
         $response->assertStatus(422);
     }
 
-    public function testUpdateUserProfileSuccessfully()
+    public function testUpdateProfileSuccessfully()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -83,9 +83,9 @@ class UserProfileTest extends TestCase
             ]
         );
 
-        $userProfile = factory(UserProfile::class)->create();
+        $profile = factory(Profile::class)->create();
 
-        $dataUpdateForUserProfile = [
+        $dataUpdateForProfile = [
             'profile' => $this->faker->numerify('Profile ###'),
         ];
 
@@ -93,21 +93,21 @@ class UserProfileTest extends TestCase
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->putJson(
-            $this->urlWithParameter($this->urlUserProfile, $userProfile->idProfile),
-            $dataUpdateForUserProfile
+            $this->urlWithParameter($this->urlProfile, $profile->idProfile),
+            $dataUpdateForProfile
         );
 
         $response->assertOk();
 
-        $getUserProfile = $response->getData()->userProfile;
+        $getProfile = $response->getData()->profile;
 
         $this->assertEquals(
-            $getUserProfile->profile,
-            $dataUpdateForUserProfile['profile']
+            $getProfile->profile,
+            $dataUpdateForProfile['profile']
         );
     }
 
-    public function testViewUserProfileDataSuccessfully()
+    public function testViewProfileDataSuccessfully()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -115,14 +115,14 @@ class UserProfileTest extends TestCase
             ]
         );
 
-        $userProfile = factory(UserProfile::class)->create();
+        $profile = factory(Profile::class)->create();
 
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson(
-            $this->urlWithParameter($this->urlUserProfile, $userProfile->idProfile)
+            $this->urlWithParameter($this->urlProfile, $profile->idProfile)
         );
 
         $response->assertOk();
@@ -138,13 +138,13 @@ class UserProfileTest extends TestCase
         $this->assertAuthenticatedAs($user, 'api');
 
         $response = $this->getJson(
-            $this->urlWithParameter($this->urlUserProfile, $userProfile->idProfile)
+            $this->urlWithParameter($this->urlProfile, $profile->idProfile)
         );
 
         $response->assertOk();
     }
 
-    public function testDeleteUserProfileSuccessfully()
+    public function testDeleteProfileSuccessfully()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -152,35 +152,35 @@ class UserProfileTest extends TestCase
             ]
         );
 
-        $userProfile = factory(UserProfile::class)->create();
+        $profile = factory(Profile::class)->create();
 
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->deleteJson(
-            $this->urlWithParameter($this->urlUserProfile, $userProfile->idProfile)
+            $this->urlWithParameter($this->urlProfile, $profile->idProfile)
         );
 
         $response->assertOk();
 
-        $userProfileWasDeleted = isset(UserProfile::withTrashed()->find($userProfile->idProfile)->deleted_at);
+        $profileWasDeleted = isset(Profile::withTrashed()->find($profile->idProfile)->deleted_at);
 
-        $this->assertTrue($userProfileWasDeleted);
+        $this->assertTrue($profileWasDeleted);
     }
 
-    public function testUserNotAdminTruingDeleteUserProfileUnsuccessfully()
+    public function testUserNotAdminTruingDeleteProfileUnsuccessfully()
     {
         $user = factory(User::class)->create();
 
-        $userProfile = factory(UserProfile::class)->create();
+        $profile = factory(Profile::class)->create();
 
 
         Passport::actingAs($user);
         $this->assertAuthenticatedAs($user, 'api');
 
         $response = $this->deleteJson(
-            $this->urlWithParameter($this->urlUserProfile, $userProfile->idProfile)
+            $this->urlWithParameter($this->urlProfile, $profile->idProfile)
         );
 
         $response->assertForbidden();

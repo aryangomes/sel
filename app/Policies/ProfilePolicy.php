@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\UserProfile;
+use App\Models\Profile;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class UserProfilePolicy
+class ProfilePolicy
 {
     use HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class UserProfilePolicy
      * Determine whether the user can view the user profile.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\UserProfile  $userProfile
+     * @param  \App\Models\Profile  $profile
      * @return mixed
      */
-    public function view(User $user, UserProfile $userProfile)
+    public function view(User $user, Profile $profile)
     {
         return $user->mayToDoThisAction();
     }
@@ -48,10 +48,10 @@ class UserProfilePolicy
      * Determine whether the user can update the user profile.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\UserProfile  $userProfile
+     * @param  \App\Models\Profile  $profile
      * @return mixed
      */
-    public function update(User $user, UserProfile $userProfile)
+    public function update(User $user, Profile $profile)
     {
         return $user->mayToDoThisAction();
     }
@@ -60,10 +60,10 @@ class UserProfilePolicy
      * Determine whether the user can delete the user profile.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\UserProfile  $userProfile
+     * @param  \App\Models\Profile  $profile
      * @return mixed
      */
-    public function delete(User $user, UserProfile $userProfile)
+    public function delete(User $user, Profile $profile)
     {
         return $user->mayToDoThisAction();
     }
@@ -72,10 +72,10 @@ class UserProfilePolicy
      * Determine whether the user can restore the user profile.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\UserProfile  $userProfile
+     * @param  \App\Models\Profile  $profile
      * @return mixed
      */
-    public function restore(User $user, UserProfile $userProfile)
+    public function restore(User $user, Profile $profile)
     {
         //
     }
@@ -84,10 +84,10 @@ class UserProfilePolicy
      * Determine whether the user can permanently delete the user profile.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\UserProfile  $userProfile
+     * @param  \App\Models\Profile  $profile
      * @return mixed
      */
-    public function forceDelete(User $user, UserProfile $userProfile)
+    public function forceDelete(User $user, Profile $profile)
     {
         //
     }

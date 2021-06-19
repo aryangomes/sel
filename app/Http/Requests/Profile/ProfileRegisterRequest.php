@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\UserProfile;
+namespace App\Http\Requests\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserProfileRegisterRequest extends FormRequest
+class ProfileRegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class UserProfileRegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'profile' => 'required|string|max:100|unique:user_profiles,profile'
+            'profile' => 'required|string|max:100|unique:profiles,profile'
         ];
     }
 }

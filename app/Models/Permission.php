@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Rule extends Model
+class Permission extends Model
 {
     use SoftDeletes;
 
@@ -15,14 +15,14 @@ class Rule extends Model
      *
      * @var string
      */
-    protected $table = 'rules';
+    protected $table = 'permissions';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = 'idRule';
+    protected $primaryKey = 'idPermission';
 
     /**
      * The attributes that are mass assignable.
@@ -30,19 +30,19 @@ class Rule extends Model
      * @var array
      */
     protected $fillable = [
-        'rule',
+        'permission',
         'can',
-        'idUserProfile',
+        'description',
     ];
 
 
     /**
-     * Get the profile that owns the Rule
+     * Get the profile that owns the Permission
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function profile(): BelongsTo
     {
-        return $this->belongsTo(Profile::class, 'idUserProfile', 'idProfile');
+        return $this->belongsTo(Profile::class, 'idProfile', 'idProfile');
     }
 }

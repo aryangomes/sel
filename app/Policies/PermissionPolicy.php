@@ -2,16 +2,16 @@
 
 namespace App\Policies;
 
-use App\Models\Rule;
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RulePolicy
+class PermissionPolicy
 {
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view any rules.
+     * Determine whether the user can view any permissions.
      *
      * @param  \App\Models\User  $user
      * @return mixed
@@ -22,19 +22,19 @@ class RulePolicy
     }
 
     /**
-     * Determine whether the user can view the rule.
+     * Determine whether the user can view the permission.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Rule  $rule
+     * @param  \App\Models\Permission  $permission
      * @return mixed
      */
-    public function view(User $user, Rule $rule)
+    public function view(User $user, Permission $permission)
     {
         return $user->mayToDoThisAction();
     }
 
     /**
-     * Determine whether the user can create rules.
+     * Determine whether the user can create permissions.
      *
      * @param  \App\Models\User  $user
      * @return mixed
@@ -45,49 +45,49 @@ class RulePolicy
     }
 
     /**
-     * Determine whether the user can update the rule.
+     * Determine whether the user can update the permission.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Rule  $rule
+     * @param  \App\Models\Permission  $permission
      * @return mixed
      */
-    public function update(User $user, Rule $rule)
+    public function update(User $user, Permission $permission)
     {
         return $user->mayToDoThisAction();
     }
 
     /**
-     * Determine whether the user can delete the rule.
+     * Determine whether the user can delete the permission.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Rule  $rule
+     * @param  \App\Models\Permission  $permission
      * @return mixed
      */
-    public function delete(User $user, Rule $rule)
+    public function delete(User $user, Permission $permission)
     {
         return $user->mayToDoThisAction();
     }
 
     /**
-     * Determine whether the user can restore the rule.
+     * Determine whether the user can restore the permission.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Rule  $rule
+     * @param  \App\Models\Permission  $permission
      * @return mixed
      */
-    public function restore(User $user, Rule $rule)
+    public function restore(User $user, Permission $permission)
     {
         //
     }
 
     /**
-     * Determine whether the user can permanently delete the rule.
+     * Determine whether the user can permanently delete the permission.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Rule  $rule
+     * @param  \App\Models\Permission  $permission
      * @return mixed
      */
-    public function forceDelete(User $user, Rule $rule)
+    public function forceDelete(User $user, Permission $permission)
     {
         //
     }

@@ -2,26 +2,26 @@
 
 namespace Tests\Unit;
 
-use App\Models\Rule;
+use App\Models\Permission;
 use App\Models\User;
-use App\Models\UserProfile;
+use App\Models\Profile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
-class RuleTest extends TestCase
+class PermissionTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    private $urlRule;
+    private $urlPermission;
 
     /**
      * @override
      */
     public function setUp(): void
     {
-        $this->urlRule = "{$this->url}rules";
+        $this->urlPermission = "{$this->url}permissions";
         parent::setUp();
     }
 
@@ -33,7 +33,7 @@ class RuleTest extends TestCase
         parent::tearDown();
     }
 
-    public function testRegisterRuleSuccessfully()
+    public function testRegisterPermissionSuccessfully()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -41,17 +41,17 @@ class RuleTest extends TestCase
             ]
         );
 
-        $postRule = factory(Rule::class)->make()->toArray();
+        $postPermission = factory(Permission::class)->make()->toArray();
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
-        $response = $this->postJson($this->urlRule, $postRule);
+        $response = $this->postJson($this->urlPermission, $postPermission);
 
         $response->assertCreated();
     }
 
-    public function testRegisterRuleFailedWithInvalidData()
+    public function testRegisterPermissionFailedWithInvalidData()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -59,11 +59,11 @@ class RuleTest extends TestCase
             ]
         );
 
-        $postRule = factory(Rule::class)->make(
+        $postPermission = factory(Permission::class)->make(
             [
-                'rule' => $this->faker->randomDigit,
+                'permission' => $this->faker->randomDigit,
                 'can' => $this->faker->randomDigit,
-                'idUserProfile' => factory(UserProfile::class),
+                'idProfile' => factory(Profile::class),
 
             ]
         )->toArray();
@@ -72,12 +72,12 @@ class RuleTest extends TestCase
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
-        $response = $this->postJson($this->urlRule, $postRule);
+        $response = $this->postJson($this->urlPermission, $postPermission);
 
         $response->assertStatus(422);
     }
 
-    public function testUpdateRuleSuccessfully()
+    public function testUpdatePermissionSuccessfully()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -85,31 +85,37 @@ class RuleTest extends TestCase
             ]
         );
 
-        $rule = factory(Rule::class)->create();
+        $permission = factory(Permission::class)->create();
 
-        $dataUpdateForRule = [
-            'rule' => $this->faker->lexify('can.?????'),
+        $dataUpdateForPermission = [
+            'permission' => $this->faker->lexify('can.?????'),
         ];
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->putJson(
-            $this->urlWithParameter($this->urlRule, $rule->idRule),
-            $dataUpdateForRule
+            $this->urlWithParameter($this->urlPermission, $permission->idPermission),
+            $dataUpdateForPermission
         );
 
-        $response->assertOk();
-
-        $getRule = $response->getData()->rule;
+      
+logger(get_class($this),
+[
+    'dataUpdateForPermission'=>$dataUpdateForPermission,
+    'response'=>$response,
+]
+);
+$response->assertOk();
+        $getPermission = $response->getData()->permission;
 
         $this->assertEquals(
-            $getRule->rule,
-            $dataUpdateForRule['rule']
+            $getPermission->permission,
+            $dataUpdateForPermission['permission']
         );
     }
 
-    public function testUpdateRuleFailedWithInvalidData()
+    public function testUpdatePermissionFailedWithInvalidData()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -117,10 +123,10 @@ class RuleTest extends TestCase
             ]
         );
 
-        $rule = factory(Rule::class)->create();
+        $permission = factory(Permission::class)->create();
 
-        $dataUpdateForRule = [
-            'rule' => $this->faker->randomDigit,
+        $dataUpdateForPermission = [
+            'permission' => $this->faker->randomDigit,
             'can' => $this->faker->lexify('?????'),
         ];
 
@@ -128,23 +134,23 @@ class RuleTest extends TestCase
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->putJson(
-            $this->urlWithParameter($this->urlRule, $rule->idRule),
-            $dataUpdateForRule
+            $this->urlWithParameter($this->urlPermission, $permission->idPermission),
+            $dataUpdateForPermission
         );
 
         $response->assertStatus(422);
 
         $response = $this->getJson(
-            $this->urlWithParameter($this->urlRule, $rule->idRule)
+            $this->urlWithParameter($this->urlPermission, $permission->idPermission)
         );
 
         $this->assertNotEquals(
-            $response->getData()->data->rule,
-            $dataUpdateForRule['rule']
+            $response->getData()->data->permission,
+            $dataUpdateForPermission['permission']
         );
     }
 
-    public function testViewRuleDataSuccessfully()
+    public function testViewPermissionDataSuccessfully()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -152,14 +158,14 @@ class RuleTest extends TestCase
             ]
         );
 
-        $rule = factory(Rule::class)->create();
+        $permission = factory(Permission::class)->create();
 
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson(
-            $this->urlWithParameter($this->urlRule, $rule->idRule)
+            $this->urlWithParameter($this->urlPermission, $permission->idPermission)
         );
 
         $response->assertOk();
@@ -175,13 +181,13 @@ class RuleTest extends TestCase
         $this->assertAuthenticatedAs($user, 'api');
 
         $response = $this->getJson(
-            $this->urlWithParameter($this->urlRule, $rule->idRule)
+            $this->urlWithParameter($this->urlPermission, $permission->idPermission)
         );
 
         $response->assertOk();
     }
 
-    public function testDeleteRuleSuccessfully()
+    public function testDeletePermissionSuccessfully()
     {
         $userAdmin = factory(User::class)->create(
             [
@@ -189,35 +195,35 @@ class RuleTest extends TestCase
             ]
         );
 
-        $rule = factory(Rule::class)->create();
+        $permission = factory(Permission::class)->create();
 
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->deleteJson(
-            $this->urlWithParameter($this->urlRule, $rule->idRule)
+            $this->urlWithParameter($this->urlPermission, $permission->idPermission)
         );
 
         $response->assertOk();
 
-        $ruleWasDeleted = isset(Rule::withTrashed()->find($rule->idRule)->deleted_at);
+        $permissionWasDeleted = isset(Permission::withTrashed()->find($permission->idPermission)->deleted_at);
 
-        $this->assertTrue($ruleWasDeleted);
+        $this->assertTrue($permissionWasDeleted);
     }
 
-    public function testUserNotAdminTruingDeleteRuleUnsuccessfully()
+    public function testUserNotAdminTruingDeletePermissionUnsuccessfully()
     {
         $user = factory(User::class)->create();
 
-        $rule = factory(Rule::class)->create();
+        $permission = factory(Permission::class)->create();
 
 
         Passport::actingAs($user);
         $this->assertAuthenticatedAs($user, 'api');
 
         $response = $this->deleteJson(
-            $this->urlWithParameter($this->urlRule, $rule->idRule)
+            $this->urlWithParameter($this->urlPermission, $permission->idPermission)
         );
 
         $response->assertForbidden();

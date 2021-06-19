@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRulesTable extends Migration
+class CreatePermissionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,15 @@ class CreateRulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('rules', function (Blueprint $table) {
-            $table->bigIncrements('idRule');
-            $table->string('rule', 100);
+        Schema::create('permissions', function (Blueprint $table) {
+            $table->bigIncrements('idPermission');
+            $table->string('permission', 100);
+            $table->string('description', 150);
             $table->boolean('can')->default(true);
             $table->timestamps();
             $table->softDeletes();
 
 
-            $table->unsignedBigInteger('idUserProfile');
-
-            $table->foreign('idUserProfile')
-                ->references('idProfile')
-                ->on('user_profiles');
         });
     }
 
@@ -36,6 +32,6 @@ class CreateRulesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('rules');
+        Schema::dropIfExists('permissions');
     }
 }

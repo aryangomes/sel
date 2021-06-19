@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources\UserProfile;
+namespace App\Http\Resources\Profile;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserProfileResource extends JsonResource
+class ProfileResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

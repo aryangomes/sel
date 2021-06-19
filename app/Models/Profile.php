@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
-class UserProfile extends Model
+class Profile extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'user_profiles';
+    protected $table = 'profiles';
 
     protected $primaryKey = 'idProfile';
 
@@ -28,6 +28,6 @@ class UserProfile extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'idProfile', 'idUserProfile');
+        return $this->belongsTo(User::class, 'idProfile', 'idProfile');
     }
 }
