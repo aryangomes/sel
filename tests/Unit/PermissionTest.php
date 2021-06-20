@@ -99,14 +99,9 @@ class PermissionTest extends TestCase
             $dataUpdateForPermission
         );
 
-      
-logger(get_class($this),
-[
-    'dataUpdateForPermission'=>$dataUpdateForPermission,
-    'response'=>$response,
-]
-);
-$response->assertOk();
+
+
+        $response->assertOk();
         $getPermission = $response->getData()->permission;
 
         $this->assertEquals(

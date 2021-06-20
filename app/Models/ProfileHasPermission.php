@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProfileHasPermission extends Model
@@ -24,7 +25,7 @@ class ProfileHasPermission extends Model
     protected $primaryKey = 'idProfileHasPermissions';
 
 
-        /**
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -33,4 +34,25 @@ class ProfileHasPermission extends Model
         'idProfile',
         'idPermission',
     ];
+
+
+    /**
+     * Get the profile that owns the ProfileHasPermission
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function profile(): BelongsTo
+    {
+        return $this->belongsTo(Profile::class, 'idProfile');
+    }
+
+    /**
+     * Get the permission that owns the ProfileHasPermission
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function permission(): BelongsTo
+    {
+        return $this->belongsTo(Permission::class, 'idPermission');
+    }
 }

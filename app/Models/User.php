@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Events\LogoutUserEvent;
 use App\Models\Utils\LogFormatter;
+use App\Traits\HasPermission;
 use App\Traits\UuidPrimaryKey;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Notifications\Notifiable;
@@ -18,7 +19,7 @@ use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable, UuidPrimaryKey, SoftDeletes;
+    use HasApiTokens, Notifiable, UuidPrimaryKey, SoftDeletes, HasPermission;
 
     protected $table = 'users';
 
@@ -167,9 +168,9 @@ class User extends Authenticatable
     /**
      * Get the profile associated with the User
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \App\Models\Profile
      */
-    public function profile(): HasOne
+    public function profile()
     {
         return $this->hasOne(Profile::class, 'idProfile', 'idProfile');
     }

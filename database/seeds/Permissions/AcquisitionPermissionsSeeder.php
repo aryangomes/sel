@@ -1,0 +1,36 @@
+<?php
+
+use App\Models\Permission;
+
+class AcquisitionPermissionsSeeder extends BasePermissionsSeeder
+{
+
+    public function __construct()
+    {
+        $this->tableName = 'acquisitions';
+    }
+
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        $this->permissionsGenerated = $this->generatePermissions();
+
+        $this->permissionsGenerated->push('test');
+
+        foreach ($this->permissionsGenerated as  $permissionGenerated) {
+            $permissionFactory = factory(Permission::class)->make(
+                [
+                    'permission' => $permissionGenerated,
+                    'description' => $permissionGenerated,
+                    'can' => true,
+                ]
+            )->toArray();
+
+            $this->insertPermissionInDatabase($permissionFactory);
+        }
+    }
+}
