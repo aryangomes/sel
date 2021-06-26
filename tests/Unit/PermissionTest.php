@@ -8,9 +8,9 @@ use App\Models\Profile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class PermissionTest extends TestCase
+class PermissionTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -62,7 +62,6 @@ class PermissionTest extends TestCase
         $postPermission = factory(Permission::class)->make(
             [
                 'permission' => $this->faker->randomDigit,
-                'can' => $this->faker->randomDigit,
                 'idProfile' => factory(Profile::class),
 
             ]
@@ -122,7 +121,6 @@ class PermissionTest extends TestCase
 
         $dataUpdateForPermission = [
             'permission' => $this->faker->randomDigit,
-            'can' => $this->faker->lexify('?????'),
         ];
 
         Passport::actingAs($userAdmin);

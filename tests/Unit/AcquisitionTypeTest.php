@@ -7,9 +7,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class AcquisitionTypeTest extends TestCase
+class AcquisitionTypeTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -22,6 +22,10 @@ class AcquisitionTypeTest extends TestCase
     {
         $this->urlAcquisitionType = "{$this->url}acquisitionTypes";
         parent::setUp();
+
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('acquisition_types');
     }
 
     /**
@@ -34,28 +38,21 @@ class AcquisitionTypeTest extends TestCase
 
     public function testViewAllAcquisitionTypeDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+     
 
         $acquisitionType = factory(AcquisitionType::class)->create();
 
-
-        Passport::actingAs($userAdmin);
-
-        $this->assertAuthenticatedAs($userAdmin, 'api');
-
+        $this->createAndAuthenticateTheAdminUser();
+        
         $response = $this->getJson($this->urlAcquisitionType);
-
+        
         $response->assertOk();
 
-
-        $user = factory(User::class)->create();
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
+                'idProfile'=>$this->userProfile
+            ]
+        );
 
         $response = $this->getJson($this->urlAcquisitionType);
 
@@ -158,17 +155,9 @@ class AcquisitionTypeTest extends TestCase
 
     public function testDeleteAcquisitionTypeSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
-
+      $this->createAndAuthenticateTheAdminUser();
         $acquisitionType = factory(AcquisitionType::class)->create();
 
-
-        Passport::actingAs($userAdmin);
-        $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->deleteJson(
             $this->urlWithParameter($this->urlAcquisitionType, $acquisitionType->idAcquisitionType)

@@ -8,9 +8,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class CollectionCopyTest extends TestCase
+class CollectionCopyTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 

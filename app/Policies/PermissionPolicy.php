@@ -6,7 +6,7 @@ use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class PermissionPolicy
+class PermissionPolicy extends BasePolicy
 {
     use HandlesAuthorization;
 

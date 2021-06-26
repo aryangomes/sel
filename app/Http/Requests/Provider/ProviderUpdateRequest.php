@@ -14,7 +14,7 @@ class ProviderUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return User::userMayToDoThisAction();
+        return true;
     }
 
     /**

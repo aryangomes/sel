@@ -4,11 +4,11 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
+use Tests\BaseTest;
 use App\Models\Permission;
 use App\Models\PermissionAction;
 
-class ManagePermissionsProfileTest extends TestCase
+class ManagePermissionsProfileTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 

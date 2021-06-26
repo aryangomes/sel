@@ -3,13 +3,16 @@
 namespace Tests\Unit;
 
 use App\Models\Acquisition;
+use App\Models\Permission;
+use App\Models\Profile;
+use App\Models\ProfileHasPermission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class AcquisitionTest extends TestCase
+class AcquisitionTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -22,6 +25,9 @@ class AcquisitionTest extends TestCase
     {
         $this->urlAcquisition = "{$this->url}acquisitions";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('acquisitions');
     }
 
     /**
@@ -34,28 +40,23 @@ class AcquisitionTest extends TestCase
 
     public function testViewAllAcquisitionDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
-
         $acquisition = factory(Acquisition::class)->create();
 
 
-        Passport::actingAs($userAdmin);
+        $this->createAndAuthenticateTheAdminUser();
 
-        $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson($this->urlAcquisition);
 
         $response->assertOk();
 
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
+          
+                'idProfile' => $this->userProfile,
+            ]
+        );
 
-        $user = factory(User::class)->create();
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
 
         $response = $this->getJson($this->urlAcquisition);
 
@@ -203,4 +204,6 @@ class AcquisitionTest extends TestCase
 
         $response->assertStatus(405);
     }
+
+   
 }

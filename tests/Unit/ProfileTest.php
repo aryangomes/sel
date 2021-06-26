@@ -8,9 +8,9 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class ProfileTest extends TestCase
+class ProfileTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 

@@ -6,9 +6,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class UserTest extends TestCase
+class UserTest extends BaseTest
 {
     use RefreshDatabase;
 

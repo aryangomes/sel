@@ -6,7 +6,7 @@ use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class LoanPolicy
+class LoanPolicy extends BasePolicy
 {
     use HandlesAuthorization;
 

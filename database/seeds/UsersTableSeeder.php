@@ -27,7 +27,7 @@ class UsersTableSeeder extends Seeder
             = factory(User::class)->make(
                 [
                     'email' => 'user@email.com',
-                    'isAdmin' => 0,
+                  
                 ]
             )->toArray();
 

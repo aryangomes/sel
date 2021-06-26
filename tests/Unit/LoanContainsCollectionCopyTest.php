@@ -10,9 +10,9 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class LoanContainsCollectionCopyTest extends TestCase
+class LoanContainsCollectionCopyTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 

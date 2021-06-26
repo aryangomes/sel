@@ -10,9 +10,9 @@ use App\Models\Utils\Regex;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class ProviderTest extends TestCase
+class ProviderTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 

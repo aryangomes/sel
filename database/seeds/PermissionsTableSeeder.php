@@ -18,7 +18,8 @@ class PermissionsTableSeeder extends Seeder
 
         $this->call(
             [
-                AcquisitionPermissionsSeeder::class
+                AcquisitionPermissionsSeeder::class,
+                AcquisitionTypePermissionsSeeder::class,
             ]
         );
     }

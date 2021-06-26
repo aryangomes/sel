@@ -6,7 +6,7 @@ use App\Models\Acquisition;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class AcquisitionPolicy
+class AcquisitionPolicy extends BasePolicy
 {
     use HandlesAuthorization;
 
@@ -91,4 +91,6 @@ class AcquisitionPolicy
     {
         //
     }
+
+   
 }

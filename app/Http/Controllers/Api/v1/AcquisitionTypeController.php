@@ -23,6 +23,7 @@ class AcquisitionTypeController extends ApiController
     ) {
         $this->acquisitionTypeRepository = $acquisitionTypeRepository;
         $this->acquisitionType = $acquisitionType;
+        $this->tablePermissions = 'acquisition_types';
     }
 
     /**
@@ -32,6 +33,9 @@ class AcquisitionTypeController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction($this->makeNameActionFromTable('index'), 
+        $this->acquisitionType);
+
         $this->acquisitionTypeRepository->getResourceCollectionModel();
 
         if ($this->acquisitionTypeRepository->transactionIsSuccessfully) {
@@ -63,7 +67,8 @@ class AcquisitionTypeController extends ApiController
      */
     public function store(AcquisitionTypeRegisterRequest $request)
     {
-        $this->authorize('create', $this->acquisitionType);
+        $this->canPerformAction($this->makeNameActionFromTable('create'), 
+        $this->acquisitionType);
 
         $requestValidated = $request->validated();
 
@@ -117,7 +122,8 @@ class AcquisitionTypeController extends ApiController
     {
         $this->acquisitionType = $acquisitionType;
 
-        $this->authorize('update',  $this->acquisitionType);
+        $this->canPerformAction($this->makeNameActionFromTable('update'), 
+        $this->acquisitionType);
 
         $requestValidated = $request->validated();
 
@@ -149,7 +155,8 @@ class AcquisitionTypeController extends ApiController
     {
         $this->acquisitionType = $acquisitionType;
 
-        $this->authorize('delete',  $this->acquisitionType);
+        $this->canPerformAction($this->makeNameActionFromTable('delete'), 
+        $this->acquisitionType);
 
         $this->acquisitionTypeRepository->delete($this->acquisitionType);
 
