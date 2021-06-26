@@ -26,7 +26,6 @@ class PermissionRegisterRequest extends FormRequest
         return [
             'permission' => 'required|string|max:100',
             'description' => 'required|string|max:150',
-            'can' => 'required|boolean',
         ];
     }
 }

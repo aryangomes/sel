@@ -28,12 +28,9 @@ trait HasPermission
     {
         $permission = null;
 
-        $searchPermission = $this->profile->permissions
+        $permission = $this->profile->permissions
             ->where('permission.permission', $action)->first();
 
-        if ($searchPermission != null) {
-            $permission = $searchPermission->permission;
-        }
 
         return $permission;
     }

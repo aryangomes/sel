@@ -31,7 +31,6 @@ class Permission extends Model
      */
     protected $fillable = [
         'permission',
-        'can',
         'description',
     ];
 
@@ -44,5 +43,11 @@ class Permission extends Model
     public function profile(): BelongsTo
     {
         return $this->belongsTo(Profile::class, 'idProfile', 'idProfile');
+    }
+
+
+    public function scopeTablePermissions($query, $table)
+    {
+        return $query->where('permission', 'like', "%{$table}%");
     }
 }

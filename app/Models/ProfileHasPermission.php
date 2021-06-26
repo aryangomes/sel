@@ -33,6 +33,7 @@ class ProfileHasPermission extends Model
     protected $fillable = [
         'idProfile',
         'idPermission',
+        'can',
     ];
 
 

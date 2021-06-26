@@ -2,12 +2,12 @@
 
 use App\Models\Permission;
 
-class AcquisitionPermissionsSeeder extends BasePermissionsSeeder
+class AcquisitionTypePermissionsSeeder extends BasePermissionsSeeder
 {
 
     public function __construct()
     {
-        $this->tableName = 'acquisitions';
+        $this->tableName = 'acquisition_types';
     }
 
     /**

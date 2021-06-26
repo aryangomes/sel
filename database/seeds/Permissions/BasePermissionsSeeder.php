@@ -42,13 +42,6 @@ class BasePermissionsSeeder extends Seeder
             return $permission;
         });
 
-        logger(
-            get_class($this),
-            [
-                'generatePermissions' => $generatePermissions
-            ]
-        );
-
         return $generatePermissions;
     }
 

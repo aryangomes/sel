@@ -103,13 +103,7 @@ class User extends Authenticatable
         try {
 
             $tokenAccess = Auth::guard('api')->user()->token();
-            Log::info(
-                get_class($this),
-                [
-                    'variavel' => Auth::guard('api')->user(),
-                    ' $tokenAccess' => $tokenAccess,
-                ]
-            );
+        
             $tokenAccessWasRevoken = $tokenAccess->revoke();
         } catch (\Exception $exception) {
             Log::error(LogFormatter::formatTextLog(['Message' => $exception->getMessage()]));

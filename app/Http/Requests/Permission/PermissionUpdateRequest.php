@@ -26,7 +26,6 @@ class PermissionUpdateRequest extends FormRequest
         return [
             'permission' => 'string|max:100',
             'description' => 'string|max:150',
-            'can' => 'boolean',
         ];
     }
 }

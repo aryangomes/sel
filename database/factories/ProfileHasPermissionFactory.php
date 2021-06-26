@@ -12,5 +12,6 @@ $factory->define(ProfileHasPermission::class, function (Faker $faker) {
     return [
         'idProfile' => factory(Profile::class),
         'idPermission' => factory(Permission::class),
+        'can' => $faker->boolean(),
     ];
 });

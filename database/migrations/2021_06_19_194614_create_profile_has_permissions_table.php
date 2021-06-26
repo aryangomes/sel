@@ -15,19 +15,19 @@ class CreateProfileHasPermissionsTable extends Migration
     {
         Schema::create('profile_has_permissions', function (Blueprint $table) {
             $table->bigIncrements('idProfileHasPermission');
+            $table->boolean('can')->default(true);
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->unsignedBigInteger('idProfile');
             $table->foreign('idProfile')
-            ->references('idProfile')
-            ->on('profiles');
-            
+                ->references('idProfile')
+                ->on('profiles');
+
             $table->unsignedBigInteger('idPermission');
             $table->foreign('idPermission')
-            ->references('idPermission')
-            ->on('permissions');
-
+                ->references('idPermission')
+                ->on('permissions');
         });
     }
 
