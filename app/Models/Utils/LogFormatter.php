@@ -2,9 +2,8 @@
 
 namespace App\Models\Utils;
 
-use Illuminate\Database\Eloquent\Model;
 
-class LogFormatter extends Model
+class LogFormatter 
 {
     public static function formatTextLog($messages)
     {
