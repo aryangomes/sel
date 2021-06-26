@@ -7,13 +7,12 @@ use App\Http\Requests\Acquisition\AcquisitionRegisterRequest;
 use App\Http\Requests\Acquisition\AcquisitionUpdateRequest;
 use App\Models\Acquisition;
 use App\Repositories\Interfaces\AcquisitionRepositoryInterface;
-use App\Traits\GetControllerMethods;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class AcquisitionController extends ApiController
 {
-    use GetControllerMethods;
     private $acquisition;
 
     private $acquisitionRepository;
