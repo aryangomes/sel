@@ -23,6 +23,7 @@ class CollectionController extends ApiController
     ) {
         $this->collectionRepository = $collectionRepository;
         $this->collection = $collection;
+        $this->tablePermissions = 'collections';
     }
 
     /**
@@ -32,6 +33,11 @@ class CollectionController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->collection
+        );
+
         $this->collectionRepository->getResourceCollectionModel();
 
         if ($this->collectionRepository->transactionIsSuccessfully) {
@@ -63,7 +69,10 @@ class CollectionController extends ApiController
      */
     public function store(CollectionRegisterRequest $request)
     {
-        $this->authorize('create', $this->collection);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->collection
+        );
 
         $requestValidated = $request->validated();
 
@@ -92,6 +101,11 @@ class CollectionController extends ApiController
      */
     public function show(Collection $collection)
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->collection
+        );
+
         return $this->collectionRepository->getResourceModel($collection);
     }
 
@@ -117,7 +131,10 @@ class CollectionController extends ApiController
     {
         $this->collection = $collection;
 
-        $this->authorize('update',  $this->collection);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->collection
+        );
 
         $requestValidated = $request->validated();
 
@@ -149,7 +166,10 @@ class CollectionController extends ApiController
     {
         $this->collection = $collection;
 
-        $this->authorize('delete',  $this->collection);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->collection
+        );
 
         $this->collectionRepository->delete($this->collection);
 

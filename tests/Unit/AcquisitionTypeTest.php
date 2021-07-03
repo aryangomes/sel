@@ -38,19 +38,19 @@ class AcquisitionTypeTest extends BaseTest
 
     public function testViewAllAcquisitionTypeDataSuccessfully()
     {
-     
+
 
         $acquisitionType = factory(AcquisitionType::class)->create();
 
         $this->createAndAuthenticateTheAdminUser();
-        
+
         $response = $this->getJson($this->urlAcquisitionType);
-        
+
         $response->assertOk();
 
         $this->createAndAuthenticateTheUserNotAdmin(
             [
-                'idProfile'=>$this->userProfile
+                'idProfile' => $this->userProfile
             ]
         );
 
@@ -155,7 +155,7 @@ class AcquisitionTypeTest extends BaseTest
 
     public function testDeleteAcquisitionTypeSuccessfully()
     {
-      $this->createAndAuthenticateTheAdminUser();
+        $this->createAndAuthenticateTheAdminUser();
         $acquisitionType = factory(AcquisitionType::class)->create();
 
 

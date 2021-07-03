@@ -1,10 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\v1\AcquisitionController;
-use App\Models\Acquisition;
-use App\Models\Utils\DbTables;
+
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class PermissionsTableSeeder extends Seeder
 {
@@ -20,6 +17,16 @@ class PermissionsTableSeeder extends Seeder
             [
                 AcquisitionPermissionsSeeder::class,
                 AcquisitionTypePermissionsSeeder::class,
+                CollectionCategoryPermissionsSeeder::class,
+                CollectionPermissionsSeeder::class,
+                CollectionCopyPermissionsSeeder::class,
+                CollectionTypePermissionsSeeder::class,
+                LoanContainsCollectionCopyPermissionsSeeder::class,
+                PermissionPermissionsSeeder::class,
+                ProfilePermissionsSeeder::class,
+                UserPermissionsSeeder::class,
+                LenderPermissionsSeeder::class,
+                ProviderPermissionsSeeder::class,
             ]
         );
     }

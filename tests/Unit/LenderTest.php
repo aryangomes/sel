@@ -22,6 +22,9 @@ class LenderTest extends BaseTest
     {
         $this->urlLender = "{$this->url}lenders";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('lenders');
     }
 
     /**
@@ -115,17 +118,9 @@ class LenderTest extends BaseTest
 
     public function testViewLenderDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
 
+        $this->createAndAuthenticateTheAdminUser();
         $lender = factory(Lender::class)->create();
-
-
-        Passport::actingAs($userAdmin);
-        $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson(
             $this->urlWithParameter($this->urlLender, $lender->idLender)
@@ -134,10 +129,12 @@ class LenderTest extends BaseTest
         $response->assertOk();
 
 
-        $user = factory(User::class)->create();
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
 
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+                'idProfile' => $this->userProfile,
+            ]
+        );
 
         $response = $this->getJson(
             $this->urlWithParameter($this->urlLender, $lender->idLender)

@@ -23,6 +23,10 @@ class LoanTest extends BaseTest
     {
         $this->urlLoan = "{$this->url}loans";
         parent::setUp();
+
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('loans');
     }
 
     /**
@@ -130,11 +134,19 @@ class LoanTest extends BaseTest
 
         $response->assertOk();
 
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
+                'idProfile' => $this->userProfile
+            ]
+        );
 
-        $user = factory(User::class)->create();
 
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+        $loan = factory(Loan::class)->create(
+            [
+                'idBorrowerUser' => $this->userNotAdmin->id
+            ]
+        );
+
 
         $response = $this->getJson(
             $this->urlWithParameter($this->urlLoan, $loan->idLoan)

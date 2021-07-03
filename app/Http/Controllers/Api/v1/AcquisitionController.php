@@ -34,8 +34,11 @@ class AcquisitionController extends ApiController
      */
     public function index()
     {
-        $this->canPerformAction($this->makeNameActionFromTable('index'), 
-        $this->acquisition);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->acquisition
+        );
+
         $this->acquisitionRepository->getResourceCollectionModel();
 
         if ($this->acquisitionRepository->transactionIsSuccessfully) {
@@ -67,8 +70,10 @@ class AcquisitionController extends ApiController
      */
     public function store(AcquisitionRegisterRequest $request)
     {
-        $this->canPerformAction($this->makeNameActionFromTable('store'), 
-        $this->acquisition);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->acquisition
+        );
 
         $requestValidated = $request->validated();
 
@@ -122,8 +127,10 @@ class AcquisitionController extends ApiController
     {
         $this->acquisition = $acquisition;
 
-        $this->canPerformAction($this->makeNameActionFromTable('update'), 
-        $this->acquisition);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->acquisition
+        );
 
         $requestValidated = $request->validated();
 
@@ -156,8 +163,10 @@ class AcquisitionController extends ApiController
 
         $this->acquisition = $acquisition;
 
-        $this->canPerformAction($this->makeNameActionFromTable('delete'), 
-        $this->acquisition);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->acquisition
+        );
 
         $this->acquisitionRepository->delete($this->acquisition);
 
@@ -181,5 +190,4 @@ class AcquisitionController extends ApiController
 
         return $this->responseWithJson();
     }
-    
 }

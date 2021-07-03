@@ -22,6 +22,7 @@ class CollectionCategoryController extends ApiController
     ) {
         $this->collectionCategoryRepository = $collectionCategoryRepository;
         $this->collectionCategory = $collectionCategory;
+        $this->tablePermissions = 'collection_categories';
     }
 
     /**
@@ -31,6 +32,9 @@ class CollectionCategoryController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction($this->makeNameActionFromTable('index'), 
+       $this->collectionCategory);
+
         $this->collectionCategoryRepository->getResourceCollectionModel();
 
         if ($this->collectionCategoryRepository->transactionIsSuccessfully) {
@@ -62,8 +66,8 @@ class CollectionCategoryController extends ApiController
      */
     public function store(CollectionCategoryRegisterRequest $request)
     {
-        $this->authorize('create', $this->collectionCategory);
-
+      $this->canPerformAction($this->makeNameActionFromTable('store'), 
+       $this->collectionCategory);
         $requestValidated = $request->validated();
 
         $this->collectionCategoryRepository->create($requestValidated);
@@ -116,8 +120,8 @@ class CollectionCategoryController extends ApiController
     {
         $this->collectionCategory = $collectionCategory;
 
-        $this->authorize('update',  $this->collectionCategory);
-
+        $this->canPerformAction($this->makeNameActionFromTable('update'), 
+       $this->collectionCategory);
         $requestValidated = $request->validated();
 
         $this->collectionCategoryRepository->update($requestValidated, $this->collectionCategory);
@@ -148,8 +152,8 @@ class CollectionCategoryController extends ApiController
     {
         $this->collectionCategory = $collectionCategory;
 
-        $this->authorize('delete',  $this->collectionCategory);
-
+        $this->canPerformAction($this->makeNameActionFromTable('delete'), 
+       $this->collectionCategory);
         $this->collectionCategoryRepository->delete($this->collectionCategory);
 
         if ($this->collectionCategoryRepository->transactionIsSuccessfully) {

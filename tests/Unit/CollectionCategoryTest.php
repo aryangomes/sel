@@ -22,6 +22,9 @@ class CollectionCategoryTest extends BaseTest
     {
         $this->urlCollectionCategory = "{$this->url}collectionCategories";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('collection_categories');
     }
 
     /**
@@ -34,29 +37,17 @@ class CollectionCategoryTest extends BaseTest
 
     public function testViewAllCollectionCategoryDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+        $this->createAndAuthenticateTheAdminUser();
 
         $collectionCategory = factory(CollectionCategory::class)->create();
-
-
-        Passport::actingAs($userAdmin);
-
-        $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson($this->urlCollectionCategory);
 
         $response->assertOk();
 
-
-        $user = factory(User::class)->create();
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
-
+        $this->createAndAuthenticateTheAdminUser([
+            'idProfile' => $this->userProfile
+        ]);
         $response = $this->getJson($this->urlCollectionCategory);
 
         $response->assertOk();

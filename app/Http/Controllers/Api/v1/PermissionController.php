@@ -19,9 +19,9 @@ class PermissionController extends ApiController
         PermissionRepositoryInterface $permissionRepository,
         Permission $permission
     ) {
-        $this->authorizeResource(Permission::class, 'permission');
         $this->permissionRepository = $permissionRepository;
         $this->permission = $permission;
+        $this->tablePermissions = 'permissions';
     }
 
     /**
@@ -31,6 +31,12 @@ class PermissionController extends ApiController
      */
     public function index()
     {
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->permission
+        );
+
         $this->permissionRepository->getResourceCollectionModel();
 
         if ($this->permissionRepository->transactionIsSuccessfully) {
@@ -62,6 +68,10 @@ class PermissionController extends ApiController
      */
     public function store(PermissionRegisterRequest $request)
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->permission
+        );
 
         $requestValidated = $request->validated();
 
@@ -90,6 +100,11 @@ class PermissionController extends ApiController
      */
     public function show(Permission $permission)
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->permission
+        );
+
         return $this->permissionRepository->getResourceModel($permission);
     }
 
@@ -114,6 +129,11 @@ class PermissionController extends ApiController
     public function update(PermissionUpdateRequest $request, Permission $permission)
     {
         $this->permission = $permission;
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->permission
+        );
 
         $requestValidated = $request->validated();
 
@@ -145,6 +165,10 @@ class PermissionController extends ApiController
     {
         $this->permission = $permission;
 
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->permission
+        );
 
         $this->permissionRepository->delete($this->permission);
 

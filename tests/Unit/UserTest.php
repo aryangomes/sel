@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
@@ -21,6 +22,9 @@ class UserTest extends BaseTest
     {
         $this->urlUser = "{$this->url}users";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('users');
     }
 
     /**
@@ -98,17 +102,19 @@ class UserTest extends BaseTest
 
     public function testUpdateUserNotAdminSuccessfully()
     {
-        $user = factory(User::class)->create();
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
+
+                'idProfile' => $this->userProfile,
+            ]
+        );
 
         $dataUpdateForUser = [
             'name' => 'New Name'
         ];
 
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
-
         $response = $this->putJson(
-            $this->urlWithParameter($this->urlUser, $user->id),
+            $this->urlWithParameter($this->urlUser, $this->userNotAdmin->id),
             $dataUpdateForUser
         );
 
@@ -181,7 +187,12 @@ class UserTest extends BaseTest
 
     public function testUserNotAdminViewOwnDataSuccessfully()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->create(
+            [
+
+                'idProfile' => $this->userProfile,
+            ]
+        );
 
         $credentials = [
             'cpf' => $user->cpf,
@@ -228,13 +239,18 @@ class UserTest extends BaseTest
         )->getJson(
             $this->urlWithParameter($this->urlUser, $otherUser->id)
         );
-      
+
         $response->assertForbidden();
     }
 
     public function testUserNotAdminDeleteSuccessfully()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->create(
+            [
+
+                'idProfile' => $this->userProfile,
+            ]
+        );
 
         $credentials = [
             'cpf' => $user->cpf,
@@ -263,6 +279,8 @@ class UserTest extends BaseTest
 
     public function testUserNotAdminTryingDeleteOtherUser()
     {
+
+
         $user = factory(User::class)->create();
         $otherUser = factory(User::class)->create();
 
@@ -276,7 +294,6 @@ class UserTest extends BaseTest
         $accessToken = $response->getData()->success->token;
 
         $response->assertOk();
-
 
         $response = $this->withHeader(
             'Authorization',
@@ -300,7 +317,6 @@ class UserTest extends BaseTest
         ];
 
         $response = $this->postJson($this->url . 'login/admin', $credentials);
-
         $accessToken = $response->getData()->success->token;
 
         $response->assertOk();

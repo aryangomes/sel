@@ -25,6 +25,9 @@ class ProviderTest extends BaseTest
     {
         $this->urlProvider = "{$this->url}providers";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('providers');
     }
 
     /**
@@ -95,7 +98,6 @@ class ProviderTest extends BaseTest
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->postJson($this->urlProvider, $postProvider);
-
 
         $response->assertCreated();
 

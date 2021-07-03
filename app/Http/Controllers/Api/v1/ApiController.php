@@ -78,6 +78,20 @@ class ApiController extends Controller
         ]);
     }
 
+
+    public function canPerformActionOrResourceBelongsToUser(
+        $action,
+        $idResource,
+        $model
+    ) {
+
+        $this->authorize('canPerformActionOrResourceBelongsToUser', [
+            $model,
+            $action,
+            $idResource
+        ]);
+    }
+
     public function makeNameActionFromTable($actionWithoutTablePermission = '')
     {
         return Str::slug("{$this->tablePermissions} {$actionWithoutTablePermission}");

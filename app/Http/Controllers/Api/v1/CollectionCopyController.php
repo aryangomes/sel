@@ -23,6 +23,7 @@ class CollectionCopyController extends ApiController
     ) {
         $this->collectionCopyRepository = $collectionCopyRepository;
         $this->collectionCopy = $collectionCopy;
+        $this->tablePermissions = 'collection_copies';
     }
 
     /**
@@ -32,6 +33,11 @@ class CollectionCopyController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->collectionCopy
+        );
+
         $this->collectionCopyRepository->getResourceCollectionModel();
 
         if ($this->collectionCopyRepository->transactionIsSuccessfully) {
@@ -63,7 +69,10 @@ class CollectionCopyController extends ApiController
      */
     public function store(CollectionCopyRegisterRequest $request)
     {
-        $this->authorize('create', $this->collectionCopy);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->collectionCopy
+        );
 
         $requestValidated = $request->validated();
 
@@ -92,6 +101,10 @@ class CollectionCopyController extends ApiController
      */
     public function show(CollectionCopy $collectionCopy)
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->collectionCopy
+        );
         return $this->collectionCopyRepository->getResourceModel($collectionCopy);
     }
 
@@ -117,7 +130,10 @@ class CollectionCopyController extends ApiController
     {
         $this->collectionCopy = $collectionCopy;
 
-        $this->authorize('update',  $this->collectionCopy);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->collectionCopy
+        );
 
         $requestValidated = $request->validated();
 
@@ -149,7 +165,10 @@ class CollectionCopyController extends ApiController
     {
         $this->collectionCopy = $collectionCopy;
 
-        $this->authorize('delete',  $this->collectionCopy);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->collectionCopy
+        );
 
         $this->collectionCopyRepository->delete($this->collectionCopy);
 

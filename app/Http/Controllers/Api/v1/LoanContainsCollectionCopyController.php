@@ -22,6 +22,7 @@ class LoanContainsCollectionCopyController extends ApiController
         $this->authorizeResource(LoanContainsCollectionCopy::class, 'loanContainsCollectionCopy');
         $this->loanContainsCollectionCopyRepository = $loanContainsCollectionCopyRepository;
         $this->loanContainsCollectionCopy = $loanContainsCollectionCopy;
+        $this->tablePermissions = 'loan_contains_collection_copies';
     }
 
     /**
@@ -31,6 +32,11 @@ class LoanContainsCollectionCopyController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->loanContainsCollectionCopy
+        );
+
         $this->loanContainsCollectionCopyRepository->getResourceCollectionModel();
 
         if ($this->loanContainsCollectionCopyRepository->transactionIsSuccessfully) {
@@ -63,6 +69,11 @@ class LoanContainsCollectionCopyController extends ApiController
     public function store(LoanContainsCollectionCopyRegisterRequest $request)
     {
 
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->loanContainsCollectionCopy
+        );
+
         $requestValidated = $request->validated();
 
         $this->loanContainsCollectionCopyRepository->create($requestValidated);
@@ -90,6 +101,11 @@ class LoanContainsCollectionCopyController extends ApiController
      */
     public function show(LoanContainsCollectionCopy $loanContainsCollectionCopy)
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->loanContainsCollectionCopy
+        );
+
         return $this->loanContainsCollectionCopyRepository->getResourceModel($loanContainsCollectionCopy);
     }
 
@@ -115,6 +131,10 @@ class LoanContainsCollectionCopyController extends ApiController
     {
         $this->loanContainsCollectionCopy = $loanContainsCollectionCopy;
 
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->loanContainsCollectionCopy
+        );
 
         $requestValidated = $request->validated();
 
@@ -146,6 +166,10 @@ class LoanContainsCollectionCopyController extends ApiController
     {
         $this->loanContainsCollectionCopy = $loanContainsCollectionCopy;
 
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->loanContainsCollectionCopy
+        );
 
         $this->loanContainsCollectionCopyRepository->delete($this->loanContainsCollectionCopy);
 

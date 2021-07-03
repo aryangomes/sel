@@ -42,9 +42,7 @@ class AcquisitionTest extends BaseTest
     {
         $acquisition = factory(Acquisition::class)->create();
 
-
         $this->createAndAuthenticateTheAdminUser();
-
 
         $response = $this->getJson($this->urlAcquisition);
 
@@ -52,7 +50,7 @@ class AcquisitionTest extends BaseTest
 
         $this->createAndAuthenticateTheUserNotAdmin(
             [
-          
+
                 'idProfile' => $this->userProfile,
             ]
         );
@@ -204,6 +202,4 @@ class AcquisitionTest extends BaseTest
 
         $response->assertStatus(405);
     }
-
-   
 }

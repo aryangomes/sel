@@ -22,6 +22,10 @@ class CollectionTypeTest extends BaseTest
     {
         $this->urlCollectionType = "{$this->url}collectionTypes";
         parent::setUp();
+
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('collection_types');
     }
 
     /**
@@ -34,28 +38,23 @@ class CollectionTypeTest extends BaseTest
 
     public function testViewAllCollectionTypeDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+
 
         $collectionType = factory(CollectionType::class)->create();
 
 
-        Passport::actingAs($userAdmin);
-
-        $this->assertAuthenticatedAs($userAdmin, 'api');
+        $this->createAndAuthenticateTheAdminUser();
 
         $response = $this->getJson($this->urlCollectionType);
 
         $response->assertOk();
 
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
 
-        $user = factory(User::class)->create();
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+                'idProfile' => $this->userProfile,
+            ]
+        );
 
         $response = $this->getJson($this->urlCollectionType);
 

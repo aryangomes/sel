@@ -19,9 +19,9 @@ class ProfileController extends ApiController
         ProfileRepositoryInterface $profileRepository,
         Profile $profile
     ) {
-        $this->authorizeResource(Profile::class, 'profile');
         $this->profileRepository = $profileRepository;
         $this->profile = $profile;
+        $this->tablePermissions = 'profiles';
     }
 
     /**
@@ -31,6 +31,10 @@ class ProfileController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->profile
+        );
         $this->profileRepository->getResourceCollectionModel();
 
         if ($this->profileRepository->transactionIsSuccessfully) {
@@ -62,6 +66,10 @@ class ProfileController extends ApiController
      */
     public function store(ProfileRegisterRequest $request)
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->profile
+        );
 
         $requestValidated = $request->validated();
 
@@ -90,6 +98,11 @@ class ProfileController extends ApiController
      */
     public function show(Profile $profile)
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->profile
+        );
+
         return $this->profileRepository->getResourceModel($profile);
     }
 
@@ -113,7 +126,13 @@ class ProfileController extends ApiController
      */
     public function update(ProfileUpdateRequest $request, Profile $profile)
     {
+
         $this->profile = $profile;
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->profile
+        );
 
         $requestValidated = $request->validated();
 
@@ -144,6 +163,11 @@ class ProfileController extends ApiController
     public function destroy(Profile $profile)
     {
         $this->profile = $profile;
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->profile
+        );
 
 
         $this->profileRepository->delete($this->profile);

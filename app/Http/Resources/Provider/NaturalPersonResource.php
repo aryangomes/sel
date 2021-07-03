@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Provider;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class JuridicPersonResource extends JsonResource
+class NaturalPersonResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,8 +15,8 @@ class JuridicPersonResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'idJuridicPerson'=>$this->idJuridicPerson,
-            'cnpj'=>$this->cnpj
+            'idNaturalPerson' => $this->idNaturalPerson,
+            'cpf' => $this->cpf
         ];
     }
 }

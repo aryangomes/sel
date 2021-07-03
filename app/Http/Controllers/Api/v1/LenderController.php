@@ -2,17 +2,32 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
 use App\Models\Lender;
 use App\Http\Requests\Lender\LenderRegisterRequest;
 use App\Http\Requests\Lender\LenderUpdateRequest;
 use App\Http\Resources\LenderResource;
-use Illuminate\Http\Request;
+use App\Repositories\Interfaces\LenderRepositoryInterface;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class LenderController extends ApiController
 {
+
+
+    private $lender;
+
+    private $lenderRepository;
+
+    public function __construct(
+        LenderRepositoryInterface $lenderRepository,
+        Lender $lender
+    ) {
+
+        $this->lenderRepository = $lenderRepository;
+        $this->lender = $lender;
+        $this->tablePermissions = 'lenders';
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -41,30 +56,25 @@ class LenderController extends ApiController
      */
     public function store(LenderRegisterRequest $request)
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->lender
+        );
+
         $requestValidated = $request->validated();
 
-        $lenderWasCreated = false;
+        $this->lenderRepository->create($requestValidated);
 
-        $this->authorize('create', new Lender());
+        if ($this->lenderRepository->transactionIsSuccessfully) {
+            $lenderCreated =
+                $this->lenderRepository->getResourceModel($this->lenderRepository->responseFromTransaction);
 
-        try {
-            DB::beginTransaction();
-
-            $lenderCreated = Lender::create($requestValidated);
-
-            $lenderWasCreated = isset($lenderCreated);
-        } catch (\Exception $exception) {
-
-            $this->logErrorFromException($exception);
-        }
-
-        if ($lenderWasCreated) {
-            DB::commit();
-            $lenderResource = $this->getLenderResource($lenderCreated->idLender);
-            $this->setSuccessResponse($lenderResource, 'lender',  Response::HTTP_CREATED);
+            $this->setSuccessResponse($lenderCreated, 'lender', Response::HTTP_CREATED);
         } else {
-            DB::rollBack();
-            $this->setErrorResponse();
+            $this->setErrorResponse(__(
+                'httpResponses.created.error',
+                ['resource' => $this->lenderRepository->resourceName]
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
@@ -78,11 +88,14 @@ class LenderController extends ApiController
      */
     public function show(Lender $lender)
     {
-        $this->authorize('view', $lender);
+        $this->lender = $lender;
 
-        $lenderResource = $this->getLenderResource($lender->idLender);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->lender
+        );
 
-        return $lenderResource;
+        return $this->lenderRepository->getResourceModel($lender);
     }
 
     /**
@@ -105,28 +118,28 @@ class LenderController extends ApiController
      */
     public function update(LenderUpdateRequest $request, Lender $lender)
     {
+        $this->lender = $lender;
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->lender
+        );
+
         $requestValidated = $request->validated();
 
-        $lenderWasUpdated = false;
+        $this->lenderRepository->update($requestValidated, $this->lender);
 
-        $this->authorize('update', $lender);
+        if ($this->lenderRepository->transactionIsSuccessfully) {
 
-        try {
-            DB::beginTransaction();
+            $lenderUpdated =
+                $this->lenderRepository->getResourceModel($this->lender);
 
-            $lenderWasUpdated = $lender->update($requestValidated);
-        } catch (\Exception $exception) {
-
-            $this->logErrorFromException($exception);
-        }
-
-        if ($lenderWasUpdated) {
-            DB::commit();
-            $lenderResource = $this->getLenderResource($lender->idLender);
-            $this->setSuccessResponse($lenderResource, 'lender', 200);
+            $this->setSuccessResponse($lenderUpdated, 'lender', Response::HTTP_OK);
         } else {
-            DB::rollBack();
-            $this->setErrorResponse();
+            $this->setErrorResponse(__(
+                'httpResponses.updated.error',
+                ['resource' => $this->lenderRepository->resourceName]
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
@@ -140,39 +153,33 @@ class LenderController extends ApiController
      */
     public function destroy(Lender $lender)
     {
-        $lenderWasDeleted = false;
+        $this->lender = $lender;
 
-        $this->authorize('delete', $lender);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->lender
+        );
 
-        try {
-            DB::beginTransaction();
+        $this->lenderRepository->delete($this->lender);
 
-            $lenderWasDeleted = $lender->delete();
-        } catch (\Exception $exception) {
-            $this->logErrorFromException($exception);
-        }
+        if ($this->lenderRepository->transactionIsSuccessfully) {
 
 
-        if ($lenderWasDeleted) {
-            DB::commit();
-            $this->setSuccessResponse('Lender deleted successfully', 'success', Response::HTTP_OK);
+            $this->setSuccessResponse(
+                __(
+                    'httpResponses.deleted.success',
+                    ['resource' => $this->lenderRepository->resourceName]
+                ),
+                ApiController::KEY_SUCCESS_CONTENT,
+                Response::HTTP_OK
+            );
         } else {
-            DB::rollBack();
-            $this->setErrorResponse('Lender deleted failed', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+            $this->setErrorResponse(__(
+                'httpResponses.deleted.error',
+                $this->lenderRepository->resourceName
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
-    }
-
-    /**
-     * 
-     * @param int $idLender
-     * @return  LenderResource
-     * 
-     */
-    private function getLenderResource($idLender)
-    {
-        $lenderResource = new LenderResource(Lender::find($idLender));
-        return $lenderResource;
     }
 }

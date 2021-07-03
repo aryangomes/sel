@@ -23,6 +23,9 @@ class ProfileTest extends BaseTest
     {
         $this->urlProfile = "{$this->url}profiles";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('profiles');
     }
 
     /**
