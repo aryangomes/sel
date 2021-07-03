@@ -26,4 +26,20 @@ class BasePolicy
 
         return $user->canMadeThisAction($action);
     }
+
+    public function resourceBelongsToUser(User $user,  $idResource)
+    {
+        return $user->id == $idResource;
+    }
+
+    public function canPerformActionOrResourceBelongsToUser(
+        User $user,
+        Model $model,
+        string $action,
+        $idResource
+    ) {
+
+        return $this->canPerformAction($user, $model, $action) ||
+            $this->resourceBelongsToUser($user, $idResource);
+    }
 }
