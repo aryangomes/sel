@@ -6,7 +6,7 @@ use App\Models\CollectionCopy;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class CollectionCopyPolicy
+class CollectionCopyPolicy extends BasePolicy
 {
     use HandlesAuthorization;
 

@@ -23,6 +23,7 @@ class UserController extends ApiController
     ) {
         $this->userRepository = $userRepository;
         $this->user = $user;
+        $this->tablePermissions = 'users';
     }
 
     /**
@@ -32,6 +33,11 @@ class UserController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->user
+        );
+
         $this->userRepository->getResourceCollectionModel();
 
         if ($this->userRepository->transactionIsSuccessfully) {
@@ -63,7 +69,11 @@ class UserController extends ApiController
      */
     public function store(UserRegisterRequest $request)
     {
-        $this->authorize('create', $this->user);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->user
+        );
+
 
         $requestValidated = $request->validated();
 
@@ -93,7 +103,13 @@ class UserController extends ApiController
     public function show(User $user)
     {
         $this->user = $user;
-        $this->authorize('view', $this->user);
+
+        $this->canPerformActionOrResourceBelongsToUser(
+            $this->makeNameActionFromTable('view'),
+            $this->user->id,
+            $this->user
+        );
+
 
         return $this->userRepository->getResourceModel($user);
     }
@@ -120,7 +136,12 @@ class UserController extends ApiController
     {
         $this->user = $user;
 
-        $this->authorize('update',  $this->user);
+        $this->canPerformActionOrResourceBelongsToUser(
+            $this->makeNameActionFromTable('update'),
+            $this->user->id,
+            $this->user
+        );
+
 
         $requestValidated = $request->validated();
 
@@ -152,7 +173,11 @@ class UserController extends ApiController
     {
         $this->user = $user;
 
-        $this->authorize('delete',  $this->user);
+        $this->canPerformActionOrResourceBelongsToUser(
+            $this->makeNameActionFromTable('delete'),
+            $this->user->id,
+            $this->user
+        );
 
         $this->userRepository->delete($this->user);
 

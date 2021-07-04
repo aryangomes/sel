@@ -7,12 +7,12 @@ use App\Http\Requests\Acquisition\AcquisitionRegisterRequest;
 use App\Http\Requests\Acquisition\AcquisitionUpdateRequest;
 use App\Models\Acquisition;
 use App\Repositories\Interfaces\AcquisitionRepositoryInterface;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class AcquisitionController extends ApiController
 {
-
     private $acquisition;
 
     private $acquisitionRepository;
@@ -21,8 +21,10 @@ class AcquisitionController extends ApiController
         AcquisitionRepositoryInterface $acquisitionRepository,
         Acquisition $acquisition
     ) {
+
         $this->acquisitionRepository = $acquisitionRepository;
         $this->acquisition = $acquisition;
+        $this->tablePermissions = 'acquisitions';
     }
 
     /**
@@ -32,6 +34,11 @@ class AcquisitionController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->acquisition
+        );
+
         $this->acquisitionRepository->getResourceCollectionModel();
 
         if ($this->acquisitionRepository->transactionIsSuccessfully) {
@@ -63,7 +70,10 @@ class AcquisitionController extends ApiController
      */
     public function store(AcquisitionRegisterRequest $request)
     {
-        $this->authorize('create', $this->acquisition);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->acquisition
+        );
 
         $requestValidated = $request->validated();
 
@@ -117,7 +127,10 @@ class AcquisitionController extends ApiController
     {
         $this->acquisition = $acquisition;
 
-        $this->authorize('update',  $this->acquisition);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->acquisition
+        );
 
         $requestValidated = $request->validated();
 
@@ -147,9 +160,13 @@ class AcquisitionController extends ApiController
      */
     public function destroy(Acquisition $acquisition)
     {
+
         $this->acquisition = $acquisition;
 
-        $this->authorize('delete',  $this->acquisition);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->acquisition
+        );
 
         $this->acquisitionRepository->delete($this->acquisition);
 

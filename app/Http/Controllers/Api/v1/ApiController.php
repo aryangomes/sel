@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Utils\LogFormatter;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ApiController extends Controller
 {
 
+    protected $tablePermissions;
 
     protected $codeStatusResponse = Response::HTTP_OK;
 
@@ -65,5 +67,33 @@ class ApiController extends Controller
         $this->codeStatusResponse =  $codeStatusResponse;
 
         $this->requestResponse = ['errors' => $exception->getMessage()];
+    }
+
+    public function canPerformAction($action, $model = null)
+    {
+
+        $this->authorize('canPerformAction', [
+            $model,
+            $action
+        ]);
+    }
+
+
+    public function canPerformActionOrResourceBelongsToUser(
+        $action,
+        $idResource,
+        $model
+    ) {
+
+        $this->authorize('canPerformActionOrResourceBelongsToUser', [
+            $model,
+            $action,
+            $idResource
+        ]);
+    }
+
+    public function makeNameActionFromTable($actionWithoutTablePermission = '')
+    {
+        return Str::slug("{$this->tablePermissions} {$actionWithoutTablePermission}");
     }
 }

@@ -7,9 +7,9 @@ use App\Models\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class CollectionTest extends TestCase
+class CollectionTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -22,6 +22,9 @@ class CollectionTest extends TestCase
     {
         $this->urlCollection = "{$this->url}collections";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('collections');
     }
 
     /**
@@ -34,28 +37,19 @@ class CollectionTest extends TestCase
 
     public function testViewAllCollectionDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+        $this->createAndAuthenticateTheAdminUser();
 
         $collection = factory(Collection::class)->create();
-
-
-        Passport::actingAs($userAdmin);
-
-        $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson($this->urlCollection);
 
         $response->assertOk();
 
-
-        $user = factory(User::class)->create();
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
+                'idProfile' => $this->userProfile
+            ]
+        );
 
         $response = $this->getJson($this->urlCollection);
 
@@ -64,28 +58,20 @@ class CollectionTest extends TestCase
 
     public function testViewCollectionDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
 
         $collection = factory(Collection::class)->create();
 
-
-        Passport::actingAs($userAdmin);
-
-        $this->assertAuthenticatedAs($userAdmin, 'api');
+        $this->createAndAuthenticateTheAdminUser();
 
         $response = $this->getJson($this->urlCollection);
 
         $response->assertOk();
 
-
-        $user = factory(User::class)->create();
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
+                'idProfile' => $this->userProfile
+            ]
+        );
 
         $response = $this->getJson($this->urlWithParameter(
             $this->urlCollection,

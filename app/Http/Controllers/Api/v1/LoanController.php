@@ -23,6 +23,7 @@ class LoanController extends ApiController
     ) {
         $this->loanRepository = $loanRepository;
         $this->loan = $loan;
+        $this->tablePermissions = 'loans';
     }
 
     /**
@@ -32,6 +33,11 @@ class LoanController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->loan
+        );
+
         $this->loanRepository->getResourceCollectionModel();
 
         if ($this->loanRepository->transactionIsSuccessfully) {
@@ -63,7 +69,10 @@ class LoanController extends ApiController
      */
     public function store(LoanRegisterRequest $request)
     {
-        $this->authorize('create', $this->loan);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->loan
+        );
 
         $requestValidated = $request->validated();
 
@@ -92,7 +101,16 @@ class LoanController extends ApiController
      */
     public function show(Loan $loan)
     {
-        //
+        $this->loan = $loan;
+
+        $this->canPerformActionOrResourceBelongsToUser(
+            $this->makeNameActionFromTable('view'),
+            $this->loan->idBorrowerUser,
+            $this->loan
+        );
+
+
+        return $this->loanRepository->getResourceModel($loan);
     }
 
     /**
@@ -117,7 +135,10 @@ class LoanController extends ApiController
     {
         $this->loan = $loan;
 
-        $this->authorize('update',  $this->loan);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->loan
+        );
 
         $requestValidated = $request->validated();
 
@@ -149,7 +170,10 @@ class LoanController extends ApiController
     {
         $this->loan = $loan;
 
-        $this->authorize('delete',  $this->loan);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->loan
+        );
 
         $this->loanRepository->delete($this->loan);
 

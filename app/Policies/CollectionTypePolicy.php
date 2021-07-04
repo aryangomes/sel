@@ -6,7 +6,7 @@ use App\Models\CollectionType;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class CollectionTypePolicy
+class CollectionTypePolicy extends BasePolicy
 {
     use HandlesAuthorization;
 

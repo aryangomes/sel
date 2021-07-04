@@ -6,7 +6,7 @@ use App\Models\LoanContainsCollectionCopy;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class LoanContainsCollectionCopyPolicy
+class LoanContainsCollectionCopyPolicy extends BasePolicy
 {
     use HandlesAuthorization;
 

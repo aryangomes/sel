@@ -23,6 +23,7 @@ class CollectionTypeController extends ApiController
     ) {
         $this->collectionTypeRepository = $collectionTypeRepository;
         $this->collectionType = $collectionType;
+        $this->tablePermissions = 'collection_types';
     }
 
     /**
@@ -32,6 +33,11 @@ class CollectionTypeController extends ApiController
      */
     public function index()
     {
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->collectionType
+        );
+
         $this->collectionTypeRepository->getResourceCollectionModel();
 
         if ($this->collectionTypeRepository->transactionIsSuccessfully) {
@@ -63,7 +69,11 @@ class CollectionTypeController extends ApiController
      */
     public function store(CollectionTypeRegisterRequest $request)
     {
-        $this->authorize('create', $this->collectionType);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->collectionType
+        );
+
 
         $requestValidated = $request->validated();
 
@@ -117,7 +127,11 @@ class CollectionTypeController extends ApiController
     {
         $this->collectionType = $collectionType;
 
-        $this->authorize('update',  $this->collectionType);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->collectionType
+        );
+
 
         $requestValidated = $request->validated();
 
@@ -149,7 +163,11 @@ class CollectionTypeController extends ApiController
     {
         $this->collectionType = $collectionType;
 
-        $this->authorize('delete',  $this->collectionType);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->collectionType
+        );
+
 
         $this->collectionTypeRepository->delete($this->collectionType);
 

@@ -14,7 +14,7 @@ class AcquisitionRegisterRequest extends FormRequest
      */
     public function authorize()
     {
-        return User::userMayToDoThisAction();
+        return true;
     }
     /**
      * Get the validation rules that apply to the request.

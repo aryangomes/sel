@@ -10,9 +10,9 @@ use App\Models\Utils\Regex;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class ProviderTest extends TestCase
+class ProviderTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -25,6 +25,9 @@ class ProviderTest extends TestCase
     {
         $this->urlProvider = "{$this->url}providers";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('providers');
     }
 
     /**
@@ -95,7 +98,6 @@ class ProviderTest extends TestCase
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->postJson($this->urlProvider, $postProvider);
-
 
         $response->assertCreated();
 

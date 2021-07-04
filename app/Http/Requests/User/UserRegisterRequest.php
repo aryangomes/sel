@@ -13,7 +13,7 @@ class UserRegisterRequest extends FormRequest
      * @return bool
      */
     public function authorize()
-    {   
+    {
         return User::userIsAdmin();
     }
 

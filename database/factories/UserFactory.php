@@ -4,7 +4,7 @@
 
 use App\Models\Utils\Regex;
 use App\Models\User;
-use App\Models\UserProfile;
+use App\Models\Profile;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 
@@ -34,6 +34,6 @@ $factory->define(User::class, function (Faker $faker) {
         'password' => bcrypt(env('DEFAULT_PASSWORD_ADMIN')),
         'remember_token' => Str::random(10),
         'isAdmin' => 0,
-        'idUserProfile' => factory(UserProfile::class),
+        'idProfile' => factory(Profile::class),
     ];
 });
