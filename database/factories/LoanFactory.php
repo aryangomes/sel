@@ -3,6 +3,7 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Model;
+use App\Models\CollectionCopy;
 use App\Models\Loan;
 use App\Models\User;
 use Faker\Generator as Faker;

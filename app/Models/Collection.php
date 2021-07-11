@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Collection extends Model
@@ -70,5 +71,22 @@ class Collection extends Model
     public function collectionCategory(): BelongsTo
     {
         return $this->belongsTo(CollectionCategory::class, 'idCollectionCategory');
+    }
+
+
+    /**
+     * Get all of the copies for the Collection
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function copies(): HasMany
+    {
+        return $this->hasMany(CollectionCopy::class, 'idCollection', 'idCollection');
+    }
+
+
+    public function scopeQuantityOfCopiesAvailable($query)
+    {
+        return $this->copies->where('isAvailable', true)->count();
     }
 }

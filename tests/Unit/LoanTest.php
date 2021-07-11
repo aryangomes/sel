@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Models\Collection;
+use App\Models\CollectionCopy;
 use App\Models\Loan;
 use App\Models\User;
 use Carbon\Carbon;
@@ -46,13 +48,22 @@ class LoanTest extends BaseTest
         );
 
         $postLoan = factory(Loan::class)->make()->toArray();
+        $postCollectionCopy['collectionCopy'][0] =
+            factory(CollectionCopy::class)->create(
+                [
+                    'isAvailable' => 1,
+                    'idCollection' => factory(Collection::class)
+                ]
+            )->toArray();
+
+        $postLoan = array_merge($postLoan, $postCollectionCopy);
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->postJson($this->urlLoan, $postLoan);
 
-        $response->assertCreated();
+        $response->assertStatus(405);
     }
 
     public function testRegisterLoanFailedWithInvalidData()

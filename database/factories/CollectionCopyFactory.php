@@ -10,7 +10,7 @@ use Faker\Generator as Faker;
 $factory->define(CollectionCopy::class, function (Faker $faker) {
     return [
         'reference' => $faker->numerify('Loc. ###-###-###'),
-        'isAvailable' => $faker->boolean,
+        'isAvailable' => true,
         'idCollection' => factory(Collection::class),
     ];
 });

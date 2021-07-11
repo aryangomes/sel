@@ -34,6 +34,8 @@ $factory->define(User::class, function (Faker $faker) {
         'password' => bcrypt(env('DEFAULT_PASSWORD_ADMIN')),
         'remember_token' => Str::random(10),
         'isAdmin' => 0,
+        'isActive' => 1,
+        'isBlocked' => 0,
         'idProfile' => factory(Profile::class),
     ];
 });

@@ -15,7 +15,7 @@ class CreateLoansTable extends Migration
     {
         Schema::create('loans', function (Blueprint $table) {
             $table->bigIncrements('idLoan');
-            $table->string('loansIdentifier', 30);
+            $table->string('loansIdentifier', 30)->nullable();
             $table->dateTime('returnDate')->nullable();
             $table->dateTime('expectedReturnDate');
             $table->string('observation', 200);

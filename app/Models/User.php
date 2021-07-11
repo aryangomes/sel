@@ -33,7 +33,7 @@ class User extends Authenticatable
         'name', 'email', 'password', 'streetAddress',
         'neighborhoodAddress', 'numberAddress',
         'phoneNumber', 'cellNumber', 'complementAddress', 'photo',
-        'isAdmin', 'cpf', 'idProfile'
+        'isAdmin', 'cpf', 'idProfile', 'isActive', 'isBlocked'
     ];
 
     /**
@@ -103,7 +103,7 @@ class User extends Authenticatable
         try {
 
             $tokenAccess = Auth::guard('api')->user()->token();
-        
+
             $tokenAccessWasRevoken = $tokenAccess->revoke();
         } catch (\Exception $exception) {
             Log::error(LogFormatter::formatTextLog(['Message' => $exception->getMessage()]));

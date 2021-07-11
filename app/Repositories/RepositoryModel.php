@@ -176,6 +176,13 @@ class RepositoryModel implements InterfacesRepositoryEloquentInterface
 
 	protected function setTransactionExceptionResponse(Exception $exception)
 	{
+		logger(
+			get_class($this),
+			[
+				"Exception" => $exception
+			]
+		);
+
 		$this->transactionIsSuccessfully = false;
 
 		DB::rollBack();

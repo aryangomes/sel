@@ -24,6 +24,10 @@ Route::prefix('login')->group(function () {
 
 Route::middleware('auth:api')->group(function () {
 
+    Route::prefix('loan')->group(function () {
+        Route::post('/register', 'Api\v1\Loan\RegisterController');
+    });
+
     Route::resource('/users', 'Api\v1\UserController');
 
     Route::resource('/lenders', 'Api\v1\LenderController');

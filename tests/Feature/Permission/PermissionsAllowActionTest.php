@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Permission;
 
 use App\Models\Acquisition;
 use App\Models\Permission;
@@ -104,7 +104,7 @@ class PermissionsAllowActionTest extends BaseTest
         $this->createAndAuthenticateTheUserNotAdmin(
             [
                 'idProfile' => $profile,
-             
+
             ]
         );
 
@@ -132,7 +132,7 @@ class PermissionsAllowActionTest extends BaseTest
         $this->createAndAuthenticateTheUserNotAdmin(
             [
                 'idProfile' => $profile,
-               
+
             ]
         );
 

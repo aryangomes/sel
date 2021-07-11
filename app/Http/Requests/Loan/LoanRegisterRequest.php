@@ -24,12 +24,14 @@ class LoanRegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'loansIdentifier' => 'required|string|max:30',
             'returnDate' => 'nullable|after_or_equal:today',
             'expectedReturnDate' => 'after_or_equal:today',
             'observation' => 'required|string|max:200',
             'idOperatorUser' => 'required',
             'idBorrowerUser' => 'required',
+            'collectionCopy' => 'required|array',
+            // 'idCollectionCopy' => 'required|array',
+            'idCollectionCopy.*' => 'required',
         ];
     }
 }

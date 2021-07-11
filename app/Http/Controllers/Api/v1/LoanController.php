@@ -7,6 +7,7 @@ use App\Http\Requests\Loan\LoanRegisterRequest;
 use App\Http\Requests\Loan\LoanUpdateRequest;
 use App\Models\Loan;
 use App\Repositories\Interfaces\LoanRepositoryInterface;
+use App\Services\Loan\RegisterLoanService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -69,14 +70,18 @@ class LoanController extends ApiController
      */
     public function store(LoanRegisterRequest $request)
     {
-        $this->canPerformAction(
+        $this->setSuccessResponse('', '', Response::HTTP_METHOD_NOT_ALLOWED);
+        return $this->responseWithJson();
+        /* $this->canPerformAction(
             $this->makeNameActionFromTable('store'),
             $this->loan
         );
 
         $requestValidated = $request->validated();
 
-        $this->loanRepository->create($requestValidated);
+        $registerLoanService = new RegisterLoanService($this->loanRepository);
+
+        $registerLoanService($requestValidated);
 
         if ($this->loanRepository->transactionIsSuccessfully) {
             $loanCreated =
@@ -90,7 +95,8 @@ class LoanController extends ApiController
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        return $this->responseWithJson();
+
+        return $this->responseWithJson(); */
     }
 
     /**
