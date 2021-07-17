@@ -15,7 +15,6 @@ class CreateLoanContainsCollectionCopiesTable extends Migration
     {
         Schema::create('loan_contains_collection_copies', function (Blueprint $table) {
             $table->bigIncrements('idLoanContainsCollectionCopy');
-            $table->integer('quantity')->default(1);
             $table->timestamps();
             $table->softDeletes();
 

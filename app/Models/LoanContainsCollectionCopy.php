@@ -32,7 +32,6 @@ class LoanContainsCollectionCopy extends Model
     protected $fillable = [
         'idLoan',
         'idCollectionCopy',
-        'quantity',
     ];
 
     /**

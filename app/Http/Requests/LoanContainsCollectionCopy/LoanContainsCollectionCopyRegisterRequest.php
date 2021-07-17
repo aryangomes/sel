@@ -24,7 +24,6 @@ class LoanContainsCollectionCopyRegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'quantity' => 'required|numeric|min:1|max:1000000',
             'idLoan' => 'required',
             'idCollectionCopy' => 'required',
         ];

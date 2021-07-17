@@ -60,9 +60,8 @@ class LoanContainsCollectionCopyTest extends BaseTest
 
         $postLoanContainsCollectionCopy = factory(LoanContainsCollectionCopy::class)->make(
             [
-                'quantity' => $this->faker->numberBetween(-11, 0),
                 'idLoan' => factory(Loan::class),
-                'idCollectionCopy' => factory(CollectionCopy::class),
+                'idCollectionCopy' => -1,
 
             ]
         )->toArray();
@@ -76,38 +75,7 @@ class LoanContainsCollectionCopyTest extends BaseTest
         $response->assertStatus(422);
     }
 
-    public function testUpdateLoanContainsCollectionCopySuccessfully()
-    {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
 
-        $loan = factory(LoanContainsCollectionCopy::class)->create();
-
-        $dataUpdateForLoanContainsCollectionCopy = [
-            'quantity' => $this->faker->numberBetween(1, 1000000),
-
-        ];
-
-        Passport::actingAs($userAdmin);
-        $this->assertAuthenticatedAs($userAdmin, 'api');
-
-        $response = $this->putJson(
-            $this->urlWithParameter($this->urlLoanContainsCollectionCopy, $loan->idLoanContainsCollectionCopy),
-            $dataUpdateForLoanContainsCollectionCopy
-        );
-
-        $response->assertOk();
-
-        $getLoanContainsCollectionCopy = $response->getData()->loanContainsCollectionCopy;
-
-        $this->assertEquals(
-            $getLoanContainsCollectionCopy->quantity,
-            $dataUpdateForLoanContainsCollectionCopy['quantity']
-        );
-    }
 
     public function testViewLoanContainsCollectionCopyDataSuccessfully()
     {

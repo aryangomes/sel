@@ -23,8 +23,6 @@ class LoanContainsCollectionCopyUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'quantity' => 'numeric|min:1|max:1000000',
-        ];
+        return [];
     }
 }
