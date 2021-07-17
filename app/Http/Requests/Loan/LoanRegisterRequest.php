@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Loan;
 
+use App\Rules\Loan\CopyIsAbleToLoanRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoanRegisterRequest extends FormRequest
@@ -29,9 +30,8 @@ class LoanRegisterRequest extends FormRequest
             'observation' => 'required|string|max:200',
             'idOperatorUser' => 'required',
             'idBorrowerUser' => 'required',
-            'collectionCopy' => 'required|array',
-            // 'idCollectionCopy' => 'required|array',
-            'idCollectionCopy.*' => 'required',
+            'collectionCopy' => ['required', 'array', new CopyIsAbleToLoanRule()],
+            'idCollectionCopy.*' => ['required'],
         ];
     }
 }

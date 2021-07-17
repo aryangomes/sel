@@ -15,7 +15,7 @@ class RegisterLoanService
     private $verifyBorrowerUserCanLoan;
     private $verifyCopyIsAbleToLoan;
     private $loanRepository;
-    private $data;
+    private $dataToRegisterLoan;
 
     public function __construct(
 
@@ -25,17 +25,12 @@ class RegisterLoanService
         $this->loanRepository = $loanRepository;
     }
 
-    public function __invoke($data)
+    public function __invoke($dataToRegisterLoan)
     {
-        info(
-            get_class($this),
-            [
-                'data' => $data
-            ]
-        );
-        $this->data = $data;
+
+        $this->dataToRegisterLoan = $dataToRegisterLoan;
         $this->getVerifyBorrowerUserCanLoan();
-        $this->getVerifyCopyIsAbleToLoan();
+        // $this->getVerifyCopyIsAbleToLoan();
         $this->execute();
     }
 
@@ -46,40 +41,34 @@ class RegisterLoanService
 
             if ($this->loanCanBeDone()) {
 
-                $idCollectionCopy = $this->data['collectionCopy'];
+                $collectionCopies = $this->dataToRegisterLoan['collectionCopy'];
 
-                info(
-                    get_class($this),
-                    [
-                        '$this->data' => $this->data,
-                        'idCollectionCopy' => $idCollectionCopy,
-                    ]
-                );
+                $idCollectionCopy = $collectionCopies;
 
-                unset($this->data['collectionCopy']);
+                $collectionCopy = key_exists(0, $collectionCopies) ?
+                    $collectionCopies[0] : $collectionCopies;
+
+                unset($this->dataToRegisterLoan['collectionCopy']);
 
                 //TODO REGISTER LOAN
-                $this->loanRepository->create($this->data);
+                $this->loanRepository->create($this->dataToRegisterLoan);
 
                 $loan = $this->loanRepository->responseFromTransaction;
+                if (key_exists(0, $collectionCopies)) {
 
-                info(
-                    get_class($this),
-                    [
-                        'lockCollectionsCopies idCollectionCopy' => $idCollectionCopy
-                    ]
-                );
-                foreach ($idCollectionCopy as $key => $value) {
-                    info(
-                        get_class($this),
-                        [
-                            'idCollectionCopy value' => $value['idCollectionCopy']
-                        ]
-                    );
+                    foreach ($idCollectionCopy as $key => $value) {
+
+                        //TODO LOCK THE COPIES BORROWED
+                        $lockCollectionsCopies = new LockCollectionsCopies($loan, $value['idCollectionCopy']);
+                        $lockCollectionsCopies->lockCollectionCopies();
+                    }
+                } else {
+
                     //TODO LOCK THE COPIES BORROWED
-                    $lockCollectionsCopies = new LockCollectionsCopies($loan, $value['idCollectionCopy']);
+                    $lockCollectionsCopies = new LockCollectionsCopies($loan, $collectionCopy['idCollectionCopy']);
                     $lockCollectionsCopies->lockCollectionCopies();
                 }
+
 
                 //TODO GENERATE LOAN IDENTIFIER
                 $generatedLoanIdentifier = new GenerateLoanIdentifierAction($loan);
@@ -103,7 +92,7 @@ class RegisterLoanService
 
     private function getVerifyBorrowerUserCanLoan()
     {
-        $user = User::find($this->data['idBorrowerUser']);
+        $user = User::find($this->dataToRegisterLoan['idBorrowerUser']);
 
         $verifyBorrowerUserCanLoan = new VerifyBorrowerUserCanLoanAction($user);
 
@@ -112,30 +101,38 @@ class RegisterLoanService
 
     private function getVerifyCopyIsAbleToLoan()
     {
-        info(
-            get_class($this),
-            [
-                'variavel' => key_exists('collectionCopy', $this->data),
-                '$this->data[collectionCopy]' => $this->data['collectionCopy'],
-                '$this->data[collectionCopy]count' => count($this->data['collectionCopy']),
-            ]
-        );
 
-        if (count($this->data['collectionCopy']) > 1) {
 
-            $collectionCopy = CollectionCopy::find($this->data['collectionCopy'][0]['idCollectionCopy']);
-        } else {
-            foreach ($this->data['collectionCopy'] as $key => $idCollectionCopy) {
+        $existCollectionCopy = $this->verifyIfHasCollectionCopy();
 
-                $collectionCopy = CollectionCopy::find($idCollectionCopy['idCollectionCopy']);
+        if ($existCollectionCopy) {
+
+
+            $collectionCopies = $this->dataToRegisterLoan['collectionCopy'];
+            $collectionCopy = key_exists(0, $collectionCopies) ?
+                $collectionCopies[0] : $collectionCopies;
+
+            if (key_exists(0, $collectionCopies)) {
+            } else {
+                $copyIsAbleToLoanResult = [];
+
+                foreach ($collectionCopies  as  $collectionCopy) {
+
+                    $existIdCollectionCopy = $this->verifyIfHasIdCollectionCopy($collectionCopies);
+
+                    if ($existIdCollectionCopy) {
+
+                        $collectionCopy = CollectionCopy::find($collectionCopy['idCollectionCopy']);
+
+                        $verifyCopyIsAbleToLoan = new VerifyCopyIsAbleToLoanAction($collectionCopy);
+
+                        $copyIsAbleToLoanResult[$collectionCopy->idCollection] = $verifyCopyIsAbleToLoan->copyIsAbleToLoan();
+                    }
+                }
             }
         }
 
-        $verifyCopyIsAbleToLoan = new VerifyCopyIsAbleToLoanAction($collectionCopy);
-
-
-
-        $this->verifyCopyIsAbleToLoan = $verifyCopyIsAbleToLoan->copyIsAbleToLoan();
+        $this->verifyCopyIsAbleToLoan = $copyIsAbleToLoanResult;
     }
 
     public function loanCanBeDone()
@@ -144,10 +141,24 @@ class RegisterLoanService
         $borrowerUserCanLoan = $this->verifyBorrowerUserCanLoan;
 
         //TODO VERIFY IF A COPY ABLE TO LOAN IT
-        $copyIsAbleToLoan = $this->verifyCopyIsAbleToLoan;
+        // $copyIsAbleToLoan = $this->verifyCopyIsAbleToLoan;
 
-        $loanCanBeDone = ($borrowerUserCanLoan && $copyIsAbleToLoan);
+        $loanCanBeDone = ($borrowerUserCanLoan);
 
         return  $loanCanBeDone;
+    }
+
+    private function verifyIfHasCollectionCopy()
+    {
+        $verifyIfHasCollectionCopy = key_exists('collectionCopy', $this->dataToRegisterLoan);
+
+        return $verifyIfHasCollectionCopy;
+    }
+
+    private function verifyIfHasIdCollectionCopy($collectionCopy)
+    {
+        $verifyIfHasIdCollectionCopy = key_exists('idCollectionCopy', $collectionCopy);
+
+        return $verifyIfHasIdCollectionCopy;
     }
 }

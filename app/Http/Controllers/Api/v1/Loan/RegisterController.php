@@ -39,13 +39,6 @@ class RegisterController extends ApiController
 
         $requestValidated = $request->validated();
 
-        info(
-            get_class($this),
-            [
-                'requestValidated' => $requestValidated
-            ]
-        );
-
         $registerLoanService = new RegisterLoanService($this->loanRepository);
 
         $registerLoanService($requestValidated);

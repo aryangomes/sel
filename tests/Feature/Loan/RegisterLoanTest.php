@@ -64,15 +64,70 @@ class RegisterLoanTest extends BaseTest
 
         $collectionCopy = CollectionCopy::find($postCollectionCopy['collectionCopy'][0]['idCollectionCopy']);
 
-        info(
-            get_class($this),
+        $response->assertCreated();
+
+        $this->assertFalse((bool) $collectionCopy->isAvailable);
+    }
+
+    public function testRegisterLoanSuccessfullyWithDataWithouArrayCollectionCopy()
+    {
+        $this->createAndAuthenticateTheAdminUser();
+
+        $borrowerUser =
+            factory(User::class)->create();
+
+        $postLoan = factory(Loan::class)->make(
             [
-                'collectionCopy' => $collectionCopy,
-                'response' => $response,
+                'idBorrowerUser' => $borrowerUser
             ]
-        );
+        )->toArray();
+        $postCollectionCopy['collectionCopy'] =
+            factory(CollectionCopy::class)->create(
+                [
+                    'isAvailable' => 1,
+                    'idCollection' => factory(Collection::class)
+                ]
+            )->toArray();
+
+        $postLoan = array_merge($postLoan, $postCollectionCopy);
+
+        $response = $this->postJson($this->urlLoan, $postLoan);
+
+        $collectionCopy = CollectionCopy::find($postCollectionCopy['collectionCopy']['idCollectionCopy']);
 
         $response->assertCreated();
+
+        $this->assertFalse((bool) $collectionCopy->isAvailable);
+    }
+
+    public function testRegisterLoanUnsuccessfully()
+    {
+        $this->createAndAuthenticateTheAdminUser();
+
+        $borrowerUser =
+            factory(User::class)->create();
+
+        $postLoan = factory(Loan::class)->make(
+            [
+                'idBorrowerUser' => $borrowerUser
+            ]
+        )->toArray();
+        $postCollectionCopy['collectionCopy'] =
+            factory(CollectionCopy::class)->create(
+                [
+                    'isAvailable' => 0,
+                    'idCollection' => factory(Collection::class)
+                ]
+            )->toArray();
+
+        $postLoan = array_merge($postLoan, $postCollectionCopy);
+
+        $response = $this->postJson($this->urlLoan, $postLoan);
+
+        $collectionCopy = CollectionCopy::find($postCollectionCopy['collectionCopy']['idCollectionCopy']);
+
+        $response->assertStatus(422);
+
         $this->assertFalse((bool) $collectionCopy->isAvailable);
     }
 
@@ -203,23 +258,7 @@ class RegisterLoanTest extends BaseTest
 
         $postLoan = array_merge($postLoan, $postCollectionCopyArray);
 
-
-        info(
-            get_class($this),
-            [
-                'postCollectionCopyArray' => $postCollectionCopyArray,
-                'postLoan' => $postLoan,
-            ]
-        );
-
         $response = $this->postJson($this->urlLoan, $postLoan);
-
-        info(
-            get_class($this),
-            [
-                'response' => $response,
-            ]
-        );
 
         $response->assertCreated();
 
@@ -227,13 +266,6 @@ class RegisterLoanTest extends BaseTest
 
 
             $collectionCopy = CollectionCopy::find($postCollectionCopy['idCollectionCopy']);
-            info(
-                get_class($this),
-                [
-                    '!postCollectionCopy' => $postCollectionCopy,
-                    '!collectionCopy' => $collectionCopy
-                ]
-            );
 
             $this->assertFalse((bool) $collectionCopy->isAvailable);
         }

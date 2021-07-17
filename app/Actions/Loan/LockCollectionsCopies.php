@@ -34,14 +34,6 @@ class LockCollectionsCopies
         $this->loanContainsCollectionCopyRepository->create($dataForLoanContainsCollectionCopy);
 
         $this->becomeTheCollectionCopyUnavailable($collectionCopy);
-
-        info(
-            get_class($this),
-            [
-                'this' => $this->loanContainsCollectionCopyRepository,
-                'dataForLoanContainsCollectionCopy' => $dataForLoanContainsCollectionCopy,
-            ]
-        );
     }
 
     private function becomeTheCollectionCopyUnavailable($collectionCopy)
