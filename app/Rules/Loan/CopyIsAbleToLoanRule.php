@@ -32,13 +32,11 @@ class CopyIsAbleToLoanRule implements Rule
     {
         $copyIsAbleToLoan = false;
 
-        $collectionCopy = key_exists(0, $value) ? $value[0] : $value;
-
+        $collectionCopy = $this->getCollectionCopyFromValue($value);
 
         if (key_exists('idCollectionCopy', $collectionCopy)) {
 
             $this->collectionCopy = CollectionCopy::find($collectionCopy['idCollectionCopy']);
-
 
             $copyIsAbleToLoan = $this->copyIsAbleToLoan();
         }
@@ -69,5 +67,11 @@ class CopyIsAbleToLoanRule implements Rule
         $copyIsAbleToLoan = ($quantityOfCopiesAvailable > 0);
 
         return $copyIsAbleToLoan;
+    }
+
+    private function getCollectionCopyFromValue($value)
+    {
+        return
+            key_exists(0, $value) ? $value[0] : $value;
     }
 }

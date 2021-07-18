@@ -41,41 +41,18 @@ class RegisterLoanService
 
             if ($this->loanCanBeDone()) {
 
-                $collectionCopies = $this->dataToRegisterLoan['collectionCopy'];
+                $collectionCopies = $this->getCollectionCopies();
 
-                $idCollectionCopy = $collectionCopies;
+                $loanRegistered = $this->registerLoan();
 
-                $collectionCopy = key_exists(0, $collectionCopies) ?
-                    $collectionCopies[0] : $collectionCopies;
+                if ($this->loanRepository->transactionIsSuccessfully) {
 
-                unset($this->dataToRegisterLoan['collectionCopy']);
+                    $this->lockingCollectionCopy($loanRegistered, $collectionCopies);
 
-                //TODO REGISTER LOAN
-                $this->loanRepository->create($this->dataToRegisterLoan);
+                    $actionWasExecuted = true;
 
-                $loan = $this->loanRepository->responseFromTransaction;
-                if (key_exists(0, $collectionCopies)) {
-
-                    foreach ($idCollectionCopy as $key => $value) {
-
-                        //TODO LOCK THE COPIES BORROWED
-                        $lockCollectionsCopies = new LockCollectionsCopies($loan, $value['idCollectionCopy']);
-                        $lockCollectionsCopies->lockCollectionCopies();
-                    }
-                } else {
-
-                    //TODO LOCK THE COPIES BORROWED
-                    $lockCollectionsCopies = new LockCollectionsCopies($loan, $collectionCopy['idCollectionCopy']);
-                    $lockCollectionsCopies->lockCollectionCopies();
+                    $this->generateLoanIdentifier($loanRegistered);
                 }
-
-
-                //TODO GENERATE LOAN IDENTIFIER
-                $generatedLoanIdentifier = new GenerateLoanIdentifierAction($loan);
-
-                $loan->loansIdentifier = $generatedLoanIdentifier();
-
-                $actionWasExecuted =  $loan->save();
             }
         } catch (\Exception $exception) {
             logger(
@@ -99,41 +76,7 @@ class RegisterLoanService
         $this->verifyBorrowerUserCanLoan = $verifyBorrowerUserCanLoan->borrowerUserCanLoan();
     }
 
-    private function getVerifyCopyIsAbleToLoan()
-    {
 
-
-        $existCollectionCopy = $this->verifyIfHasCollectionCopy();
-
-        if ($existCollectionCopy) {
-
-
-            $collectionCopies = $this->dataToRegisterLoan['collectionCopy'];
-            $collectionCopy = key_exists(0, $collectionCopies) ?
-                $collectionCopies[0] : $collectionCopies;
-
-            if (key_exists(0, $collectionCopies)) {
-            } else {
-                $copyIsAbleToLoanResult = [];
-
-                foreach ($collectionCopies  as  $collectionCopy) {
-
-                    $existIdCollectionCopy = $this->verifyIfHasIdCollectionCopy($collectionCopies);
-
-                    if ($existIdCollectionCopy) {
-
-                        $collectionCopy = CollectionCopy::find($collectionCopy['idCollectionCopy']);
-
-                        $verifyCopyIsAbleToLoan = new VerifyCopyIsAbleToLoanAction($collectionCopy);
-
-                        $copyIsAbleToLoanResult[$collectionCopy->idCollection] = $verifyCopyIsAbleToLoan->copyIsAbleToLoan();
-                    }
-                }
-            }
-        }
-
-        $this->verifyCopyIsAbleToLoan = $copyIsAbleToLoanResult;
-    }
 
     public function loanCanBeDone()
     {
@@ -160,5 +103,71 @@ class RegisterLoanService
         $verifyIfHasIdCollectionCopy = key_exists('idCollectionCopy', $collectionCopy);
 
         return $verifyIfHasIdCollectionCopy;
+    }
+
+    private function getCollectionCopyFromInputValue($inputValue)
+    {
+        return key_exists(0, $inputValue) ? $inputValue[0] : $inputValue;
+    }
+
+    private function getCollectionCopies()
+    {
+        $collectionCopies = null;
+
+        if ($this->verifyIfHasCollectionCopy()) {
+
+            $collectionCopies = $this->dataToRegisterLoan['collectionCopy'];
+
+            unset($this->dataToRegisterLoan['collectionCopy']);
+        }
+
+
+        return $collectionCopies;
+    }
+
+    private function lockCollectionCopy($loan, $collectionCopy)
+    {
+        $lockCollectionsCopies = new LockCollectionsCopies($loan, $collectionCopy['idCollectionCopy']);
+        $lockCollectionsCopies->lockCollectionCopies();
+    }
+
+    private function lockingCollectionCopy($loan, $collectionCopies)
+    {
+
+        $collectionCopy =
+            $this->getCollectionCopyFromInputValue($collectionCopies);
+
+        if (key_exists(0, $collectionCopies)) {
+
+            foreach ($collectionCopies as  $collectionCopy) {
+
+                //TODO LOCK THE COPIES BORROWED
+                $this->lockCollectionCopy($loan, $collectionCopy);
+            }
+        } else {
+
+            //TODO LOCK THE COPIES BORROWED
+            $this->lockCollectionCopy($loan, $collectionCopy);
+        }
+    }
+
+    private function registerLoan()
+    {
+        //TODO REGISTER LOAN
+        $this->loanRepository->create($this->dataToRegisterLoan);
+
+        $loan = $this->loanRepository->responseFromTransaction;
+
+        return $loan;
+    }
+
+    private function generateLoanIdentifier($loanRegistered)
+    {
+        //TODO GENERATE LOAN IDENTIFIER
+        $generatedLoanIdentifier = new GenerateLoanIdentifierAction($loanRegistered);
+
+        $loanRegistered->loansIdentifier = $generatedLoanIdentifier();
+
+        $loanRegistered->save();
     }
 }

@@ -156,6 +156,18 @@ class RegisterLoanTest extends BaseTest
         $response->assertStatus(422);
     }
 
+    public function testRegisterLoanUnsuccessfullyWithoutCollectionCopy()
+    {
+        $this->createAndAuthenticateTheAdminUser();
+
+
+        $postLoan = factory(Loan::class)->make()->toArray();
+
+        $response = $this->postJson($this->urlLoan, $postLoan);
+
+        $response->assertStatus(422);
+    }
+
     public function testRegisterLoanUnsuccessfullyWithUserBlocked()
     {
         $this->createAndAuthenticateTheAdminUser();
