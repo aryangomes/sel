@@ -195,7 +195,6 @@ class RegisterLoanTest extends BaseTest
 
         $response = $this->postJson($this->urlLoan, $postLoan);
 
-
         $collectionCopy = CollectionCopy::find($postCollectionCopy['collectionCopy'][0]['idCollectionCopy']);
 
         $this->assertTrue((bool) $collectionCopy->isAvailable);

@@ -29,8 +29,7 @@ class RegisterLoanService
     {
 
         $this->dataToRegisterLoan = $dataToRegisterLoan;
-        $this->getVerifyBorrowerUserCanLoan();
-        // $this->getVerifyCopyIsAbleToLoan();
+
         $this->execute();
     }
 
@@ -39,20 +38,18 @@ class RegisterLoanService
         $actionWasExecuted = false;
         try {
 
-            if ($this->loanCanBeDone()) {
 
-                $collectionCopies = $this->getCollectionCopies();
+            $collectionCopies = $this->getCollectionCopies();
 
-                $loanRegistered = $this->registerLoan();
+            $loanRegistered = $this->registerLoan();
 
-                if ($this->loanRepository->transactionIsSuccessfully) {
+            if ($this->loanRepository->transactionIsSuccessfully) {
 
-                    $this->lockingCollectionCopy($loanRegistered, $collectionCopies);
+                $this->lockingCollectionCopies($loanRegistered, $collectionCopies);
 
-                    $actionWasExecuted = true;
+                $actionWasExecuted = true;
 
-                    $this->generateLoanIdentifier($loanRegistered);
-                }
+                $this->generateLoanIdentifier($loanRegistered);
             }
         } catch (\Exception $exception) {
             logger(
@@ -64,31 +61,6 @@ class RegisterLoanService
         }
 
         return $actionWasExecuted;
-    }
-
-
-    private function getVerifyBorrowerUserCanLoan()
-    {
-        $user = User::find($this->dataToRegisterLoan['idBorrowerUser']);
-
-        $verifyBorrowerUserCanLoan = new VerifyBorrowerUserCanLoanAction($user);
-
-        $this->verifyBorrowerUserCanLoan = $verifyBorrowerUserCanLoan->borrowerUserCanLoan();
-    }
-
-
-
-    public function loanCanBeDone()
-    {
-        //TODO VERIFY IF  USER BORROWER CAN TO LOAN
-        $borrowerUserCanLoan = $this->verifyBorrowerUserCanLoan;
-
-        //TODO VERIFY IF A COPY ABLE TO LOAN IT
-        // $copyIsAbleToLoan = $this->verifyCopyIsAbleToLoan;
-
-        $loanCanBeDone = ($borrowerUserCanLoan);
-
-        return  $loanCanBeDone;
     }
 
     private function verifyIfHasCollectionCopy()
@@ -127,11 +99,15 @@ class RegisterLoanService
 
     private function lockCollectionCopy($loan, $collectionCopy)
     {
-        $lockCollectionsCopies = new LockCollectionsCopies($loan, $collectionCopy['idCollectionCopy']);
-        $lockCollectionsCopies->lockCollectionCopies();
+        if ($this->verifyIfHasIdCollectionCopy($collectionCopy)) {
+
+            $lockCollectionsCopies = new LockCollectionsCopies($loan, $collectionCopy['idCollectionCopy']);
+
+            $lockCollectionsCopies->lockCollectionCopies();
+        }
     }
 
-    private function lockingCollectionCopy($loan, $collectionCopies)
+    private function lockingCollectionCopies($loan, $collectionCopies)
     {
 
         $collectionCopy =

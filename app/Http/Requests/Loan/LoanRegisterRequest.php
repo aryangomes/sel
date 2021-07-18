@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Loan;
 
+use App\Rules\Loan\BorrowerUserCanLoanRule;
 use App\Rules\Loan\CopyIsAbleToLoanRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -29,7 +30,7 @@ class LoanRegisterRequest extends FormRequest
             'expectedReturnDate' => 'after_or_equal:today',
             'observation' => 'required|string|max:200',
             'idOperatorUser' => 'required',
-            'idBorrowerUser' => 'required',
+            'idBorrowerUser' => ['required', new BorrowerUserCanLoanRule()],
             'collectionCopy' => ['required', 'array', new CopyIsAbleToLoanRule()],
             'idCollectionCopy.*' => ['required'],
         ];
