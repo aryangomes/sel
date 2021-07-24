@@ -23,6 +23,9 @@ class LoanContainsCollectionCopyUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        return [
+            'idLoan' => 'exists:loans,idLoan',
+            'idCollectionCopy' => 'exists:collection_copies,idCollectionCopy',
+        ];
     }
 }

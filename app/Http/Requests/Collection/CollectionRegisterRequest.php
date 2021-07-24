@@ -30,9 +30,9 @@ class CollectionRegisterRequest extends FormRequest
             'cdu' => 'max:20|string|nullable',
             'isbn' => 'max:20|string|nullable',
             'publisherCompany' => 'max:150|string|nullable',
-            'idCollectionType' => 'required',
-            'idCollectionCategory' => 'required',
-            'idAcquisition' => 'required',
+            'idCollectionType' => 'required|exists:collection_types,idCollectionType',
+            'idCollectionCategory' => 'required|exists:collection_categories,idCollectionCategory',
+            'idAcquisition' => 'required|exists:acquisitions,idAcquisition',
         ];
     }
 }

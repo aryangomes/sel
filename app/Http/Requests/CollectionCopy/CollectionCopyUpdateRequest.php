@@ -26,6 +26,7 @@ class CollectionCopyUpdateRequest extends FormRequest
         return [
             'reference' => 'string|max:50',
             'isAvailable' => 'required|boolean',
+            'idCollection' => 'exists:collections,idCollection',
         ];
     }
 }

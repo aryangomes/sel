@@ -27,8 +27,8 @@ class AcquisitionRegisterRequest extends FormRequest
             'price' => 'required|numeric|min:0|max:1000000',
             'quantity' => 'required|numeric|min:1|max:1000000',
             'idLender' => 'required',
-            'idProvider' => 'required',
-            'idAcquisitionType' => 'required',
+            'idProvider' => 'required|exists:providers,idProvider',
+            'idAcquisitionType' => 'required|exists:acquisition_types,idAcquisitionType',
         ];
     }
 }

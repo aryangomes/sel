@@ -43,10 +43,17 @@ class LoanContainsCollectionCopyTest extends BaseTest
 
         $this->createAndAuthenticateTheAdminUser();
 
-        $postLoanContainsCollectionCopy = factory(LoanContainsCollectionCopy::class)->make()->toArray();
+
+        $postLoanContainsCollectionCopy = factory(LoanContainsCollectionCopy::class)
+            ->make([])->toArray();
 
         $response = $this->postJson($this->urlLoanContainsCollectionCopy, $postLoanContainsCollectionCopy);
-
+        info(
+            get_class($this),
+            [
+                'variavel' => $response
+            ]
+        );
         $response->assertCreated();
     }
 
@@ -61,7 +68,7 @@ class LoanContainsCollectionCopyTest extends BaseTest
         $postLoanContainsCollectionCopy = factory(LoanContainsCollectionCopy::class)->make(
             [
                 'idLoan' => factory(Loan::class),
-                'idCollectionCopy' => -1,
+                'idCollectionCopy' => 'id1',
 
             ]
         )->toArray();

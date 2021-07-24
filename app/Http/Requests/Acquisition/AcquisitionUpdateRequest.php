@@ -27,6 +27,8 @@ class AcquisitionUpdateRequest extends FormRequest
         return [
             'price' => 'required|numeric|min:0|max:1000000',
             'quantity' => 'required|numeric|min:1|max:1000000',
+            'idProvider' => 'exists:providers,idProvider',
+            'idAcquisitionType' => 'exists:acquisition_types,idAcquisitionType',
 
         ];
     }

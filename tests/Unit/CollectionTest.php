@@ -2,8 +2,11 @@
 
 namespace Tests\Unit;
 
+use App\Models\Acquisition;
 use App\Models\User;
 use App\Models\Collection;
+use App\Models\CollectionCategory;
+use App\Models\CollectionType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
@@ -148,9 +151,9 @@ class CollectionTest extends BaseTest
             'cdu' =>  $this->faker->numerify('#########'),
             'isbn' => $this->faker->isbn13(10),
             'publisherCompany' => $this->faker->company,
-            'idCollectionType' => factory(CollectionType::class),
-            'idCollectionCategory' => factory(CollectionCategory::class),
-            'idAcquisition' => factory(Acquisition::class),
+            'idCollectionType' => factory(CollectionType::class)->create()->idCollectionType,
+            'idCollectionCategory' => factory(CollectionCategory::class)->create()->idCollectionCategory,
+            'idAcquisition' => factory(Acquisition::class)->create()->idAcquisition,
         ];
 
         Passport::actingAs($userAdmin);

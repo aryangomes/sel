@@ -30,6 +30,9 @@ class CollectionUpdateRequest extends FormRequest
             'cdu' => 'max:20|string|nullable',
             'isbn' => 'max:20|string|nullable',
             'publisherCompany' => 'max:150|string|nullable',
+            'idCollectionType' => 'exists:collection_types,idCollectionType',
+            'idCollectionCategory' => 'exists:collection_categories,idCollectionCategory',
+            'idAcquisition' => 'exists:acquisitions,idAcquisition',
 
         ];
     }

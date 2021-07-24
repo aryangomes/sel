@@ -24,8 +24,8 @@ class LoanContainsCollectionCopyRegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'idLoan' => 'required',
-            'idCollectionCopy' => 'required',
+            'idLoan' => 'required|exists:loans,idLoan',
+            'idCollectionCopy' => 'required|exists:collection_copies,idCollectionCopy',
         ];
     }
 }

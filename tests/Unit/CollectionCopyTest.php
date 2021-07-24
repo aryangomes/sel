@@ -120,7 +120,7 @@ class CollectionCopyTest extends BaseTest
         $dataUpdateForCollectionCopy = [
             'reference' => $this->faker->numerify('Loc. ###-###-###'),
             'isAvailable' => $this->faker->boolean,
-            'idCollection' => factory(Collection::class),
+            'idCollection' => factory(Collection::class)->create()->idCollection,
         ];
 
         Passport::actingAs($userAdmin);

@@ -29,10 +29,14 @@ class LoanRegisterRequest extends FormRequest
             'returnDate' => 'nullable|after_or_equal:today',
             'expectedReturnDate' => 'after_or_equal:today',
             'observation' => 'required|string|max:200',
-            'idOperatorUser' => 'required',
-            'idBorrowerUser' => ['required', new BorrowerUserCanLoanRule()],
+            'idOperatorUser' => ['required', 'exists:users,id'],
+            'idBorrowerUser' =>
+            [
+                'required', 'exists:users,id',
+                new BorrowerUserCanLoanRule()
+            ],
             'collectionCopy' => ['required', 'array', new CopyIsAbleToLoanRule()],
-            'idCollectionCopy.*' => ['required'],
+            'idCollectionCopy.*' => ['required', 'exists:collection_copies,idCollectionCopy'],
         ];
     }
 }
