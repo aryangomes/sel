@@ -5,6 +5,9 @@ namespace Tests\Feature\Loan;
 use App\Models\Collection;
 use App\Models\CollectionCopy;
 use App\Models\Loan;
+use App\Models\Permission;
+use App\Models\Profile;
+use App\Models\ProfileHasPermission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -40,7 +43,7 @@ class RegisterLoanTest extends BaseTest
 
     public function testRegisterLoanSuccessfully()
     {
-        $this->createAndAuthenticateTheAdminUser();
+        $this->generatePermissionsLoanProfileToUserNotAdmin(true);
 
         $borrowerUser =
             factory(User::class)->create();
@@ -71,7 +74,7 @@ class RegisterLoanTest extends BaseTest
 
     public function testRegisterLoanSuccessfullyWithDataWithouArrayCollectionCopy()
     {
-        $this->createAndAuthenticateTheAdminUser();
+        $this->generatePermissionsLoanProfileToUserNotAdmin(true);
 
         $borrowerUser =
             factory(User::class)->create();
@@ -102,7 +105,7 @@ class RegisterLoanTest extends BaseTest
 
     public function testRegisterLoanUnsuccessfully()
     {
-        $this->createAndAuthenticateTheAdminUser();
+        $this->generatePermissionsLoanProfileToUserNotAdmin();
 
         $borrowerUser =
             factory(User::class)->create();
@@ -131,9 +134,40 @@ class RegisterLoanTest extends BaseTest
         $this->assertFalse((bool) $collectionCopy->isAvailable);
     }
 
+    public function testRegisterLoanSuccessfullyWithUserOperatorNotAdmin()
+    {
+        $this->generatePermissionsLoanProfileToUserNotAdmin();
+
+        $borrowerUser =
+            factory(User::class)->create();
+
+        $postLoan = factory(Loan::class)->make(
+            [
+                'idBorrowerUser' => $borrowerUser
+            ]
+        )->toArray();
+        $postCollectionCopy['collectionCopy'][0] =
+            factory(CollectionCopy::class)->create(
+                [
+                    'isAvailable' => 1,
+                    'idCollection' => factory(Collection::class)
+                ]
+            )->toArray();
+
+        $postLoan = array_merge($postLoan, $postCollectionCopy);
+
+        $response = $this->postJson($this->urlLoan, $postLoan);
+
+        $collectionCopy = CollectionCopy::find($postCollectionCopy['collectionCopy'][0]['idCollectionCopy']);
+
+        $response->assertForbidden();
+
+        $this->assertTrue((bool) $collectionCopy->isAvailable);
+    }
+
     public function testRegisterLoanUnsuccessfullyWithCollectionCopyWithoutAvaible()
     {
-        $this->createAndAuthenticateTheAdminUser();
+        $this->generatePermissionsLoanProfileToUserNotAdmin();
 
 
         $postLoan = factory(Loan::class)->make()->toArray();
@@ -158,7 +192,7 @@ class RegisterLoanTest extends BaseTest
 
     public function testRegisterLoanUnsuccessfullyWithoutCollectionCopy()
     {
-        $this->createAndAuthenticateTheAdminUser();
+        $this->generatePermissionsLoanProfileToUserNotAdmin();
 
 
         $postLoan = factory(Loan::class)->make()->toArray();
@@ -170,7 +204,7 @@ class RegisterLoanTest extends BaseTest
 
     public function testRegisterLoanUnsuccessfullyWithUserBlocked()
     {
-        $this->createAndAuthenticateTheAdminUser();
+        $this->generatePermissionsLoanProfileToUserNotAdmin();
 
         $userNotAdmin = factory(User::class)->create(
             [
@@ -204,7 +238,7 @@ class RegisterLoanTest extends BaseTest
 
     public function testRegisterLoanUnsuccessfullyWithUserInactive()
     {
-        $this->createAndAuthenticateTheAdminUser();
+        $this->generatePermissionsLoanProfileToUserNotAdmin();
 
         $userNotAdmin = factory(User::class)->create(
             [
@@ -236,9 +270,9 @@ class RegisterLoanTest extends BaseTest
         $response->assertStatus(422);
     }
 
-    public function testRegisterLoanSuccessfullyWithMultipleCollectionCopies()
+    public function testRegisterLoanSuccessfullyWithMultipleCollectionCopiesFromOneCollection()
     {
-        $this->createAndAuthenticateTheAdminUser();
+        $this->generatePermissionsLoanProfileToUserNotAdmin(true);
 
         $borrowerUser =
             factory(User::class)->create();
@@ -280,5 +314,84 @@ class RegisterLoanTest extends BaseTest
 
             $this->assertFalse((bool) $collectionCopy->isAvailable);
         }
+    }
+
+    public function testRegisterLoanSuccessfullyWithMultipleCollectionCopiesFromMutipleCollection()
+    {
+        $this->generatePermissionsLoanProfileToUserNotAdmin(true);
+
+        $borrowerUser =
+            factory(User::class)->create();
+
+        $postLoan = factory(Loan::class)->make(
+            [
+                'idBorrowerUser' => $borrowerUser
+            ]
+        )->toArray();
+
+
+
+        $postCollectionCopyArray = [];
+
+        $collections = factory(Collection::class, 10)->create()
+            ->each(function ($collection) {
+                $collection->copies()->createMany(factory(CollectionCopy::class, 3)->make()->toArray());
+            });
+
+        foreach ($collections as $key => $collection) {
+
+            for ($i = 0; $i < $collections->count(); $i++) {
+                $postCollectionCopyArray['collectionCopy'][$i] = $collection->copies->random();
+            }
+        }
+
+        $postLoan = array_merge($postLoan, $postCollectionCopyArray);
+
+        $response = $this->postJson($this->urlLoan, $postLoan);
+
+        $response->assertCreated();
+
+        foreach ($postCollectionCopyArray['collectionCopy'] as $key => $postCollectionCopy) {
+
+
+            $collectionCopy = CollectionCopy::find($postCollectionCopy['idCollectionCopy']);
+
+            $this->assertFalse((bool) $collectionCopy->isAvailable);
+        }
+    }
+
+    private function generatePermissionsLoanProfileToUserNotAdmin($canMadeAction = 0)
+    {
+        $crud =
+            [
+                'index',
+                'view',
+                'create',
+                'store',
+                'edit',
+                'update',
+                'delete',
+            ];
+
+        $permissions = [];
+
+        foreach ($crud as $key => $value) {
+            array_push($permissions, factory(Permission::class)->create(
+                [
+                    'permission' => "loans-{$value}"
+                ]
+            ));
+        }
+
+        foreach ($permissions as $key => $permission) {
+            factory(ProfileHasPermission::class)->create([
+                'idProfile' => $this->userProfile,
+                'idPermission' => $permission->idPermission,
+                'can' => $canMadeAction,
+            ]);
+        }
+        $this->createAndAuthenticateTheUserNotAdmin([
+            'idProfile' => $this->userProfile->idProfile
+        ]);
     }
 }
