@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\CollectionCopy;
-use App\Models\Loan;
-use App\Models\LoanContainsCollectionCopy;
+use App\Models\Loan\Loan;
+use App\Models\Loan\LoanContainsCollectionCopy;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -48,12 +48,7 @@ class LoanContainsCollectionCopyTest extends BaseTest
             ->make([])->toArray();
 
         $response = $this->postJson($this->urlLoanContainsCollectionCopy, $postLoanContainsCollectionCopy);
-        info(
-            get_class($this),
-            [
-                'variavel' => $response
-            ]
-        );
+
         $response->assertCreated();
     }
 

@@ -4,8 +4,8 @@
 
 use App\Model;
 use App\Models\CollectionCopy;
-use App\Models\Loan;
-use App\Models\LoanContainsCollectionCopy;
+use App\Models\Loan\Loan;
+use App\Models\Loan\LoanContainsCollectionCopy;
 use Faker\Generator as Faker;
 
 $factory->define(LoanContainsCollectionCopy::class, function (Faker $faker) {

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api\v1\Loan;
 use App\Http\Controllers\Api\v1\ApiController;
 use App\Http\Requests\Loan\LoanRegisterRequest;
 use App\Http\Requests\Loan\LoanUpdateRequest;
-use App\Models\Loan;
+use App\Models\Loan\Loan;
 use App\Repositories\Interfaces\LoanRepositoryInterface;
 use Illuminate\Http\Response;
 
@@ -77,7 +77,7 @@ class LoanController extends ApiController
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Loan  $loan
+     * @param  \App\Models\Loan\Loan  $loan
      * @return \Illuminate\Http\Response
      */
     public function show(Loan $loan)
@@ -97,7 +97,7 @@ class LoanController extends ApiController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Loan  $loan
+     * @param  \App\Models\Loan\Loan  $loan
      * @return \Illuminate\Http\Response
      */
     public function edit(Loan $loan)
@@ -109,7 +109,7 @@ class LoanController extends ApiController
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Loan  $loan
+     * @param  \App\Models\Loan\Loan  $loan
      * @return \Illuminate\Http\Response
      */
     public function update(LoanUpdateRequest $request, Loan $loan)
@@ -144,7 +144,7 @@ class LoanController extends ApiController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Loan  $loan
+     * @param  \App\Models\Loan\Loan  $loan
      * @return \Illuminate\Http\Response
      */
     public function destroy(Loan $loan)

@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Loan;
 
+use App\Traits\Loan\StatusLoanTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Loan extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, StatusLoanTrait;
 
     /**
      * The table associated with the model.
@@ -34,6 +35,7 @@ class Loan extends Model
         'returnDate',
         'expectedReturnDate',
         'observation',
+        'status',
         'idOperatorUser',
         'idBorrowerUser',
     ];

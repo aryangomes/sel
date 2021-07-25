@@ -36,8 +36,8 @@ class RegisterLoanService
     private  function execute()
     {
         $actionWasExecuted = false;
-        try {
 
+        try {
 
             $collectionCopies = $this->getCollectionCopies();
 
@@ -113,23 +113,20 @@ class RegisterLoanService
         $collectionCopy =
             $this->getCollectionCopyFromInputValue($collectionCopies);
 
-        if (key_exists(0, $collectionCopies)) {
 
-            foreach ($collectionCopies as  $collectionCopy) {
+        $collectionCopiesIsArray = key_exists(0, $collectionCopies);
 
-                //TODO LOCK THE COPIES BORROWED
-                $this->lockCollectionCopy($loan, $collectionCopy);
-            }
+        if ($collectionCopiesIsArray) {
+            $this->lockCollectionCopies($loan, $collectionCopies);
         } else {
 
-            //TODO LOCK THE COPIES BORROWED
             $this->lockCollectionCopy($loan, $collectionCopy);
         }
     }
 
     private function registerLoan()
     {
-        //TODO REGISTER LOAN
+
         $this->loanRepository->create($this->dataToRegisterLoan);
 
         $loan = $this->loanRepository->responseFromTransaction;
@@ -139,11 +136,19 @@ class RegisterLoanService
 
     private function generateLoanIdentifier($loanRegistered)
     {
-        //TODO GENERATE LOAN IDENTIFIER
         $generatedLoanIdentifier = new GenerateLoanIdentifierAction($loanRegistered);
 
         $loanRegistered->loansIdentifier = $generatedLoanIdentifier();
 
         $loanRegistered->save();
+    }
+
+    public function lockCollectionCopies($loan, $collectionCopies)
+    {
+        foreach ($collectionCopies as  $collectionCopy) {
+
+
+            $this->lockCollectionCopy($loan, $collectionCopy);
+        }
     }
 }

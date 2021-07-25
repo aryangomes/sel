@@ -2,7 +2,7 @@
 
 namespace App\Actions\Loan;
 
-use App\Models\Loan;
+use App\Models\Loan\Loan;
 use App\Models\User;
 
 class GenerateLoanIdentifierAction

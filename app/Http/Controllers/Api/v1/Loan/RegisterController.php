@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\v1\Loan;
 
 use App\Http\Controllers\Api\v1\ApiController;
 use App\Http\Requests\Loan\LoanRegisterRequest;
-use App\Models\Loan;
+use App\Models\Loan\Loan;
 use App\Repositories\Interfaces\LoanRepositoryInterface;
 use App\Repositories\LoanRepository;
 use App\Services\Loan\RegisterLoanService;

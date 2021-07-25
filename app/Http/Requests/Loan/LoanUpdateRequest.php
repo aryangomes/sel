@@ -25,6 +25,7 @@ class LoanUpdateRequest extends FormRequest
     {
         return [
             'loansIdentifier' => 'string|max:30',
+            'status' => 'string|max:30',
             'returnDate' => 'nullable|after_or_equal:created_at',
             'expectedReturnDate' => 'after_or_equal:created_at',
             'observation' => 'string|max:200',

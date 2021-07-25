@@ -29,6 +29,7 @@ class LoanRegisterRequest extends FormRequest
             'returnDate' => 'nullable|after_or_equal:today',
             'expectedReturnDate' => 'after_or_equal:today',
             'observation' => 'required|string|max:200',
+            'status' => 'required|string|max:30',
             'idOperatorUser' => ['required', 'exists:users,id'],
             'idBorrowerUser' =>
             [

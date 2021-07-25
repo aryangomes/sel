@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\v1\Loan;
 use App\Http\Controllers\Api\v1\ApiController;
 use App\Http\Requests\LoanContainsCollectionCopy\LoanContainsCollectionCopyRegisterRequest;
 use App\Http\Requests\LoanContainsCollectionCopy\LoanContainsCollectionCopyUpdateRequest;
-use App\Models\LoanContainsCollectionCopy;
+use App\Models\Loan\LoanContainsCollectionCopy;
 use App\Repositories\Interfaces\LoanContainsCollectionCopyRepositoryInterface;
 use Illuminate\Http\Response;
 
@@ -97,7 +97,7 @@ class LoanContainsCollectionCopyController extends ApiController
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\LoanContainsCollectionCopy  $loanContainsCollectionCopy
+     * @param  \App\Models\Loan\LoanContainsCollectionCopy  $loanContainsCollectionCopy
      * @return \Illuminate\Http\Response
      */
     public function show(LoanContainsCollectionCopy $loanContainsCollectionCopy)
@@ -113,7 +113,7 @@ class LoanContainsCollectionCopyController extends ApiController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\LoanContainsCollectionCopy  $loanContainsCollectionCopy
+     * @param  \App\Models\Loan\LoanContainsCollectionCopy  $loanContainsCollectionCopy
      * @return \Illuminate\Http\Response
      */
     public function edit(LoanContainsCollectionCopy $loanContainsCollectionCopy)
@@ -125,7 +125,7 @@ class LoanContainsCollectionCopyController extends ApiController
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\LoanContainsCollectionCopy  $loanContainsCollectionCopy
+     * @param  \App\Models\Loan\LoanContainsCollectionCopy  $loanContainsCollectionCopy
      * @return \Illuminate\Http\Response
      */
     public function update(LoanContainsCollectionCopyUpdateRequest $request, LoanContainsCollectionCopy $loanContainsCollectionCopy)
@@ -160,7 +160,7 @@ class LoanContainsCollectionCopyController extends ApiController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\LoanContainsCollectionCopy  $loanContainsCollectionCopy
+     * @param  \App\Models\Loan\LoanContainsCollectionCopy  $loanContainsCollectionCopy
      * @return \Illuminate\Http\Response
      */
     public function destroy(LoanContainsCollectionCopy $loanContainsCollectionCopy)

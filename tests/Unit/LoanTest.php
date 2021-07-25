@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Collection;
 use App\Models\CollectionCopy;
-use App\Models\Loan;
+use App\Models\Loan\Loan;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;

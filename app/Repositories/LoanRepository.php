@@ -8,7 +8,7 @@ use App\Repositories\Interfaces\LoanRepositoryInterface;
 
 use App\Repositories\RepositoryModel;
 
-use App\Models\Loan;
+use App\Models\Loan\Loan;
 
 class LoanRepository extends RepositoryModel implements LoanRepositoryInterface
 {

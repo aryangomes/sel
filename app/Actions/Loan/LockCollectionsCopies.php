@@ -3,8 +3,8 @@
 namespace App\Actions\Loan;
 
 use App\Models\CollectionCopy;
-use App\Models\Loan;
-use App\Models\LoanContainsCollectionCopy;
+use App\Models\Loan\Loan;
+use App\Models\Loan\LoanContainsCollectionCopy;
 use App\Repositories\LoanContainsCollectionCopyRepository;
 
 class LockCollectionsCopies

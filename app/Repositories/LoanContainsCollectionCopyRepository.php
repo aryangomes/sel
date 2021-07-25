@@ -8,7 +8,7 @@ use App\Repositories\Interfaces\LoanContainsCollectionCopyRepositoryInterface;
 
 use App\Repositories\RepositoryModel;
 
-use App\Models\LoanContainsCollectionCopy;
+use App\Models\Loan\LoanContainsCollectionCopy;
 
 class LoanContainsCollectionCopyRepository extends RepositoryModel implements LoanContainsCollectionCopyRepositoryInterface
 {
