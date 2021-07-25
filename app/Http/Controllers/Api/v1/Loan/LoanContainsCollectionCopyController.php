@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1;
+namespace App\Http\Controllers\Api\v1\Loan;
 
+use App\Http\Controllers\Api\v1\ApiController;
 use App\Http\Requests\LoanContainsCollectionCopy\LoanContainsCollectionCopyRegisterRequest;
 use App\Http\Requests\LoanContainsCollectionCopy\LoanContainsCollectionCopyUpdateRequest;
 use App\Models\LoanContainsCollectionCopy;

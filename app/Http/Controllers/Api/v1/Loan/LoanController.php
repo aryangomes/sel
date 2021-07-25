@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1;
+namespace App\Http\Controllers\Api\v1\Loan;
 
-use App\Http\Controllers\Controller;
+
+use App\Http\Controllers\Api\v1\ApiController;
 use App\Http\Requests\Loan\LoanRegisterRequest;
 use App\Http\Requests\Loan\LoanUpdateRequest;
 use App\Models\Loan;
 use App\Repositories\Interfaces\LoanRepositoryInterface;
-use App\Services\Loan\RegisterLoanService;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class LoanController extends ApiController
@@ -70,33 +69,9 @@ class LoanController extends ApiController
      */
     public function store(LoanRegisterRequest $request)
     {
-        $this->setSuccessResponse('', '', Response::HTTP_METHOD_NOT_ALLOWED);
+        $this->setSuccessResponse('HTTP_METHOD_NOT_ALLOWED', '', Response::HTTP_METHOD_NOT_ALLOWED);
+
         return $this->responseWithJson();
-        /* $this->canPerformAction(
-            $this->makeNameActionFromTable('store'),
-            $this->loan
-        );
-
-        $requestValidated = $request->validated();
-
-        $registerLoanService = new RegisterLoanService($this->loanRepository);
-
-        $registerLoanService($requestValidated);
-
-        if ($this->loanRepository->transactionIsSuccessfully) {
-            $loanCreated =
-                $this->loanRepository->getResourceModel($this->loanRepository->responseFromTransaction);
-
-            $this->setSuccessResponse($loanCreated, 'loan', Response::HTTP_CREATED);
-        } else {
-            $this->setErrorResponse(__(
-                'httpResponses.created.error',
-                ['resource' => $this->loanRepository->resourceName]
-            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-
-        return $this->responseWithJson(); */
     }
 
     /**

@@ -46,9 +46,9 @@ Route::middleware('auth:api')->group(function () {
 
     Route::resource('/collectionCopies', 'Api\v1\CollectionCopyController');
 
-    Route::resource('/loans', 'Api\v1\LoanController');
+    Route::resource('/loans', 'Api\v1\Loan\LoanController');
 
-    Route::resource('/loanContainsCollectionCopies', 'Api\v1\LoanContainsCollectionCopyController');
+    Route::resource('/loanContainsCollectionCopies', 'Api\v1\Loan\LoanContainsCollectionCopyController');
 
     Route::resource('/profiles', 'Api\v1\ProfileController');
 

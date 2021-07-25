@@ -27,8 +27,7 @@ class LockCollectionsCopies
 
         $dataForLoanContainsCollectionCopy = [
             'idLoan' => $this->loan->idLoan,
-            'idCollectionCopy' => $this->collectionCopiesId,
-            'quantity' => 1,
+            'idCollectionCopy' => $this->collectionCopiesId
         ];
 
         $this->loanContainsCollectionCopyRepository->create($dataForLoanContainsCollectionCopy);
