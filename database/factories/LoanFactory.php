@@ -4,7 +4,7 @@
 
 use App\Model;
 use App\Models\CollectionCopy;
-use App\Models\Loan;
+use App\Models\Loan\Loan;
 use App\Models\User;
 use Faker\Generator as Faker;
 
@@ -14,6 +14,7 @@ $factory->define(Loan::class, function (Faker $faker) {
         'returnDate' => $faker->dateTimeInInterval('now', '+6 days'),
         'expectedReturnDate' => $faker->dateTimeInInterval('now', '+7 days'),
         'observation' => $faker->text(),
+        'status' => $faker->text(30),
         'idOperatorUser' => factory(User::class),
         'idBorrowerUser' => factory(User::class),
     ];
