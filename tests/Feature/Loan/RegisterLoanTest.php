@@ -340,9 +340,7 @@ class RegisterLoanTest extends BaseTest
 
         foreach ($collections as $key => $collection) {
 
-            for ($i = 0; $i < $collections->count(); $i++) {
-                $postCollectionCopyArray['collectionCopy'][$i] = $collection->copies->random();
-            }
+            $postCollectionCopyArray['collectionCopy'][$key] = $collection->copies->random();
         }
 
         $postLoan = array_merge($postLoan, $postCollectionCopyArray);
@@ -358,6 +356,54 @@ class RegisterLoanTest extends BaseTest
 
             $this->assertFalse((bool) $collectionCopy->isAvailable);
         }
+    }
+
+    public function testRegisterLoanUnsuccessfullyWithMultipleCollectionCopiesFromMutipleCollection()
+    {
+        $this->generatePermissionsLoanProfileToUserNotAdmin(true);
+
+        $borrowerUser =
+            factory(User::class)->create();
+
+        $postLoan = factory(Loan::class)->make(
+            [
+                'idBorrowerUser' => $borrowerUser
+            ]
+        )->toArray();
+
+
+
+        $postCollectionCopyArray = [];
+
+        $collections = factory(Collection::class, 10)->create()
+            ->each(function ($collection) {
+                $collection->copies()->createMany(factory(CollectionCopy::class, 3)->make()->toArray());
+            });
+
+        foreach ($collections as $key => $collection) {
+
+            $postCollectionCopyArray['collectionCopy'][$key] = $collection->copies->random();
+        }
+
+
+        $postLoan = array_merge($postLoan, $postCollectionCopyArray);
+
+        $response = $this->postJson($this->urlLoan, $postLoan);
+
+        $response->assertCreated();
+
+        foreach ($postCollectionCopyArray['collectionCopy'] as $key => $postCollectionCopy) {
+
+            $collectionCopy = CollectionCopy::find($postCollectionCopy['idCollectionCopy']);
+
+            $this->assertFalse((bool) $collectionCopy->isAvailable);
+        }
+
+        $postLoan = array_merge($postLoan, $postCollectionCopyArray);
+
+        $response = $this->postJson($this->urlLoan, $postLoan);
+
+        $response->assertStatus(422);
     }
 
     private function generatePermissionsLoanProfileToUserNotAdmin($canMadeAction = 0)
