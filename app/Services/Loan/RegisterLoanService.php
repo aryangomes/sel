@@ -126,10 +126,10 @@ class RegisterLoanService
 
     private function registerLoan()
     {
-
         $this->loanRepository->create($this->dataToRegisterLoan);
 
         $loan = $this->loanRepository->responseFromTransaction;
+        $loan->setStatusLoanToPending();
 
         return $loan;
     }

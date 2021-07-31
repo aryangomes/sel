@@ -70,6 +70,8 @@ class RegisterLoanTest extends BaseTest
         $response->assertCreated();
 
         $this->assertFalse((bool) $collectionCopy->isAvailable);
+
+        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isPending());
     }
 
     public function testRegisterLoanSuccessfullyWithDataWithouArrayCollectionCopy()
@@ -101,6 +103,8 @@ class RegisterLoanTest extends BaseTest
         $response->assertCreated();
 
         $this->assertFalse((bool) $collectionCopy->isAvailable);
+
+        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isPending());
     }
 
     public function testRegisterLoanUnsuccessfully()
@@ -134,7 +138,7 @@ class RegisterLoanTest extends BaseTest
         $this->assertFalse((bool) $collectionCopy->isAvailable);
     }
 
-    public function testRegisterLoanSuccessfullyWithUserOperatorNotAdmin()
+    public function testRegisterLoanUnsuccessfullyWithUserOperatorNotAdmin()
     {
         $this->generatePermissionsLoanProfileToUserNotAdmin();
 
@@ -314,6 +318,8 @@ class RegisterLoanTest extends BaseTest
 
             $this->assertFalse((bool) $collectionCopy->isAvailable);
         }
+
+        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isPending());
     }
 
     public function testRegisterLoanSuccessfullyWithMultipleCollectionCopiesFromMutipleCollection()
@@ -356,6 +362,8 @@ class RegisterLoanTest extends BaseTest
 
             $this->assertFalse((bool) $collectionCopy->isAvailable);
         }
+
+        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isPending());
     }
 
     public function testRegisterLoanUnsuccessfullyWithMultipleCollectionCopiesFromMutipleCollection()
@@ -439,5 +447,16 @@ class RegisterLoanTest extends BaseTest
         $this->createAndAuthenticateTheUserNotAdmin([
             'idProfile' => $this->userProfile->idProfile
         ]);
+    }
+
+    private function getLoanFromResponse($response)
+    {
+        if ($response == null) {
+            return null;
+        }
+
+        $loan = Loan::find($response->getData()->loan->idLoan);
+
+        return $loan;
     }
 }
