@@ -50,6 +50,9 @@ class RegisterLoanService
                 $actionWasExecuted = true;
 
                 $this->generateLoanIdentifier($loanRegistered);
+
+
+                $loanRegistered->setStatusLoanToInLoan();
             }
         } catch (\Exception $exception) {
             logger(
@@ -126,10 +129,11 @@ class RegisterLoanService
 
     private function registerLoan()
     {
+        $this->dataToRegisterLoan['status'] = 'in_loan';
+
         $this->loanRepository->create($this->dataToRegisterLoan);
 
         $loan = $this->loanRepository->responseFromTransaction;
-        $loan->setStatusLoanToPending();
 
         return $loan;
     }

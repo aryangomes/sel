@@ -13,6 +13,8 @@ use Illuminate\Http\Response;
 
 class RegisterController extends ApiController
 {
+    private $loanRepository;
+    private $loan;
 
     public function __construct(
         LoanRepositoryInterface $loanRepository,

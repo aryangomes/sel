@@ -13,7 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\BaseTest;
 
-class RegisterLoanTest extends BaseTest
+class RegisterLoanTest extends BaseLoanTest
 {
 
     use RefreshDatabase, WithFaker;
@@ -71,7 +71,7 @@ class RegisterLoanTest extends BaseTest
 
         $this->assertFalse((bool) $collectionCopy->isAvailable);
 
-        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isPending());
+        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isInLoan());
     }
 
     public function testRegisterLoanSuccessfullyWithDataWithouArrayCollectionCopy()
@@ -104,7 +104,7 @@ class RegisterLoanTest extends BaseTest
 
         $this->assertFalse((bool) $collectionCopy->isAvailable);
 
-        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isPending());
+        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isInLoan());
     }
 
     public function testRegisterLoanUnsuccessfully()
@@ -319,7 +319,7 @@ class RegisterLoanTest extends BaseTest
             $this->assertFalse((bool) $collectionCopy->isAvailable);
         }
 
-        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isPending());
+        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isInLoan());
     }
 
     public function testRegisterLoanSuccessfullyWithMultipleCollectionCopiesFromMutipleCollection()
@@ -363,7 +363,7 @@ class RegisterLoanTest extends BaseTest
             $this->assertFalse((bool) $collectionCopy->isAvailable);
         }
 
-        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isPending());
+        $this->assertTrue((bool) $this->getLoanFromResponse($response)->isInLoan());
     }
 
     public function testRegisterLoanUnsuccessfullyWithMultipleCollectionCopiesFromMutipleCollection()
@@ -412,51 +412,5 @@ class RegisterLoanTest extends BaseTest
         $response = $this->postJson($this->urlLoan, $postLoan);
 
         $response->assertStatus(422);
-    }
-
-    private function generatePermissionsLoanProfileToUserNotAdmin($canMadeAction = 0)
-    {
-        $crud =
-            [
-                'index',
-                'view',
-                'create',
-                'store',
-                'edit',
-                'update',
-                'delete',
-            ];
-
-        $permissions = [];
-
-        foreach ($crud as $key => $value) {
-            array_push($permissions, factory(Permission::class)->create(
-                [
-                    'permission' => "loans-{$value}"
-                ]
-            ));
-        }
-
-        foreach ($permissions as $key => $permission) {
-            factory(ProfileHasPermission::class)->create([
-                'idProfile' => $this->userProfile,
-                'idPermission' => $permission->idPermission,
-                'can' => $canMadeAction,
-            ]);
-        }
-        $this->createAndAuthenticateTheUserNotAdmin([
-            'idProfile' => $this->userProfile->idProfile
-        ]);
-    }
-
-    private function getLoanFromResponse($response)
-    {
-        if ($response == null) {
-            return null;
-        }
-
-        $loan = Loan::find($response->getData()->loan->idLoan);
-
-        return $loan;
     }
 }
