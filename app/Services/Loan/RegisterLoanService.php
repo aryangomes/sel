@@ -7,6 +7,7 @@ use App\Actions\Loan\LockCollectionsCopies;
 use App\Actions\Loan\VerifyBorrowerUserCanLoanAction;
 use App\Actions\Loan\VerifyCopyIsAbleToLoanAction;
 use App\Models\CollectionCopy;
+use App\Models\Loan\Loan;
 use App\Models\User;
 use App\Repositories\LoanRepository;
 
@@ -129,7 +130,6 @@ class RegisterLoanService
 
     private function registerLoan()
     {
-        $this->dataToRegisterLoan['status'] = 'in_loan';
 
         $this->loanRepository->create($this->dataToRegisterLoan);
 

@@ -2,8 +2,12 @@
 
 namespace Tests\Feature\Loan;
 
+use App\Models\Collection;
+use App\Models\CollectionCopy;
 use App\Models\Loan\Loan;
+use App\Models\Loan\LoanContainsCollectionCopy;
 use App\Models\Loan\StatusLoan;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -15,6 +19,7 @@ class ReturnLoanTest extends BaseLoanTest
     use RefreshDatabase, WithFaker;
 
     private $urlLoan;
+    private $loan;
 
     /**
      * @override
@@ -39,27 +44,29 @@ class ReturnLoanTest extends BaseLoanTest
 
     public function testReturnLoanSuccessfully()
     {
-        $this->generatePermissionsLoanProfileToUserNotAdmin(true);
 
-        $loan = factory(Loan::class)->create(
-            [
-                'status' => Loan::status()[0],
-                'expectedReturnDate' => Carbon::now()->addDays(7),
-            ]
-        );
+        $this->generateLoan();
 
-        $this->assertTrue((bool) $loan->isPending());
+        $this->assertTrue((bool) $this->loan->isInLoan());
 
-        $idLoan = ['idLoan' => $loan->idLoan];
+        $idLoan = ['idLoan' => $this->loan->idLoan];
 
         $response = $this->patchJson(
-            $this->generateUrl($loan->idLoan),
+            $this->generateUrl($this->loan->idLoan),
             $idLoan
         );
 
         $response->assertOk();
 
         $this->assertTrue((bool) $this->getLoanFromResponse($response)->isReturned());
+
+        $this->loan = $this->getLoanFromResponse($response);
+        $loanCollectionCopies = $this->loan->containCopies;
+
+        foreach ($loanCollectionCopies as $collectionCopy) {
+            $this->assertTrue((bool) CollectionCopy::find($collectionCopy->idCollectionCopy)
+                ->isAvailable);
+        }
     }
 
     public function testReturnLoanUnsuccessfullyWithReturnDateGreaterExpectedReturnDate()
@@ -68,12 +75,11 @@ class ReturnLoanTest extends BaseLoanTest
 
         $loan = factory(Loan::class)->create(
             [
-                'status' => Loan::status()[0],
                 'expectedReturnDate' => Carbon::now()->subDays(7),
             ]
         );
 
-        $this->assertTrue((bool) $loan->isPending());
+        $this->assertTrue((bool) $loan->isInLoan());
 
         $idLoan = ['idLoan' => $loan->idLoan];
 
@@ -84,11 +90,45 @@ class ReturnLoanTest extends BaseLoanTest
 
         $response->assertStatus(422);
 
-        $this->assertTrue((bool) $loan->isPending());
+        $this->assertTrue((bool) $loan->isInLoan());
     }
 
     private function generateUrl($idLoan)
     {
         return "{$this->urlLoan}{$idLoan}/return";
+    }
+
+    private function generateLoan($copiesQuantity = 10)
+    {
+        $this->generatePermissionsLoanProfileToUserNotAdmin(true);
+
+        $borrowerUser =
+            factory(User::class)->create();
+
+        $postLoan = factory(Loan::class)->make(
+            [
+                'idBorrowerUser' => $borrowerUser
+            ]
+        )->toArray();
+
+        $postCollectionCopyArray = [];
+
+        $collections = factory(Collection::class, $copiesQuantity)->create()
+            ->each(function ($collection) {
+                $collection->copies()->createMany(factory(CollectionCopy::class, 3)->make()->toArray());
+            });
+
+        foreach ($collections as $key => $collection) {
+
+            $postCollectionCopyArray['collectionCopy'][$key] = $collection->copies->random();
+        }
+
+        $postLoan = array_merge($postLoan, $postCollectionCopyArray);
+
+        $response = $this->postJson("{$this->urlLoan}register", $postLoan);
+
+        $response->assertCreated();
+
+        $this->loan = Loan::find($response->getData()->loan->idLoan);
     }
 }

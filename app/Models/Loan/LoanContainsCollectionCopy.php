@@ -2,8 +2,12 @@
 
 namespace App\Models\Loan;
 
+use App\Models\CollectionCopy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LoanContainsCollectionCopy extends Model
@@ -37,20 +41,30 @@ class LoanContainsCollectionCopy extends Model
     /**
      * The loan that belong to the LoanContainsCollectionCopy
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function loan(): BelongsToMany
+    public function loan(): BelongsTo
     {
-        return $this->belongsToMany(Loan::class, 'loans', 'idLoan');
+        return $this->belongsTo(Loan::class, 'idLoan');
     }
 
     /**
      * The collectionCopy that belong to the LoanContainsCollectionCopy
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function collectionCopy(): BelongsToMany
+    public function collectionCopies(): HasMany
     {
-        return $this->belongsToMany(CollectionCopy::class, 'collection_copies', 'idCollectionCopy');
+        return $this->hasMany(CollectionCopy::class,  'idCollectionCopy');
+    }
+
+    /**
+     * Get the collectionCopy associated with the LoanContainsCollectionCopy
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function collectionCopy(): HasOne
+    {
+        return $this->hasOne(CollectionCopy::class, 'idCollectionCopy');
     }
 }

@@ -27,6 +27,14 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\LogoutUserListener'
         ],
 
+        'App\Events\Loan\CreatingLoanEvent' => [
+            'App\Listeners\Loan\CreatingLoanListener'
+        ],
+
+        'App\Events\Loan\CreatedLoanEvent' => [
+            'App\Listeners\Loan\CreatedLoanListener'
+        ],
+
     ];
 
     /**

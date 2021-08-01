@@ -46,6 +46,8 @@ class CollectionCopy extends Model
         return $this->belongsTo(Collection::class, 'idCollection');
     }
 
+
+
     public function scopeQuantityOfCopiesAvailable($query)
     {
         return $query->collection->where('isAvailable', true);
@@ -54,5 +56,10 @@ class CollectionCopy extends Model
     public function changeToUnavailable()
     {
         $this->isAvailable = false;
+    }
+
+    public function changeToAvailable()
+    {
+        $this->isAvailable = true;
     }
 }

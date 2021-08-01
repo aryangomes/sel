@@ -39,7 +39,12 @@ class RegisterController extends ApiController
             $this->loan
         );
 
+
+
         $requestValidated = $request->validated();
+
+        $requestValidated =
+            $this->setStatusLoanToPendingToRequest($requestValidated);
 
         $registerLoanService = new RegisterLoanService($this->loanRepository);
 
@@ -59,5 +64,15 @@ class RegisterController extends ApiController
 
 
         return $this->responseWithJson();
+    }
+
+    private function setStatusLoanToPendingToRequest($request)
+    {
+        if (key_exists('status', $request)) {
+            unset($request['status']);
+        }
+        $request['status'] = Loan::status()[0];
+
+        return $request;
     }
 }

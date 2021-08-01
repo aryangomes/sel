@@ -35,6 +35,7 @@ trait StatusLoanTrait
 
     public function setStatusLoanToInLoan()
     {
+
         if ($this->canSetStatusLoanToInLoan()) {
             $this->status = self::$IN_LOAN;
             $this->save();

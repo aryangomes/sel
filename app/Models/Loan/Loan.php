@@ -2,8 +2,11 @@
 
 namespace App\Models\Loan;
 
+use App\Events\Loan\CreatedLoanEvent;
+use App\Events\Loan\CreatingLoanEvent;
 use App\Traits\Loan\StatusLoanTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -45,6 +48,11 @@ class Loan extends Model
         'expectedReturnDate',
     ];
 
+
+    protected $dispatchesEvents = [
+        'created' => CreatedLoanEvent::class
+    ];
+
     /**
      * Get the operatorUser associated with the Loan
      *
@@ -63,5 +71,15 @@ class Loan extends Model
     public function borrowerUser(): HasOne
     {
         return $this->hasOne(User::class, 'idBorrowerUser');
+    }
+
+    /**
+     * Get all of the colllectionCopies for the Loan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function containCopies(): HasMany
+    {
+        return $this->hasMany(LoanContainsCollectionCopy::class, 'idLoan');
     }
 }
