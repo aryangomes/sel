@@ -17,8 +17,7 @@ Enter the command in the folder of your preference:
 1. Enter yours project's folder:  
    `cd your_directory/your_folder/`
 
-2. Clone the repository to your folder (Enter your BitBucket password when prompted.):  
-   `https://github.com/aryangomes/sel.git`
+2. Clone the repository to your folder  
 
 3. Enter the folder that was created:  
    `cd sel`
@@ -63,11 +62,11 @@ Enter the command in the folder of your preference:
 
 1. Copy and paste according to the database variable settings:  
    `DB_CONNECTION=mysql`  
-   `DB_HOST=db-app-leilao-skysoft`  
+   `DB_HOST=`  
    `DB_PORT=3306`  
-   `DB_DATABASE=leilao_skysoft`  
-   `DB_USERNAME=skysoft`  
-   `DB_PASSWORD=localskysoft`
+   `DB_DATABASE=`  
+   `DB_USERNAME=`  
+   `DB_PASSWORD=`
 
 2. Copy and paste as variable settings from the default password of users (how default passwords can be changed):  
    `APP_URL = http://localhost:8042`
@@ -89,8 +88,7 @@ Enter the command in the folder of your preference:
 -   Populate the database with some previously registered information:  
      `php artisan db: seed`
 
--   Give read and write permission for mass storage ():  
-     `chmod -R 775 storage/`
+
 
 # Changelog
 
