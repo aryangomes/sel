@@ -26,10 +26,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: r15987
+      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
       MYSQL_DATABASE: sel
       MYSQL_USER: sel
-      MYSQL_PASSWORD: sel4631
+      MYSQL_PASSWORD: MYSQL_PASSWORD
     networks:
       - network-sel
 
