@@ -28,11 +28,17 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}l
+      MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - sel-db:/var/lib/mysql
     networks:
       - network-sel
 
 networks:
   network-sel:
     driver: bridge
+
+volumes:
+  sel-db:
+    driver: local
