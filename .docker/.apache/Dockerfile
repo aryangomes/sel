@@ -1,8 +1,8 @@
-ARG versao_php
+ARG PHP_VERSION
 
-FROM php:"$versao_php"-apache
+FROM php:"$PHP_VERSION"-apache
 
-ENV USUARIO sel
+ENV USER sel
 ENV UID 1000
 
 # replace shell with bash so we can source files
@@ -94,14 +94,14 @@ RUN sudo service apache2 restart
 
 
 
-RUN useradd -G www-data,root -u $UID -d /home/$USUARIO $USUARIO
-RUN mkdir -p /home/$USUARIO/.composer && \
-   chown -R $USUARIO:$USUARIO /home/$USUARIO
+RUN useradd -G www-data,root -u $UID -d /home/$USER $USER
+RUN mkdir -p /home/$USER/.composer && \
+   chown -R $USER:$USER /home/$USER
 
 
-RUN touch /home/$USUARIO/.bashrc
+RUN touch /home/$USER/.bashrc
 
-RUN echo alias phpunit="./vendor/phpunit/phpunit/phpunit" >> /home/$USUARIO/.bashrc
+RUN echo alias phpunit="./vendor/phpunit/phpunit/phpunit" >> /home/$USER/.bashrc
 
 COPY docker-entrypoint.sh /
 
