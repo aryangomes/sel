@@ -94,20 +94,20 @@ RUN sudo service apache2 restart
 
 
 
-RUN useradd -G www-data,root -u $UID -d /home/$USER $USER
-RUN mkdir -p /home/$USER/.composer && \
-   chown -R $USER:$USER /home/$USER
+RUN useradd -G www-data,root -u $UID -d /home/${USER} ${USER}
+RUN mkdir -p /home/${USER}/.composer && \
+   chown -R ${USER}:${USER} /home/${USER}
 
 
-RUN touch /home/$USER/.bashrc
+RUN touch /home/${USER}/.bashrc
 
-RUN echo alias phpunit="./vendor/phpunit/phpunit/phpunit" >> /home/$USER/.bashrc
+RUN echo alias phpunit="./vendor/phpunit/phpunit/phpunit" >> /home/${USER}/.bashrc
 
-COPY docker-entrypoint.sh /
+COPY docker-entrypoint.sh /home/docker-entrypoint.sh
 
-RUN ["chmod", "+x", "/docker-entrypoint.sh"]
+RUN ["chmod", "+x", "/home/docker-entrypoint.sh"]
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/home/docker-entrypoint.sh"]
 
 # ports
 EXPOSE 80 443 8042
