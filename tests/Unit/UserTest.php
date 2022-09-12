@@ -286,7 +286,7 @@ class UserTest extends BaseTest
 
         $credentials = [
             'cpf' => $user->cpf,
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_not_admin')
         ];
 
         $response = $this->postJson($this->url . 'login', $credentials);
@@ -313,7 +313,7 @@ class UserTest extends BaseTest
 
         $credentials = [
             'email' => $user->email,
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_admin')
         ];
 
         $response = $this->postJson($this->url . 'login/admin', $credentials);
