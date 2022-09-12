@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Support\Str;
@@ -86,7 +87,7 @@ class User extends Authenticatable
             $this->attributes['password'] = $this->getDefaultPasswordUserNotAdmin();
         } else {
             $this->attributes['password'] =
-                ($newPasswordIsSet) ? bcrypt($newPassword) : $this->getDefaultPasswordUserNotAdmin();
+                ($newPasswordIsSet) ? Hash::make($newPassword) : $this->getDefaultPasswordUserNotAdmin();
         }
     }
 
@@ -103,7 +104,7 @@ class User extends Authenticatable
         try {
 
             $tokenAccess = Auth::guard('api')->user()->token();
-        
+
             $tokenAccessWasRevoken = $tokenAccess->revoke();
         } catch (\Exception $exception) {
             Log::error(LogFormatter::formatTextLog(['Message' => $exception->getMessage()]));
