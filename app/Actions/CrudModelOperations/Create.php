@@ -22,10 +22,11 @@ class Create
      *
      * @param string $modelClass
      * @param array $dataToCreate
-     * @return Model
+     * @return Model|null
      */
     public function __invoke(array $dataToCreate)
     {
+        $modelCreated  = null;
         try {
             DB::beginTransaction();
 
