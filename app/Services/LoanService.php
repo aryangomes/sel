@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Http\Resources\Loan\LoanCollection;
 use App\Http\Resources\Loan\LoanResource;
-use App\Repositories\Interfaces\LoanRepositoryInterface;
+use App\Services\Interfaces\LoanServiceInterface;
 
-use App\Repositories\RepositoryModel;
+use App\Services\CrudModelOperationsService;
 
 use App\Models\Loan\Loan;
 
-class LoanRepository extends RepositoryModel implements LoanRepositoryInterface
+class LoanService extends CrudModelOperationsService
 {
 	/**
 	 *
@@ -31,7 +31,7 @@ class LoanRepository extends RepositoryModel implements LoanRepositoryInterface
 	public function getResourceCollectionModel()
 	{
 
-		$this->findAll();
+		$this->getAll();
 
 		if ($this->transactionIsSuccessfully) {
 

@@ -6,22 +6,31 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Collection\CollectionRegisterRequest;
 use App\Http\Requests\Collection\CollectionUpdateRequest;
 use App\Models\Collection;
-use App\Repositories\Interfaces\CollectionRepositoryInterface;
+use App\Repositories\Interfaces\CollectionService;
+use App\Services\CollectionService as ServicesCollectionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class CollectionController extends ApiController
 {
 
+    /**
+     *
+     * @var Collection
+     */
     private $collection;
 
-    private $collectionRepository;
+    /**
+     *
+     * @var ServicesCollectionService
+     */
+    private $collectionService;
 
     public function __construct(
-        CollectionRepositoryInterface $collectionRepository,
+        ServicesCollectionService $collectionService,
         Collection $collection
     ) {
-        $this->collectionRepository = $collectionRepository;
+        $this->collectionService = $collectionService;
         $this->collection = $collection;
         $this->tablePermissions = 'collections';
     }
@@ -38,13 +47,13 @@ class CollectionController extends ApiController
             $this->collection
         );
 
-        $this->collectionRepository->getResourceCollectionModel();
+        $this->collectionService->getResourceCollectionModel();
 
-        if ($this->collectionRepository->transactionIsSuccessfully) {
+        if ($this->collectionService->transactionIsSuccessfully) {
 
-            $this->setSuccessResponse($this->collectionRepository->responseFromTransaction);
+            $this->setSuccessResponse($this->collectionService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->collectionRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->collectionService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -76,17 +85,17 @@ class CollectionController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->collectionRepository->create($requestValidated);
+        $this->collectionService->create($requestValidated);
 
-        if ($this->collectionRepository->transactionIsSuccessfully) {
+        if ($this->collectionService->transactionIsSuccessfully) {
             $collectionCreated =
-                $this->collectionRepository->getResourceModel($this->collectionRepository->responseFromTransaction);
+                $this->collectionService->getResourceModel($this->collectionService->responseFromTransaction);
 
             $this->setSuccessResponse($collectionCreated, 'collection', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->collectionRepository->resourceName]
+                ['resource' => $this->collectionService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -106,7 +115,7 @@ class CollectionController extends ApiController
             $this->collection
         );
 
-        return $this->collectionRepository->getResourceModel($collection);
+        return $this->collectionService->getResourceModel($collection);
     }
 
     /**
@@ -138,18 +147,18 @@ class CollectionController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->collectionRepository->update($requestValidated, $this->collection);
+        $this->collectionService->update($requestValidated, $this->collection);
 
-        if ($this->collectionRepository->transactionIsSuccessfully) {
+        if ($this->collectionService->transactionIsSuccessfully) {
 
             $collectionUpdated =
-                $this->collectionRepository->getResourceModel($this->collection);
+                $this->collectionService->getResourceModel($this->collection);
 
             $this->setSuccessResponse($collectionUpdated, 'collection', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->collectionRepository->resourceName]
+                ['resource' => $this->collectionService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -171,15 +180,15 @@ class CollectionController extends ApiController
             $this->collection
         );
 
-        $this->collectionRepository->delete($this->collection);
+        $this->collectionService->delete($this->collection);
 
-        if ($this->collectionRepository->transactionIsSuccessfully) {
+        if ($this->collectionService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->collectionRepository->resourceName]
+                    ['resource' => $this->collectionService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -187,7 +196,7 @@ class CollectionController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->collectionRepository->resourceName
+                $this->collectionService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

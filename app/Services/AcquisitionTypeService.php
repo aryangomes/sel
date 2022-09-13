@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Http\Resources\AcquisitionType\AcquisitionTypeCollection;
 use App\Http\Resources\AcquisitionType\AcquisitionTypeResource;
 use App\Models\AcquisitionType;
-use App\Repositories\Interfaces\AcquisitionTypeRepositoryInterface;
-use App\Repositories\RepositoryModel;
+use App\Services\CrudModelOperationsService;
 
 
-class AcquisitionTypeRepository  extends RepositoryModel implements AcquisitionTypeRepositoryInterface
+class AcquisitionTypeService  extends CrudModelOperationsService
 {
     /**
      *
@@ -29,7 +28,7 @@ class AcquisitionTypeRepository  extends RepositoryModel implements AcquisitionT
     public function getResourceCollectionModel()
     {
 
-        $this->findAll();
+        $this->getAll();
 
         if ($this->transactionIsSuccessfully) {
 

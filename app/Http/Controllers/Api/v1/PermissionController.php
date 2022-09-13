@@ -5,21 +5,29 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Requests\Permission\PermissionRegisterRequest;
 use App\Http\Requests\Permission\PermissionUpdateRequest;
 use App\Models\Permission;
-use App\Repositories\Interfaces\PermissionRepositoryInterface;
+use App\Services\PermissionService;
 use Illuminate\Http\Response;
 
 class PermissionController extends ApiController
 {
 
+    /**
+     *
+     * @var Permission
+     */
     private $permission;
 
-    private $permissionRepository;
+    /**
+     *
+     * @var PermissionService
+     */
+    private $permissionService;
 
     public function __construct(
-        PermissionRepositoryInterface $permissionRepository,
+        PermissionService $permissionService,
         Permission $permission
     ) {
-        $this->permissionRepository = $permissionRepository;
+        $this->permissionService = $permissionService;
         $this->permission = $permission;
         $this->tablePermissions = 'permissions';
     }
@@ -37,13 +45,13 @@ class PermissionController extends ApiController
             $this->permission
         );
 
-        $this->permissionRepository->getResourceCollectionModel();
+        $this->permissionService->getResourceCollectionModel();
 
-        if ($this->permissionRepository->transactionIsSuccessfully) {
+        if ($this->permissionService->transactionIsSuccessfully) {
 
-            $this->setSuccessResponse($this->permissionRepository->responseFromTransaction);
+            $this->setSuccessResponse($this->permissionService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->permissionRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->permissionService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -75,17 +83,17 @@ class PermissionController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->permissionRepository->create($requestValidated);
+        $this->permissionService->create($requestValidated);
 
-        if ($this->permissionRepository->transactionIsSuccessfully) {
+        if ($this->permissionService->transactionIsSuccessfully) {
             $permissionCreated =
-                $this->permissionRepository->getResourceModel($this->permissionRepository->responseFromTransaction);
+                $this->permissionService->getResourceModel($this->permissionService->responseFromTransaction);
 
             $this->setSuccessResponse($permissionCreated, 'permission', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->permissionRepository->resourceName]
+                ['resource' => $this->permissionService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -105,7 +113,7 @@ class PermissionController extends ApiController
             $this->permission
         );
 
-        return $this->permissionRepository->getResourceModel($permission);
+        return $this->permissionService->getResourceModel($permission);
     }
 
     /**
@@ -137,18 +145,18 @@ class PermissionController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->permissionRepository->update($requestValidated, $this->permission);
+        $this->permissionService->update($requestValidated, $this->permission);
 
-        if ($this->permissionRepository->transactionIsSuccessfully) {
+        if ($this->permissionService->transactionIsSuccessfully) {
 
             $permissionUpdated =
-                $this->permissionRepository->getResourceModel($this->permission);
+                $this->permissionService->getResourceModel($this->permission);
 
             $this->setSuccessResponse($permissionUpdated, 'permission', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->permissionRepository->resourceName]
+                ['resource' => $this->permissionService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -170,15 +178,15 @@ class PermissionController extends ApiController
             $this->permission
         );
 
-        $this->permissionRepository->delete($this->permission);
+        $this->permissionService->delete($this->permission);
 
-        if ($this->permissionRepository->transactionIsSuccessfully) {
+        if ($this->permissionService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->permissionRepository->resourceName]
+                    ['resource' => $this->permissionService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -186,7 +194,7 @@ class PermissionController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->permissionRepository->resourceName
+                $this->permissionService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

@@ -6,24 +6,31 @@ use App\Models\Lender;
 use App\Http\Requests\Lender\LenderRegisterRequest;
 use App\Http\Requests\Lender\LenderUpdateRequest;
 use App\Http\Resources\LenderResource;
-use App\Repositories\Interfaces\LenderRepositoryInterface;
+use App\Services\LenderService;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 
 class LenderController extends ApiController
 {
 
 
+    /**
+     *
+     * @var Lender
+     */
     private $lender;
 
-    private $lenderRepository;
+    /**
+     *
+     * @var LenderService
+     */
+    private $lenderService;
 
     public function __construct(
-        LenderRepositoryInterface $lenderRepository,
+        LenderService $lenderService,
         Lender $lender
     ) {
 
-        $this->lenderRepository = $lenderRepository;
+        $this->lenderService = $lenderService;
         $this->lender = $lender;
         $this->tablePermissions = 'lenders';
     }
@@ -63,17 +70,17 @@ class LenderController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->lenderRepository->create($requestValidated);
+        $this->lenderService->create($requestValidated);
 
-        if ($this->lenderRepository->transactionIsSuccessfully) {
+        if ($this->lenderService->transactionIsSuccessfully) {
             $lenderCreated =
-                $this->lenderRepository->getResourceModel($this->lenderRepository->responseFromTransaction);
+                $this->lenderService->getResourceModel($this->lenderService->responseFromTransaction);
 
             $this->setSuccessResponse($lenderCreated, 'lender', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->lenderRepository->resourceName]
+                ['resource' => $this->lenderService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -95,7 +102,7 @@ class LenderController extends ApiController
             $this->lender
         );
 
-        return $this->lenderRepository->getResourceModel($lender);
+        return $this->lenderService->getResourceModel($lender);
     }
 
     /**
@@ -127,18 +134,18 @@ class LenderController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->lenderRepository->update($requestValidated, $this->lender);
+        $this->lenderService->update($requestValidated, $this->lender);
 
-        if ($this->lenderRepository->transactionIsSuccessfully) {
+        if ($this->lenderService->transactionIsSuccessfully) {
 
             $lenderUpdated =
-                $this->lenderRepository->getResourceModel($this->lender);
+                $this->lenderService->getResourceModel($this->lender);
 
             $this->setSuccessResponse($lenderUpdated, 'lender', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->lenderRepository->resourceName]
+                ['resource' => $this->lenderService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -160,15 +167,15 @@ class LenderController extends ApiController
             $this->lender
         );
 
-        $this->lenderRepository->delete($this->lender);
+        $this->lenderService->delete($this->lender);
 
-        if ($this->lenderRepository->transactionIsSuccessfully) {
+        if ($this->lenderService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->lenderRepository->resourceName]
+                    ['resource' => $this->lenderService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -176,7 +183,7 @@ class LenderController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->lenderRepository->resourceName
+                $this->lenderService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

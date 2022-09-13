@@ -7,21 +7,29 @@ use App\Http\Controllers\Api\v1\ApiController;
 use App\Http\Requests\Loan\LoanRegisterRequest;
 use App\Http\Requests\Loan\LoanUpdateRequest;
 use App\Models\Loan\Loan;
-use App\Repositories\Interfaces\LoanRepositoryInterface;
+use App\Services\LoanService;
 use Illuminate\Http\Response;
 
 class LoanController extends ApiController
 {
 
+    /**
+     *
+     * @var Loan
+     */
     private $loan;
 
-    private $loanRepository;
+    /**
+     *
+     * @var LoanService
+     */
+    private $loanService;
 
     public function __construct(
-        LoanRepositoryInterface $loanRepository,
+        LoanService $loanService,
         Loan $loan
     ) {
-        $this->loanRepository = $loanRepository;
+        $this->loanService = $loanService;
         $this->loan = $loan;
         $this->tablePermissions = 'loans';
     }
@@ -38,13 +46,13 @@ class LoanController extends ApiController
             $this->loan
         );
 
-        $this->loanRepository->getResourceCollectionModel();
+        $this->loanService->getResourceCollectionModel();
 
-        if ($this->loanRepository->transactionIsSuccessfully) {
+        if ($this->loanService->transactionIsSuccessfully) {
 
-            $this->setSuccessResponse($this->loanRepository->responseFromTransaction);
+            $this->setSuccessResponse($this->loanService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->loanRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->loanService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -69,7 +77,26 @@ class LoanController extends ApiController
      */
     public function store(LoanRegisterRequest $request)
     {
-        $this->setSuccessResponse('HTTP_METHOD_NOT_ALLOWED', '', Response::HTTP_METHOD_NOT_ALLOWED);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->loan
+        );
+
+        $requestValidated = $request->validated();
+
+        $this->loanService->create($requestValidated);
+
+        if ($this->loanService->transactionIsSuccessfully) {
+            $loanCreated =
+                $this->loanService->getResourceModel($this->loanService->responseFromTransaction);
+
+            $this->setSuccessResponse($loanCreated, 'loan', Response::HTTP_CREATED);
+        } else {
+            $this->setErrorResponse(__(
+                'httpResponses.created.error',
+                ['resource' => $this->loanService->resourceName]
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         return $this->responseWithJson();
     }
@@ -91,7 +118,7 @@ class LoanController extends ApiController
         );
 
 
-        return $this->loanRepository->getResourceModel($loan);
+        return $this->loanService->getResourceModel($loan);
     }
 
     /**
@@ -123,18 +150,18 @@ class LoanController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->loanRepository->update($requestValidated, $this->loan);
+        $this->loanService->update($requestValidated, $this->loan);
 
-        if ($this->loanRepository->transactionIsSuccessfully) {
+        if ($this->loanService->transactionIsSuccessfully) {
 
             $loanUpdated =
-                $this->loanRepository->getResourceModel($this->loan);
+                $this->loanService->getResourceModel($this->loan);
 
             $this->setSuccessResponse($loanUpdated, 'loan', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->loanRepository->resourceName]
+                ['resource' => $this->loanService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -156,15 +183,15 @@ class LoanController extends ApiController
             $this->loan
         );
 
-        $this->loanRepository->delete($this->loan);
+        $this->loanService->delete($this->loan);
 
-        if ($this->loanRepository->transactionIsSuccessfully) {
+        if ($this->loanService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->loanRepository->resourceName]
+                    ['resource' => $this->loanService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -172,7 +199,7 @@ class LoanController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->loanRepository->resourceName
+                $this->loanService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

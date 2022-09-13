@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Http\Resources\CollectionType\CollectionTypeCollection;
 use App\Http\Resources\CollectionType\CollectionTypeResource;
-use App\Repositories\Interfaces\CollectionTypeRepositoryInterface;
 
-use App\Repositories\RepositoryModel;
+use App\Services\CrudModelOperationsService;
 
 use App\Models\CollectionType;
 
-class CollectionTypeRepository extends RepositoryModel implements CollectionTypeRepositoryInterface
+class CollectionTypeService extends CrudModelOperationsService
 {
 	/**
 	 *
@@ -30,7 +29,7 @@ class CollectionTypeRepository extends RepositoryModel implements CollectionType
 	public function getResourceCollectionModel()
 	{
 
-		$this->findAll();
+		$this->getAll();
 
 		if ($this->transactionIsSuccessfully) {
 
