@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 class PhpUnitTest extends Command
 {
-     /**
+    /**
      * The name and signature of the console command.
      *
      * @var string
@@ -38,8 +38,8 @@ class PhpUnitTest extends Command
     public function handle()
     {
 
-        exec("./vendor/phpunit/phpunit/phpunit", $output);
+        exec("./vendor/phpunit/phpunit/phpunit --testdox", $output);
 
-        $this->info(implode(PHP_EOL, $output));
+        $this->line(implode(PHP_EOL, $output));
     }
 }
