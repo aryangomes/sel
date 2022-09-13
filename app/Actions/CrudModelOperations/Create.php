@@ -24,7 +24,7 @@ class Create
      * @param array $dataToCreate
      * @return Model
      */
-    public function __invoke(array $dataToCreate): Model
+    public function __invoke(array $dataToCreate)
     {
         try {
             DB::beginTransaction();

@@ -14,7 +14,7 @@ class Update
      * @param array $dataToUpdate
      * @return void
      */
-    public function __invoke(array $dataToUpdate, Model $model): void
+    public function __invoke(array $dataToUpdate, Model $model)
     {
         try {
             DB::beginTransaction();
