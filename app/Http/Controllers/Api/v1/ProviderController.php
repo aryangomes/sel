@@ -8,7 +8,7 @@ use App\Http\Resources\ProviderResource;
 use App\Models\JuridicPerson;
 use App\Models\NaturalPerson;
 use App\Models\Provider;
-use App\Repositories\Interfaces\ProviderRepositoryInterface;
+use App\Services\ProviderService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -16,18 +16,24 @@ use Illuminate\Support\Facades\DB;
 class ProviderController extends ApiController
 {
 
-
-
+    /**
+     *
+     * @var Provider
+     */
     private $provider;
 
-    private $providerRepository;
+    /**
+     *
+     * @var ProviderService
+     */
+    private $providerService;
 
     public function __construct(
-        ProviderRepositoryInterface $providerRepository,
+        ProviderService $providerService,
         Provider $provider
     ) {
 
-        $this->providerRepository = $providerRepository;
+        $this->providerService = $providerService;
         $this->provider = $provider;
         $this->tablePermissions = 'providers';
     }
@@ -69,19 +75,19 @@ class ProviderController extends ApiController
         $requestValidated = $request->validated();
 
 
-        $this->providerRepository->create($requestValidated);
+        $this->providerService->create($requestValidated);
 
 
 
-        if ($this->providerRepository->transactionIsSuccessfully) {
+        if ($this->providerService->transactionIsSuccessfully) {
             $providerCreated =
-                $this->providerRepository->getResourceModel($this->providerRepository->responseFromTransaction);
+                $this->providerService->getResourceModel($this->providerService->responseFromTransaction);
 
             $this->setSuccessResponse($providerCreated, 'provider', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->providerRepository->resourceName]
+                ['resource' => $this->providerService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         return $this->responseWithJson();
@@ -102,7 +108,7 @@ class ProviderController extends ApiController
             $this->provider
         );
 
-        return $this->providerRepository->getResourceModel($provider);
+        return $this->providerService->getResourceModel($provider);
     }
 
     /**
@@ -134,18 +140,18 @@ class ProviderController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->providerRepository->update($requestValidated, $this->provider);
+        $this->providerService->update($requestValidated, $this->provider);
 
-        if ($this->providerRepository->transactionIsSuccessfully) {
+        if ($this->providerService->transactionIsSuccessfully) {
 
             $providerUpdated =
-                $this->providerRepository->getResourceModel($this->provider);
+                $this->providerService->getResourceModel($this->provider);
 
             $this->setSuccessResponse($providerUpdated, 'provider', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->providerRepository->resourceName]
+                ['resource' => $this->providerService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

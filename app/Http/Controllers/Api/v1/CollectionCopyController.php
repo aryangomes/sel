@@ -6,22 +6,29 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CollectionCopy\CollectionCopyRegisterRequest;
 use App\Http\Requests\CollectionCopy\CollectionCopyUpdateRequest;
 use App\Models\CollectionCopy;
-use App\Repositories\Interfaces\CollectionCopyRepositoryInterface;
+use App\Services\CollectionCopyService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class CollectionCopyController extends ApiController
 {
-
+    /**
+     *
+     * @var CollectionCopy
+     */
     private $collectionCopy;
 
-    private $collectionCopyRepository;
+    /**
+     *
+     * @var CollectionCopyService
+     */
+    private $collectionCopyService;
 
     public function __construct(
-        CollectionCopyRepositoryInterface $collectionCopyRepository,
+        CollectionCopyService $collectionCopyService,
         CollectionCopy $collectionCopy
     ) {
-        $this->collectionCopyRepository = $collectionCopyRepository;
+        $this->collectionCopyService = $collectionCopyService;
         $this->collectionCopy = $collectionCopy;
         $this->tablePermissions = 'collection_copies';
     }
@@ -38,13 +45,13 @@ class CollectionCopyController extends ApiController
             $this->collectionCopy
         );
 
-        $this->collectionCopyRepository->getResourceCollectionModel();
+        $this->collectionCopyService->getResourceCollectionModel();
 
-        if ($this->collectionCopyRepository->transactionIsSuccessfully) {
+        if ($this->collectionCopyService->transactionIsSuccessfully) {
 
-            $this->setSuccessResponse($this->collectionCopyRepository->responseFromTransaction);
+            $this->setSuccessResponse($this->collectionCopyService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->collectionCopyRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->collectionCopyService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -76,17 +83,17 @@ class CollectionCopyController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->collectionCopyRepository->create($requestValidated);
+        $this->collectionCopyService->create($requestValidated);
 
-        if ($this->collectionCopyRepository->transactionIsSuccessfully) {
+        if ($this->collectionCopyService->transactionIsSuccessfully) {
             $collectionCopyCreated =
-                $this->collectionCopyRepository->getResourceModel($this->collectionCopyRepository->responseFromTransaction);
+                $this->collectionCopyService->getResourceModel($this->collectionCopyService->responseFromTransaction);
 
             $this->setSuccessResponse($collectionCopyCreated, 'collectionCopy', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->collectionCopyRepository->resourceName]
+                ['resource' => $this->collectionCopyService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -105,7 +112,7 @@ class CollectionCopyController extends ApiController
             $this->makeNameActionFromTable('view'),
             $this->collectionCopy
         );
-        return $this->collectionCopyRepository->getResourceModel($collectionCopy);
+        return $this->collectionCopyService->getResourceModel($collectionCopy);
     }
 
     /**
@@ -137,18 +144,18 @@ class CollectionCopyController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->collectionCopyRepository->update($requestValidated, $this->collectionCopy);
+        $this->collectionCopyService->update($requestValidated, $this->collectionCopy);
 
-        if ($this->collectionCopyRepository->transactionIsSuccessfully) {
+        if ($this->collectionCopyService->transactionIsSuccessfully) {
 
             $collectionCopyUpdated =
-                $this->collectionCopyRepository->getResourceModel($this->collectionCopy);
+                $this->collectionCopyService->getResourceModel($this->collectionCopy);
 
             $this->setSuccessResponse($collectionCopyUpdated, 'collectionCopy', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->collectionCopyRepository->resourceName]
+                ['resource' => $this->collectionCopyService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -170,15 +177,15 @@ class CollectionCopyController extends ApiController
             $this->collectionCopy
         );
 
-        $this->collectionCopyRepository->delete($this->collectionCopy);
+        $this->collectionCopyService->delete($this->collectionCopy);
 
-        if ($this->collectionCopyRepository->transactionIsSuccessfully) {
+        if ($this->collectionCopyService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->collectionCopyRepository->resourceName]
+                    ['resource' => $this->collectionCopyService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -186,7 +193,7 @@ class CollectionCopyController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->collectionCopyRepository->resourceName
+                $this->collectionCopyService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

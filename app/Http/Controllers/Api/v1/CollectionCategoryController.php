@@ -6,21 +6,29 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CollectionCategory\CollectionCategoryRegisterRequest;
 use App\Http\Requests\CollectionCategory\CollectionCategoryUpdateRequest;
 use App\Models\CollectionCategory;
-use App\Repositories\Interfaces\CollectionCategoryRepositoryInterface;
+use App\Services\CollectionCategoryService;
 use Illuminate\Http\Response;
 
 class CollectionCategoryController extends ApiController
 {
 
+    /**
+     *
+     * @var CollectionCategory
+     */
     private $collectionCategory;
 
-    private $collectionCategoryRepository;
+    /**
+     *
+     * @var CollectionCategoryService
+     */
+    private $collectionCategoryService;
 
     public function __construct(
-        CollectionCategoryRepositoryInterface $collectionCategoryRepository,
+        CollectionCategoryService $collectionCategoryService,
         CollectionCategory $collectionCategory
     ) {
-        $this->collectionCategoryRepository = $collectionCategoryRepository;
+        $this->collectionCategoryService = $collectionCategoryService;
         $this->collectionCategory = $collectionCategory;
         $this->tablePermissions = 'collection_categories';
     }
@@ -32,16 +40,18 @@ class CollectionCategoryController extends ApiController
      */
     public function index()
     {
-        $this->canPerformAction($this->makeNameActionFromTable('index'), 
-       $this->collectionCategory);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->collectionCategory
+        );
 
-        $this->collectionCategoryRepository->getResourceCollectionModel();
+        $this->collectionCategoryService->getResourceCollectionModel();
 
-        if ($this->collectionCategoryRepository->transactionIsSuccessfully) {
+        if ($this->collectionCategoryService->transactionIsSuccessfully) {
 
-            $this->setSuccessResponse($this->collectionCategoryRepository->responseFromTransaction);
+            $this->setSuccessResponse($this->collectionCategoryService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->collectionCategoryRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->collectionCategoryService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -66,21 +76,23 @@ class CollectionCategoryController extends ApiController
      */
     public function store(CollectionCategoryRegisterRequest $request)
     {
-      $this->canPerformAction($this->makeNameActionFromTable('store'), 
-       $this->collectionCategory);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->collectionCategory
+        );
         $requestValidated = $request->validated();
 
-        $this->collectionCategoryRepository->create($requestValidated);
+        $this->collectionCategoryService->create($requestValidated);
 
-        if ($this->collectionCategoryRepository->transactionIsSuccessfully) {
+        if ($this->collectionCategoryService->transactionIsSuccessfully) {
             $collectionCategoryCreated =
-                $this->collectionCategoryRepository->getResourceModel($this->collectionCategoryRepository->responseFromTransaction);
+                $this->collectionCategoryService->getResourceModel($this->collectionCategoryService->responseFromTransaction);
 
             $this->setSuccessResponse($collectionCategoryCreated, 'collectionCategory', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->collectionCategoryRepository->resourceName]
+                ['resource' => $this->collectionCategoryService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -120,22 +132,24 @@ class CollectionCategoryController extends ApiController
     {
         $this->collectionCategory = $collectionCategory;
 
-        $this->canPerformAction($this->makeNameActionFromTable('update'), 
-       $this->collectionCategory);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->collectionCategory
+        );
         $requestValidated = $request->validated();
 
-        $this->collectionCategoryRepository->update($requestValidated, $this->collectionCategory);
+        $this->collectionCategoryService->update($requestValidated, $this->collectionCategory);
 
-        if ($this->collectionCategoryRepository->transactionIsSuccessfully) {
+        if ($this->collectionCategoryService->transactionIsSuccessfully) {
 
             $collectionCategoryUpdated =
-                $this->collectionCategoryRepository->getResourceModel($this->collectionCategory);
+                $this->collectionCategoryService->getResourceModel($this->collectionCategory);
 
             $this->setSuccessResponse($collectionCategoryUpdated, 'collectionCategory', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->collectionCategoryRepository->resourceName]
+                ['resource' => $this->collectionCategoryService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -152,17 +166,19 @@ class CollectionCategoryController extends ApiController
     {
         $this->collectionCategory = $collectionCategory;
 
-        $this->canPerformAction($this->makeNameActionFromTable('delete'), 
-       $this->collectionCategory);
-        $this->collectionCategoryRepository->delete($this->collectionCategory);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->collectionCategory
+        );
+        $this->collectionCategoryService->delete($this->collectionCategory);
 
-        if ($this->collectionCategoryRepository->transactionIsSuccessfully) {
+        if ($this->collectionCategoryService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->collectionCategoryRepository->resourceName]
+                    ['resource' => $this->collectionCategoryService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -170,7 +186,7 @@ class CollectionCategoryController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->collectionCategoryRepository->resourceName
+                $this->collectionCategoryService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
