@@ -18,7 +18,11 @@ class GetAll
         $this->model = $model;
     }
 
-    public function __invoke(): Collection
+    /**
+     *      
+     * @return Collection
+     */
+    public function __invoke()
     {
         $collectionModel = [];
         try {
