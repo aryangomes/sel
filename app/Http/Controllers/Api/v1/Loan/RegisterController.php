@@ -5,22 +5,21 @@ namespace App\Http\Controllers\Api\v1\Loan;
 use App\Http\Controllers\Api\v1\ApiController;
 use App\Http\Requests\Loan\LoanRegisterRequest;
 use App\Models\Loan\Loan;
-use App\Repositories\Interfaces\LoanRepositoryInterface;
-use App\Repositories\LoanRepository;
 use App\Services\Loan\RegisterLoanService;
+use App\Services\LoanService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class RegisterController extends ApiController
 {
-    private $loanRepository;
+    private $loanService;
     private $loan;
 
     public function __construct(
-        LoanRepositoryInterface $loanRepository,
+        LoanService $loanService,
         Loan $loan
     ) {
-        $this->loanRepository = $loanRepository;
+        $this->loanService = $loanService;
         $this->loan = $loan;
         $this->tablePermissions = 'loans';
     }
@@ -46,19 +45,19 @@ class RegisterController extends ApiController
         $requestValidated =
             $this->setStatusLoanToPendingToRequest($requestValidated);
 
-        $registerLoanService = new RegisterLoanService($this->loanRepository);
+        $registerLoanService = new RegisterLoanService($this->loanService);
 
         $registerLoanService($requestValidated);
 
-        if ($this->loanRepository->transactionIsSuccessfully) {
+        if ($this->loanService->transactionIsSuccessfully) {
             $loanCreated =
-                $this->loanRepository->getResourceModel($this->loanRepository->responseFromTransaction);
+                $this->loanService->getResourceModel($this->loanService->responseFromTransaction);
 
             $this->setSuccessResponse($loanCreated, 'loan', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->loanRepository->resourceName]
+                ['resource' => $this->loanService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

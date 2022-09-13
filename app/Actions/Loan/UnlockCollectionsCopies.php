@@ -5,18 +5,18 @@ namespace App\Actions\Loan;
 use App\Models\CollectionCopy;
 use App\Models\Loan\Loan;
 use App\Models\Loan\LoanContainsCollectionCopy;
-use App\Repositories\LoanContainsCollectionCopyRepository;
+use App\Services\LoanContainsCollectionCopyService;
 
 class UnlockCollectionsCopies
 {
-    private $loan, $collectionCopiesId, $loanContainsCollectionCopyRepository;
+    private $loan, $collectionCopiesId, $loanContainsCollectionCopyService;
 
 
     public function __construct(Loan $loan, $collectionCopiesId)
     {
         $this->loan = $loan;
         $this->collectionCopiesId = $collectionCopiesId;
-        $this->loanContainsCollectionCopyRepository = new LoanContainsCollectionCopyRepository(
+        $this->loanContainsCollectionCopyService = new LoanContainsCollectionCopyService(
             new LoanContainsCollectionCopy()
         );
     }

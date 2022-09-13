@@ -7,21 +7,20 @@ use App\Actions\Loan\UnlockCollectionsCopies;
 use App\Models\CollectionCopy;
 use App\Models\Loan\LoanContainsCollectionCopy;
 use App\Models\User;
-use App\Repositories\LoanRepository;
-use App\Services\ServiceInterface;
+use App\Services\LoanService;
 use Carbon\Carbon;
 
-class ReturnLoanService implements ServiceInterface
+class ReturnLoanService
 {
 
-    private $loanRepository;
+    private $loanService;
 
     public function __construct(
 
-        LoanRepository $loanRepository
+        LoanService $loanService
     ) {
 
-        $this->loanRepository = $loanRepository;
+        $this->loanService = $loanService;
     }
 
     public function __invoke()
@@ -43,25 +42,25 @@ class ReturnLoanService implements ServiceInterface
                 'status' => 'returned',
             ];
 
-            $this->loanRepository->update($dataToUpdate, $this->loanRepository->loan);
+            $this->loanService->update($dataToUpdate, $this->loanService->loan);
 
-            // $this->loanRepository->loan->setStatusLoanToReturned();
+            // $this->loanService->loan->setStatusLoanToReturned();
 
             $this->unlockCollectionCopies(
-                $this->loanRepository->loan,
-                $this->loanRepository->loan->containCopies
+                $this->loanService->loan,
+                $this->loanService->loan->containCopies
             );
 
             info(
                 get_class($this),
                 [
-                    'loan' => $this->loanRepository->loan,
-                    'copies' => $this->loanRepository->loan->containCopies,
+                    'loan' => $this->loanService->loan,
+                    'copies' => $this->loanService->loan->containCopies,
 
                 ]
             );
 
-            if ($this->loanRepository->transactionIsSuccessfully) {
+            if ($this->loanService->transactionIsSuccessfully) {
 
                 $actionWasExecuted = true;
             }

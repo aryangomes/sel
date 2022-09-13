@@ -9,21 +9,21 @@ use App\Actions\Loan\VerifyCopyIsAbleToLoanAction;
 use App\Models\CollectionCopy;
 use App\Models\Loan\Loan;
 use App\Models\User;
-use App\Repositories\LoanRepository;
+use App\Services\LoanService;
 
 class RegisterLoanService
 {
     private $verifyBorrowerUserCanLoan;
     private $verifyCopyIsAbleToLoan;
-    private $loanRepository;
+    private $loanService;
     private $dataToRegisterLoan;
 
     public function __construct(
 
-        LoanRepository $loanRepository
+        LoanService $loanService
     ) {
 
-        $this->loanRepository = $loanRepository;
+        $this->loanService = $loanService;
     }
 
     public function __invoke($dataToRegisterLoan)
@@ -44,7 +44,7 @@ class RegisterLoanService
 
             $loanRegistered = $this->registerLoan();
 
-            if ($this->loanRepository->transactionIsSuccessfully) {
+            if ($this->loanService->transactionIsSuccessfully) {
 
                 $this->lockingCollectionCopies($loanRegistered, $collectionCopies);
 
@@ -131,9 +131,9 @@ class RegisterLoanService
     private function registerLoan()
     {
 
-        $this->loanRepository->create($this->dataToRegisterLoan);
+        $this->loanService->create($this->dataToRegisterLoan);
 
-        $loan = $this->loanRepository->responseFromTransaction;
+        $loan = $this->loanService->responseFromTransaction;
 
         return $loan;
     }

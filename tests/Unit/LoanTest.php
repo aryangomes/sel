@@ -63,7 +63,7 @@ class LoanTest extends BaseTest
 
         $response = $this->postJson($this->urlLoan, $postLoan);
 
-        $response->assertStatus(405);
+        $response->assertCreated();
     }
 
     public function testRegisterLoanFailedWithInvalidData()
