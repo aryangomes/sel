@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Http\Resources\Permission\PermissionCollection;
 use App\Http\Resources\Permission\PermissionResource;
-use App\Repositories\Interfaces\PermissionRepositoryInterface;
 
-use App\Repositories\RepositoryModel;
+use App\Services\CrudModelOperationsService;
 
 use App\Models\Permission;
 use Illuminate\Support\Facades\DB;
 
-class PermissionRepository extends RepositoryModel implements PermissionRepositoryInterface
+class PermissionService extends CrudModelOperationsService
 {
 	/**
 	 *
@@ -32,7 +31,7 @@ class PermissionRepository extends RepositoryModel implements PermissionReposito
 	public function getResourceCollectionModel()
 	{
 
-		$this->findAll();
+		$this->getAll();
 
 		if ($this->transactionIsSuccessfully) {
 
@@ -61,7 +60,7 @@ class PermissionRepository extends RepositoryModel implements PermissionReposito
 		DB::beginTransaction();
 
 		try {
-			
+
 			$this->responseFromTransaction = $this->model->create($attributes);
 
 			DB::commit();

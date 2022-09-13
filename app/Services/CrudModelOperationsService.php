@@ -1,28 +1,27 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
+use App\Actions\CrudModelOperations\Create;
+use App\Actions\CrudModelOperations\Delete;
+use App\Actions\CrudModelOperations\GetAll;
+use App\Actions\CrudModelOperations\Update;
 use Illuminate\Database\Eloquent\Model;
-
-use App\Repositories\Interfaces\RepositoryEloquentInterface as InterfacesRepositoryEloquentInterface;
 
 use Illuminate\Http\Resources\Json\Resource;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-
-use Exception;
-
 use Illuminate\Support\Facades\DB;
 
-class RepositoryModel implements InterfacesRepositoryEloquentInterface
+class CrudModelOperationsService
 {
 
 	/** 
-	 * @var Model $model Base Model of Repository 
+	 * @var Model $model Base Model of Service 
 	 */
 	protected $model;
 
-	/** @var Type $resourceName Name of resource */
+	/** @var string $resourceName Name of resource */
 	public $resourceName;
 
 	/** 
@@ -34,7 +33,7 @@ class RepositoryModel implements InterfacesRepositoryEloquentInterface
 	/** 
 	 * @var Exception $exceptionFromTransaction
 	 */
-	public $exceptionFromTransaction;
+	protected $exceptionFromTransaction;
 
 	/** 
 	 * @var boolean $transactionIsSuccessfully
@@ -42,56 +41,63 @@ class RepositoryModel implements InterfacesRepositoryEloquentInterface
 	public $transactionIsSuccessfully;
 
 
+	/**
+	 * 
+	 * @var GetAll
+	 */
+	private $getAll;
+
+	/**
+	 * 
+	 * @var Create
+	 */
+	private $create;
+
+	/**
+	 * 
+	 * @var Update
+	 */
+	private $update;
+
+	/**
+	 * 
+	 * @var Delete
+	 */
+	private $delete;
+
+
 	public function __construct(Model $model)
 	{
 		$this->model = $model;
+		$this->getAll = new GetAll($model);
+		$this->create = new Create($model);
+		$this->update = new Update($model);
+		$this->delete = new Delete($model);
 	}
 
+
+
 	/**
-	 * @param array $attributes
-	 * @return Model
+	 * 
+	 *  @return void
 	 */
-	public function create(array $attributes)
+	public function getAll()
 	{
 		$this->transactionIsSuccessfully = true;
 
-		DB::beginTransaction();
-
 		try {
-
-			$this->responseFromTransaction = $this->model->create($attributes);
-
-			DB::commit();
+			$getAllAction = $this->getAll;
+			$this->responseFromTransaction = $getAllAction();
 		} catch (\Exception $exception) {
 
 			$this->setTransactionExceptionResponse($exception);
 		}
 	}
 
-	/**
-	 * @param Model $model
-	 * @return void
-	 */
-	public function delete($model)
-	{
-		$this->transactionIsSuccessfully = true;
-
-		DB::beginTransaction();
-
-		try {
-
-			$this->responseFromTransaction = $model->delete();
-
-			DB::commit();
-		} catch (\Exception $exception) {
-
-			$this->setTransactionExceptionResponse($exception);
-		}
-	}
 
 	/**
 	 * @param $id
-	 * @return Model
+	 * @return void
 	 */
 	public function findById($id)
 	{
@@ -107,39 +113,58 @@ class RepositoryModel implements InterfacesRepositoryEloquentInterface
 	}
 
 	/**
-	 * 
-	 *  
+	 * @param array $attributes
+	 * @return void
 	 */
-	public function findAll()
+	public function create(array $attributes)
 	{
 		$this->transactionIsSuccessfully = true;
 
-		try {
 
-			$this->responseFromTransaction = $this->model->all();
+		try {
+			$createAction = $this->create;
+			$this->responseFromTransaction = $createAction($attributes);
 		} catch (\Exception $exception) {
 
 			$this->setTransactionExceptionResponse($exception);
 		}
 	}
 
+
+
 	/**
 	 * @param Model $model
 	 * @param array $attributesForUpdate
-	 * @return Model
+	 * @return void
 	 */
 	public function update(array $attributesForUpdate, Model $model)
 	{
 
 		$this->transactionIsSuccessfully = true;
 
-		DB::beginTransaction();
 
 		try {
 
-			$this->responseFromTransaction = $model->update($attributesForUpdate);
+			$updateAction = $this->update;
+			$this->responseFromTransaction = $updateAction($attributesForUpdate, $model);
+		} catch (\Exception $exception) {
 
-			DB::commit();
+			$this->setTransactionExceptionResponse($exception);
+		}
+	}
+
+	/**
+	 * @param Model $model
+	 * @return void
+	 */
+	public function delete($model)
+	{
+		$this->transactionIsSuccessfully = true;
+
+		try {
+
+			$deleteAction = $this->delete;
+			$this->responseFromTransaction = $deleteAction($model);
 		} catch (\Exception $exception) {
 
 			$this->setTransactionExceptionResponse($exception);
@@ -147,20 +172,21 @@ class RepositoryModel implements InterfacesRepositoryEloquentInterface
 	}
 
 
+
 	/**
 	 * @param Model $model
 	 * @return Resource
 	 */
-	public function getResourceModel($model)
+	protected function getResourceModel($model)
 	{
 		return new Resource($model);
 	}
 
 	/**
 	 * @param $id
-	 * @return ResourceCollection
+	 * @return void
 	 */
-	public function getResourceCollectionModel()
+	protected function getResourceCollectionModel()
 	{
 
 		$this->transactionIsSuccessfully = true;
@@ -174,7 +200,7 @@ class RepositoryModel implements InterfacesRepositoryEloquentInterface
 		}
 	}
 
-	protected function setTransactionExceptionResponse(Exception $exception)
+	protected function setTransactionExceptionResponse(\Exception $exception)
 	{
 		$this->transactionIsSuccessfully = false;
 

@@ -2,27 +2,32 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\Acquisition\AcquisitionRegisterRequest;
 use App\Http\Requests\Acquisition\AcquisitionUpdateRequest;
 use App\Models\Acquisition;
-use App\Repositories\Interfaces\AcquisitionRepositoryInterface;
-
-use Illuminate\Http\Request;
+use App\Services\AcquisitionService;
 use Illuminate\Http\Response;
 
 class AcquisitionController extends ApiController
 {
+    /**
+     *
+     * @var Acquisition
+     */
     private $acquisition;
 
-    private $acquisitionRepository;
+    /**
+     *      
+     * @var AcquisitionService
+     */
+    private $acquisitionService;
 
     public function __construct(
-        AcquisitionRepositoryInterface $acquisitionRepository,
+        AcquisitionService $acquisitionService,
         Acquisition $acquisition
     ) {
 
-        $this->acquisitionRepository = $acquisitionRepository;
+        $this->acquisitionService = $acquisitionService;
         $this->acquisition = $acquisition;
         $this->tablePermissions = 'acquisitions';
     }
@@ -39,27 +44,17 @@ class AcquisitionController extends ApiController
             $this->acquisition
         );
 
-        $this->acquisitionRepository->getResourceCollectionModel();
+        $this->acquisitionService->getResourceCollectionModel();
 
-        if ($this->acquisitionRepository->transactionIsSuccessfully) {
+        if ($this->acquisitionService->transactionIsSuccessfully) {
 
-            $this->setSuccessResponse($this->acquisitionRepository->responseFromTransaction);
+            $this->setSuccessResponse($this->acquisitionService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->acquisitionRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->acquisitionService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
         return $this->responseWithJson();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -77,17 +72,17 @@ class AcquisitionController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->acquisitionRepository->create($requestValidated);
+        $this->acquisitionService->create($requestValidated);
 
-        if ($this->acquisitionRepository->transactionIsSuccessfully) {
+        if ($this->acquisitionService->transactionIsSuccessfully) {
             $acquisitionCreated =
-                $this->acquisitionRepository->getResourceModel($this->acquisitionRepository->responseFromTransaction);
+                $this->acquisitionService->getResourceModel($this->acquisitionService->responseFromTransaction);
 
             $this->setSuccessResponse($acquisitionCreated, 'acquisition', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->acquisitionRepository->resourceName]
+                ['resource' => $this->acquisitionService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -101,17 +96,6 @@ class AcquisitionController extends ApiController
      * @return \Illuminate\Http\Response
      */
     public function show(Acquisition $acquisition)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Acquisition  $acquisition
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Acquisition $acquisition)
     {
         //
     }
@@ -134,18 +118,18 @@ class AcquisitionController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->acquisitionRepository->update($requestValidated, $this->acquisition);
+        $this->acquisitionService->update($requestValidated, $this->acquisition);
 
-        if ($this->acquisitionRepository->transactionIsSuccessfully) {
+        if ($this->acquisitionService->transactionIsSuccessfully) {
 
             $acquisitionUpdated =
-                $this->acquisitionRepository->getResourceModel($this->acquisition);
+                $this->acquisitionService->getResourceModel($this->acquisition);
 
             $this->setSuccessResponse($acquisitionUpdated, 'acquisition', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->acquisitionRepository->resourceName]
+                ['resource' => $this->acquisitionService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -168,15 +152,15 @@ class AcquisitionController extends ApiController
             $this->acquisition
         );
 
-        $this->acquisitionRepository->delete($this->acquisition);
+        $this->acquisitionService->delete($this->acquisition);
 
-        if ($this->acquisitionRepository->transactionIsSuccessfully) {
+        if ($this->acquisitionService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->acquisitionRepository->resourceName]
+                    ['resource' => $this->acquisitionService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -184,7 +168,7 @@ class AcquisitionController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->acquisitionRepository->resourceName
+                $this->acquisitionService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

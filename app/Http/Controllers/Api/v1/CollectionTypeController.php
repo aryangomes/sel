@@ -6,22 +6,30 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CollectionType\CollectionTypeRegisterRequest;
 use App\Http\Requests\CollectionType\CollectionTypeUpdateRequest;
 use App\Models\CollectionType;
-use App\Repositories\Interfaces\CollectionTypeRepositoryInterface;
+use App\Services\CollectionTypeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class CollectionTypeController extends ApiController
 {
 
+    /**
+     *
+     * @var CollectionType
+     */
     private $collectionType;
 
-    private $collectionTypeRepository;
+    /**
+     *
+     * @var CollectionTypeService
+     */
+    private $collectionTypeService;
 
     public function __construct(
-        CollectionTypeRepositoryInterface $collectionTypeRepository,
+        CollectionTypeService $collectionTypeService,
         CollectionType $collectionType
     ) {
-        $this->collectionTypeRepository = $collectionTypeRepository;
+        $this->collectionTypeService = $collectionTypeService;
         $this->collectionType = $collectionType;
         $this->tablePermissions = 'collection_types';
     }
@@ -38,13 +46,13 @@ class CollectionTypeController extends ApiController
             $this->collectionType
         );
 
-        $this->collectionTypeRepository->getResourceCollectionModel();
+        $this->collectionTypeService->getResourceCollectionModel();
 
-        if ($this->collectionTypeRepository->transactionIsSuccessfully) {
+        if ($this->collectionTypeService->transactionIsSuccessfully) {
 
-            $this->setSuccessResponse($this->collectionTypeRepository->responseFromTransaction);
+            $this->setSuccessResponse($this->collectionTypeService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->collectionTypeRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->collectionTypeService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -77,17 +85,17 @@ class CollectionTypeController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->collectionTypeRepository->create($requestValidated);
+        $this->collectionTypeService->create($requestValidated);
 
-        if ($this->collectionTypeRepository->transactionIsSuccessfully) {
+        if ($this->collectionTypeService->transactionIsSuccessfully) {
             $collectionTypeCreated =
-                $this->collectionTypeRepository->getResourceModel($this->collectionTypeRepository->responseFromTransaction);
+                $this->collectionTypeService->getResourceModel($this->collectionTypeService->responseFromTransaction);
 
             $this->setSuccessResponse($collectionTypeCreated, 'collectionType', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->collectionTypeRepository->resourceName]
+                ['resource' => $this->collectionTypeService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -135,18 +143,18 @@ class CollectionTypeController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->collectionTypeRepository->update($requestValidated, $this->collectionType);
+        $this->collectionTypeService->update($requestValidated, $this->collectionType);
 
-        if ($this->collectionTypeRepository->transactionIsSuccessfully) {
+        if ($this->collectionTypeService->transactionIsSuccessfully) {
 
             $collectionTypeUpdated =
-                $this->collectionTypeRepository->getResourceModel($this->collectionType);
+                $this->collectionTypeService->getResourceModel($this->collectionType);
 
             $this->setSuccessResponse($collectionTypeUpdated, 'collectionType', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->collectionTypeRepository->resourceName]
+                ['resource' => $this->collectionTypeService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -169,15 +177,15 @@ class CollectionTypeController extends ApiController
         );
 
 
-        $this->collectionTypeRepository->delete($this->collectionType);
+        $this->collectionTypeService->delete($this->collectionType);
 
-        if ($this->collectionTypeRepository->transactionIsSuccessfully) {
+        if ($this->collectionTypeService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->collectionTypeRepository->resourceName]
+                    ['resource' => $this->collectionTypeService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -185,7 +193,7 @@ class CollectionTypeController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->collectionTypeRepository->resourceName
+                $this->collectionTypeService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

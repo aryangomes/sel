@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Http\Resources\User\UserCollection;
 use App\Http\Resources\User\UserResource;
-use App\Repositories\Interfaces\UserRepositoryInterface;
 
-use App\Repositories\RepositoryModel;
+use App\Services\CrudModelOperationsService;
 
 use App\Models\User;
 
-class UserRepository extends RepositoryModel implements UserRepositoryInterface
+class UserService extends CrudModelOperationsService
 {
 	/**
 	 *
@@ -31,7 +30,7 @@ class UserRepository extends RepositoryModel implements UserRepositoryInterface
 	public function getResourceCollectionModel()
 	{
 
-		$this->findAll();
+		$this->getAll();
 
 		if ($this->transactionIsSuccessfully) {
 

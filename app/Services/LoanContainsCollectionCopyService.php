@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Http\Resources\LoanContainsCollectionCopy\LoanContainsCollectionCopyCollection;
 use App\Http\Resources\LoanContainsCollectionCopy\LoanContainsCollectionCopyResource;
-use App\Repositories\Interfaces\LoanContainsCollectionCopyRepositoryInterface;
 
-use App\Repositories\RepositoryModel;
+use App\Services\CrudModelOperationsService;
 
 use App\Models\LoanContainsCollectionCopy;
 
-class LoanContainsCollectionCopyRepository extends RepositoryModel implements LoanContainsCollectionCopyRepositoryInterface
+class LoanContainsCollectionCopyService extends CrudModelOperationsService
 {
 	/**
 	 *
@@ -32,7 +31,7 @@ class LoanContainsCollectionCopyRepository extends RepositoryModel implements Lo
 	public function getResourceCollectionModel()
 	{
 
-		$this->findAll();
+		$this->getAll();
 
 		if ($this->transactionIsSuccessfully) {
 

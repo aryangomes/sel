@@ -1,20 +1,16 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Http\Resources\Provider\ProviderCollection;
 use App\Http\Resources\Provider\ProviderResource;
+use App\Services\CrudModelOperationsService;
 use App\Models\JuridicPerson;
-use App\Repositories\Interfaces\ProviderRepositoryInterface;
-
-use App\Repositories\RepositoryModel;
-
-use App\Models\ModelsProvider;
 use App\Models\NaturalPerson;
 use App\Models\Provider;
 use Illuminate\Support\Facades\DB;
 
-class ProviderRepository extends RepositoryModel implements ProviderRepositoryInterface
+class ProviderService extends CrudModelOperationsService
 {
 
 	private $typesOfProvider = [
@@ -83,7 +79,7 @@ class ProviderRepository extends RepositoryModel implements ProviderRepositoryIn
 	public function getResourceCollectionModel()
 	{
 
-		$this->findAll();
+		$this->getAll();
 
 		if ($this->transactionIsSuccessfully) {
 

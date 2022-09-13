@@ -5,21 +5,29 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Requests\Profile\ProfileRegisterRequest;
 use App\Http\Requests\Profile\ProfileUpdateRequest;
 use App\Models\Profile;
-use App\Repositories\Interfaces\ProfileRepositoryInterface;
+use App\Services\ProfileService;
 use Illuminate\Http\Response;
 
 class ProfileController extends ApiController
 {
 
+    /**
+     *
+     * @var Profile
+     */
     private $profile;
 
-    private $profileRepository;
+    /**
+     *
+     * @var ProfileService
+     */
+    private $profileService;
 
     public function __construct(
-        ProfileRepositoryInterface $profileRepository,
+        ProfileService $profileService,
         Profile $profile
     ) {
-        $this->profileRepository = $profileRepository;
+        $this->profileService = $profileService;
         $this->profile = $profile;
         $this->tablePermissions = 'profiles';
     }
@@ -35,13 +43,13 @@ class ProfileController extends ApiController
             $this->makeNameActionFromTable('index'),
             $this->profile
         );
-        $this->profileRepository->getResourceCollectionModel();
+        $this->profileService->getResourceCollectionModel();
 
-        if ($this->profileRepository->transactionIsSuccessfully) {
+        if ($this->profileService->transactionIsSuccessfully) {
 
-            $this->setSuccessResponse($this->profileRepository->responseFromTransaction);
+            $this->setSuccessResponse($this->profileService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->profileRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->profileService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -73,17 +81,17 @@ class ProfileController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->profileRepository->create($requestValidated);
+        $this->profileService->create($requestValidated);
 
-        if ($this->profileRepository->transactionIsSuccessfully) {
+        if ($this->profileService->transactionIsSuccessfully) {
             $profileCreated =
-                $this->profileRepository->getResourceModel($this->profileRepository->responseFromTransaction);
+                $this->profileService->getResourceModel($this->profileService->responseFromTransaction);
 
             $this->setSuccessResponse($profileCreated, 'profile', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->profileRepository->resourceName]
+                ['resource' => $this->profileService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -103,7 +111,7 @@ class ProfileController extends ApiController
             $this->profile
         );
 
-        return $this->profileRepository->getResourceModel($profile);
+        return $this->profileService->getResourceModel($profile);
     }
 
     /**
@@ -136,18 +144,18 @@ class ProfileController extends ApiController
 
         $requestValidated = $request->validated();
 
-        $this->profileRepository->update($requestValidated, $this->profile);
+        $this->profileService->update($requestValidated, $this->profile);
 
-        if ($this->profileRepository->transactionIsSuccessfully) {
+        if ($this->profileService->transactionIsSuccessfully) {
 
             $profileUpdated =
-                $this->profileRepository->getResourceModel($this->profile);
+                $this->profileService->getResourceModel($this->profile);
 
             $this->setSuccessResponse($profileUpdated, 'profile', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->profileRepository->resourceName]
+                ['resource' => $this->profileService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -170,15 +178,15 @@ class ProfileController extends ApiController
         );
 
 
-        $this->profileRepository->delete($this->profile);
+        $this->profileService->delete($this->profile);
 
-        if ($this->profileRepository->transactionIsSuccessfully) {
+        if ($this->profileService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->profileRepository->resourceName]
+                    ['resource' => $this->profileService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -186,7 +194,7 @@ class ProfileController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->profileRepository->resourceName
+                $this->profileService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

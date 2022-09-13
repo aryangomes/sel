@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Http\Resources\Lender\LenderCollection;
 use App\Http\Resources\Lender\LenderResource;
 use App\Models\Lender;
-use App\Repositories\Interfaces\LenderRepositoryInterface;
 
-use App\Repositories\RepositoryModel;
+use App\Services\CrudModelOperationsService;
 
-class LenderRepository extends RepositoryModel implements LenderRepositoryInterface
+class LenderService extends CrudModelOperationsService
 {
 	/**
 	 *
@@ -30,7 +29,7 @@ class LenderRepository extends RepositoryModel implements LenderRepositoryInterf
 	public function getResourceLenderModel()
 	{
 
-		$this->findAll();
+		$this->getAll();
 
 		if ($this->transactionIsSuccessfully) {
 

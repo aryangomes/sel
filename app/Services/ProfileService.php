@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Http\Resources\Profile\ProfileCollection;
 use App\Http\Resources\Profile\ProfileResource;
-use App\Repositories\Interfaces\ProfileRepositoryInterface;
 
-use App\Repositories\RepositoryModel;
+use App\Services\CrudModelOperationsService;
 
 use App\Models\Profile;
 
-class ProfileRepository extends RepositoryModel implements ProfileRepositoryInterface
+class ProfileService extends CrudModelOperationsService
 {
 	/**
 	 *
@@ -30,7 +29,7 @@ class ProfileRepository extends RepositoryModel implements ProfileRepositoryInte
 	public function getResourceCollectionModel()
 	{
 
-		$this->findAll();
+		$this->getAll();
 
 		if ($this->transactionIsSuccessfully) {
 
