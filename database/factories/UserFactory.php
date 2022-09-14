@@ -41,3 +41,17 @@ $factory->define(User::class, function (Faker $faker) {
         'idProfile' => factory(Profile::class),
     ];
 });
+
+
+$factory->state(User::class, 'admin', [
+    'password' => Hash::make(config('user.default_password_admin')),
+    'isAdmin' => 1,
+
+]);
+
+
+$factory->state(User::class, 'notAdmin', [
+    'password' => Hash::make(config('user.default_password_not_admin')),
+    'isAdmin' => 0,
+
+]);

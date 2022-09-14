@@ -37,11 +37,7 @@ class UserTest extends BaseTest
 
     public function testRegisterUserNotAdminSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+        $userAdmin = factory(User::class)->states('admin')->create();
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
@@ -58,11 +54,7 @@ class UserTest extends BaseTest
 
     public function testRegisterUserNotAdminWithInvalidDatas()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+        $userAdmin = factory(User::class)->states('admin')->create();
 
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
@@ -307,9 +299,7 @@ class UserTest extends BaseTest
 
     public function testUserAdminDeleteSuccessfully()
     {
-        $user = factory(User::class)->create(
-            ['isAdmin' => 1]
-        );
+        $user = factory(User::class)->states('admin')->create();
 
         $credentials = [
             'email' => $user->email,

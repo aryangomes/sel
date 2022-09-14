@@ -75,7 +75,7 @@ class User extends Authenticatable
         return $tokenAccess;
     }
 
-    public function setPasswordAttribute($newPassword)
+    public function setNewPassword($newPassword)
     {
         $newPasswordIsSet = isset($newPassword);
 
@@ -83,17 +83,33 @@ class User extends Authenticatable
 
         $oldAndNewPasswordAreSet =  $oldPasswordIsSet && $newPasswordIsSet;
 
+        $defaultUserPassword = $this->userIsAdmin() ?
+            $this->getDefaultPasswordUserAdmin() : $this->getDefaultPasswordUserNotAdmin();
+
         if (!($oldAndNewPasswordAreSet)) {
-            $this->attributes['password'] = $this->getDefaultPasswordUserNotAdmin();
+            $this->attributes['password'] = $defaultUserPassword;
         } else {
             $this->attributes['password'] =
-                ($newPasswordIsSet) ? Hash::make($newPassword) : $this->getDefaultPasswordUserNotAdmin();
+                ($newPasswordIsSet) ? Hash::make($newPassword) : $defaultUserPassword;
         }
     }
 
+    /**
+     * @return string
+     */
+    private function getDefaultPasswordUserAdmin()
+    {
+        $defaultPassword = Hash::make(config('user.default_password_admin'));
+
+        return $defaultPassword;
+    }
+
+    /**
+     * @return string
+     */
     private function getDefaultPasswordUserNotAdmin()
     {
-        $defaultPassword = bcrypt((env('DEFAULT_PASSWORD_NOT_ADMIN')));
+        $defaultPassword = Hash::make(config('user.default_password_not_admin'));
 
         return $defaultPassword;
     }
