@@ -28,7 +28,7 @@ Enter the command in the folder of your preference:
    `DB_PORT=3306`  
    `DB_DATABASE=`  
    `DB_USERNAME=`  
-   `DB_PASSWORD=`
+   `DB_PASSWORD=`  
    `MYSQL_ROOT_PASSWORD=`
 
 5. Build the Docker image:  
