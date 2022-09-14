@@ -34,11 +34,8 @@ class LoginTest extends BaseTest
 
     public function testLoginUserAdministrator()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1,
-            ]
-        );
+        $userAdmin =
+            factory(User::class)->states('admin')->create();;
 
         $credentials = [
             'email' => $userAdmin->email,
@@ -52,7 +49,7 @@ class LoginTest extends BaseTest
 
     public function testUserTryingLoginAdministratorIsNotAdministrator()
     {
-        $userIsNotAdmin = factory(User::class)->create();
+        $userIsNotAdmin = factory(User::class)->states('notAdmin')->create();
 
         $credentials = [
             'email' => $userIsNotAdmin->email,
@@ -96,11 +93,7 @@ class LoginTest extends BaseTest
 
     public function testLogoutUserAdministrator()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+        $userAdmin = factory(User::class)->states('admin')->create();
 
         $credentials = [
             'email' => $userAdmin->email,
@@ -125,7 +118,7 @@ class LoginTest extends BaseTest
 
     public function testLoginUserNotAdministrator()
     {
-        $userNotAdmin = factory(User::class)->create();
+        $userNotAdmin = factory(User::class)->states('notAdmin')->create();
 
         $credentials = [
             'cpf' => $userNotAdmin->cpf,
@@ -139,7 +132,7 @@ class LoginTest extends BaseTest
 
     public function testLoginUserNotAdministratorTryingLoginAsUserAdministrator()
     {
-        $userNotAdmin = factory(User::class)->create();
+        $userNotAdmin = factory(User::class)->states('notAdmin')->create();
 
         $credentials = [
             'email' => $userNotAdmin->email,
@@ -153,7 +146,7 @@ class LoginTest extends BaseTest
 
     public function testUserNotAdministratorTryingLoginAdministratorWithInvalidCredentials()
     {
-        $userNotAdmin = factory(User::class)->create();
+        $userNotAdmin = factory(User::class)->states('notAdmin')->create();
 
         $credentials = [
             'name' => $userNotAdmin->name,
@@ -181,7 +174,7 @@ class LoginTest extends BaseTest
 
     public function testLogoutUserNotAdministrator()
     {
-        $userNotAdmin = factory(User::class)->create();
+        $userNotAdmin = factory(User::class)->states('notAdmin')->create();
 
         $credentials = [
             'cpf' => $userNotAdmin->cpf,
