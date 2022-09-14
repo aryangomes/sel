@@ -78,7 +78,7 @@ Enter the command in the folder of your preference:
 
 3. Install the Passport package for generating the token for User authentication:
 
-   `php artisan passport: install`
+   `php artisan passport:install`
 
 ## Useful Commands
 
