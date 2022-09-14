@@ -5,7 +5,6 @@ namespace Tests\Unit\Login;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Passport;
 use Tests\BaseTest;
 
