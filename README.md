@@ -16,10 +16,22 @@ Enter the command in the folder of your preference:
 
 1. Clone the repository to your folder.
 
-3. Enter the folder that was created:  
+2. Enter the folder that was created:  
    `cd sel`
 
-4. Build the Docker image:  
+3. Create the Laravel development variables file by copying it from a pre-defined example:  
+   `cp .env.example .env`
+
+4. Copy and paste according to the database variable settings:  
+   `DB_CONNECTION=mysql`  
+   `DB_HOST=db`  
+   `DB_PORT=3306`  
+   `DB_DATABASE=`  
+   `DB_USERNAME=`  
+   `DB_PASSWORD=`
+   `MYSQL_ROOT_PASSWORD=`
+
+5. Build the Docker image:  
    `docker compose -f ".docker/docker-compose.yml" --env-file=".env" -p sel up -d --build`
 
 ## Start Apache and MariaDB Docker (Mysql)
@@ -44,39 +56,27 @@ Enter the command in the folder of your preference:
 
 **Remember to run the following commands from the Apache prompt!**
 
-1. Create the Laravel development variables file by copying it from a pre-defined example:  
-   `cp .env.example .env`
-
-2. Install the Laravel facilities with the composer:  
+1. Install the Laravel facilities with the composer:  
    `composer install`
 
-3. Generate the Laravel local application key:  
+2. Generate the Laravel local application key:  
    `php artisan key:generate`
 
-4. Link storage directory:  
+3. Link storage directory:  
    `php artisan storage:link`
 
 ## Migrate / Generate database
 
-**Copy and paste the following variables into the file** _.env_
+**Copy and paste the following variables into the file** _.env_ (if there not exists)
 
-1. Copy and paste according to the database variable settings:  
-   `DB_CONNECTION=mysql`  
-   `DB_HOST=db`  
-   `DB_PORT=3306`  
-   `DB_DATABASE=`  
-   `DB_USERNAME=`  
-   `DB_PASSWORD=`
-   `MYSQL_ROOT_PASSWORD=`
+1. Copy and paste as variable settings from the default password of users (default passwords can be changed):  
+   - `DEFAULT_PASSWORD_ADMIN=`
+   - `DEFAULT_PASSWORD_NOT_ADMIN=`
 
-2. Copy and paste as variable settings from the default password of users (default passwords can be changed):  
-   `DEFAULT_PASSWORD_ADMIN=`
-   `DEFAULT_PASSWORD_NOT_ADMIN=`
-
-3. Run the command to generate the database with some information already prepared:  
+2. Run the command to generate the database with some information already prepared:  
    `php artisan migrate --seed`
 
-4. Install the Passport package for generating the token for User authentication:
+3. Install the Passport package for generating the token for User authentication:
 
    `php artisan passport: install`
 
