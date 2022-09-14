@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Events\LogoutUserEvent;
 use App\Models\Utils\LogFormatter;
+use App\Traits\HasPermission;
 use App\Traits\UuidPrimaryKey;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Notifications\Notifiable;
@@ -12,13 +13,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable, UuidPrimaryKey, SoftDeletes;
+    use HasApiTokens, Notifiable, UuidPrimaryKey, SoftDeletes, HasPermission;
 
     protected $table = 'users';
 
@@ -32,7 +34,7 @@ class User extends Authenticatable
         'name', 'email', 'password', 'streetAddress',
         'neighborhoodAddress', 'numberAddress',
         'phoneNumber', 'cellNumber', 'complementAddress', 'photo',
-        'isAdmin', 'cpf', 'idUserProfile'
+        'isAdmin', 'cpf', 'idProfile'
     ];
 
     /**
@@ -85,7 +87,7 @@ class User extends Authenticatable
             $this->attributes['password'] = $this->getDefaultPasswordUserNotAdmin();
         } else {
             $this->attributes['password'] =
-                ($newPasswordIsSet) ? bcrypt($newPassword) : $this->getDefaultPasswordUserNotAdmin();
+                ($newPasswordIsSet) ? Hash::make($newPassword) : $this->getDefaultPasswordUserNotAdmin();
         }
     }
 
@@ -102,13 +104,7 @@ class User extends Authenticatable
         try {
 
             $tokenAccess = Auth::guard('api')->user()->token();
-            Log::info(
-                get_class($this),
-                [
-                    'variavel' => Auth::guard('api')->user(),
-                    ' $tokenAccess' => $tokenAccess,
-                ]
-            );
+
             $tokenAccessWasRevoken = $tokenAccess->revoke();
         } catch (\Exception $exception) {
             Log::error(LogFormatter::formatTextLog(['Message' => $exception->getMessage()]));
@@ -167,10 +163,10 @@ class User extends Authenticatable
     /**
      * Get the profile associated with the User
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \App\Models\Profile
      */
-    public function profile(): HasOne
+    public function profile()
     {
-        return $this->hasOne(UserProfile::class, 'idProfile', 'idUserProfile');
+        return $this->hasOne(Profile::class, 'idProfile', 'idProfile');
     }
 }

@@ -10,9 +10,9 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class LoanContainsCollectionCopyTest extends TestCase
+class LoanContainsCollectionCopyTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -25,6 +25,9 @@ class LoanContainsCollectionCopyTest extends TestCase
     {
         $this->urlLoanContainsCollectionCopy = "{$this->url}loanContainsCollectionCopies";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('loan_contains_collection_copies');
     }
 
     /**
@@ -37,16 +40,10 @@ class LoanContainsCollectionCopyTest extends TestCase
 
     public function testRegisterLoanContainsCollectionCopySuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+
+        $this->createAndAuthenticateTheAdminUser();
 
         $postLoanContainsCollectionCopy = factory(LoanContainsCollectionCopy::class)->make()->toArray();
-
-        Passport::actingAs($userAdmin);
-        $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->postJson($this->urlLoanContainsCollectionCopy, $postLoanContainsCollectionCopy);
 
@@ -160,13 +157,15 @@ class LoanContainsCollectionCopyTest extends TestCase
 
     public function testUserNotAdminTruingDeleteLoanContainsCollectionCopyUnsuccessfully()
     {
-        $user = factory(User::class)->create();
+
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
+
+                'idProfile' => $this->userProfile,
+            ]
+        );
 
         $loan = factory(LoanContainsCollectionCopy::class)->create();
-
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
 
         $response = $this->deleteJson(
             $this->urlWithParameter($this->urlLoanContainsCollectionCopy, $loan->idLoanContainsCollectionCopy)

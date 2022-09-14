@@ -2,25 +2,41 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\Provider\ProviderRegisterRequest;
 use App\Http\Requests\Provider\ProviderUpdateRequest;
 use App\Http\Resources\ProviderResource;
 use App\Models\JuridicPerson;
 use App\Models\NaturalPerson;
 use App\Models\Provider;
+use App\Services\ProviderService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ProviderController extends ApiController
 {
 
-    public $typesOfProvider = [
-        1 => 'naturalPerson',
-        2 => 'juridicPerson'
-    ];
+    /**
+     *
+     * @var Provider
+     */
+    private $provider;
+
+    /**
+     *
+     * @var ProviderService
+     */
+    private $providerService;
+
+    public function __construct(
+        ProviderService $providerService,
+        Provider $provider
+    ) {
+
+        $this->providerService = $providerService;
+        $this->provider = $provider;
+        $this->tablePermissions = 'providers';
+    }
 
     /**
      * Display a listing of the resource.
@@ -50,58 +66,30 @@ class ProviderController extends ApiController
      */
     public function store(ProviderRegisterRequest $request)
     {
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->provider
+        );
+
         $requestValidated = $request->validated();
 
-        $providerWasCreated = $personWasCreated = false;
 
-        $personCreated = null;
-
-        $this->authorize('create', new Provider());
-
-        try {
-            DB::beginTransaction();
-
-            $providerCreated = Provider::create($requestValidated);
-
-            $providerWasCreated = isset($providerCreated);
+        $this->providerService->create($requestValidated);
 
 
 
-            if ($request->has('cpf')) {
-                $personCreated = $this->createPersonProvider(
-                    $this->typesOfProvider[1],
-                    [
-                        'idProvider' => $providerCreated->idProvider,
-                        'cpf' => $request->input('cpf'),
-                    ]
-                );
-            } else {
-                $personCreated = $this->createPersonProvider(
-                    $this->typesOfProvider[2],
-                    [
-                        'idProvider' => $providerCreated->idProvider,
-                        'cnpj' => $request->input('cnpj'),
-                    ]
-                );
-            }
+        if ($this->providerService->transactionIsSuccessfully) {
+            $providerCreated =
+                $this->providerService->getResourceModel($this->providerService->responseFromTransaction);
 
-            $personWasCreated = isset($personCreated);
-        } catch (\Exception $exception) {
-
-            $this->logErrorFromException($exception);
-        }
-
-        $providerAndPersonProviderWasCreated  = $providerWasCreated && $personWasCreated;
-
-        if ($providerAndPersonProviderWasCreated) {
-            DB::commit();
-            $providerResource = $this->getProviderResource($providerCreated->idProvider);
-            $this->setSuccessResponse($providerResource, 'provider',  Response::HTTP_CREATED);
+            $this->setSuccessResponse($providerCreated, 'provider', Response::HTTP_CREATED);
         } else {
-            DB::rollBack();
-            $this->setErrorResponse('Did not possible register the provider.', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
+            $this->setErrorResponse(__(
+                'httpResponses.created.error',
+                ['resource' => $this->providerService->resourceName]
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
         return $this->responseWithJson();
     }
 
@@ -113,11 +101,14 @@ class ProviderController extends ApiController
      */
     public function show(Provider $provider)
     {
-        $this->authorize('view', $provider);
+        $this->provider = $provider;
 
-        $providerResource = $this->getProviderResource($provider->idProvider);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->provider
+        );
 
-        return $providerResource;
+        return $this->providerService->getResourceModel($provider);
     }
 
     /**
@@ -140,28 +131,28 @@ class ProviderController extends ApiController
      */
     public function update(ProviderUpdateRequest $request, Provider $provider)
     {
+        $this->provider = $provider;
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->provider
+        );
+
         $requestValidated = $request->validated();
 
-        $providerWasUpdated = false;
+        $this->providerService->update($requestValidated, $this->provider);
 
-        $this->authorize('update', $provider);
+        if ($this->providerService->transactionIsSuccessfully) {
 
-        try {
-            DB::beginTransaction();
+            $providerUpdated =
+                $this->providerService->getResourceModel($this->provider);
 
-            $providerWasUpdated = $provider->update($requestValidated);
-        } catch (\Exception $exception) {
-
-            $this->logErrorFromException($exception);
-        }
-
-        if ($providerWasUpdated) {
-            DB::commit();
-            $providerResource = $this->getProviderResource($provider->idProvider);
-            $this->setSuccessResponse($providerResource, 'provider', 200);
+            $this->setSuccessResponse($providerUpdated, 'provider', Response::HTTP_OK);
         } else {
-            DB::rollBack();
-            $this->setErrorResponse();
+            $this->setErrorResponse(__(
+                'httpResponses.updated.error',
+                ['resource' => $this->providerService->resourceName]
+            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->responseWithJson();
@@ -203,48 +194,5 @@ class ProviderController extends ApiController
         }
 
         return $this->responseWithJson();
-    }
-
-    /**
-     * 
-     * @param int $idProvider
-     * @return  ProviderResource
-     * 
-     */
-    private function getProviderResource($idProvider)
-    {
-        $providerResource = new ProviderResource(Provider::find($idProvider));
-        return $providerResource;
-    }
-
-    private function createPersonProvider($typeOfProvider, $dataTypeOfProvider)
-    {
-        $personCreated = null;
-
-        switch ($typeOfProvider) {
-            case $this->typesOfProvider[1]:
-                $personCreated = $this->createNaturalPerson($dataTypeOfProvider);
-                break;
-
-            case $this->typesOfProvider[2]:
-                $personCreated = $this->createJuridicPerson($dataTypeOfProvider);
-                break;
-        }
-
-        return $personCreated;
-    }
-
-    private function createNaturalPerson($dataNaturalPerson)
-    {
-        $naturalPersonCreated = NaturalPerson::create($dataNaturalPerson);
-
-        return $naturalPersonCreated;
-    }
-
-    private function createJuridicPerson($dataJuridicPerson)
-    {
-        $juridicPersonCreated = JuridicPerson::create($dataJuridicPerson);
-
-        return $juridicPersonCreated;
     }
 }

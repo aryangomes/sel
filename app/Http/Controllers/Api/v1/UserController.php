@@ -6,23 +6,31 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Requests\User\UserRegisterRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\User;
-use App\Repositories\Interfaces\UserRepositoryInterface;
-
+use App\Services\UserService;
 use Illuminate\Http\Response;
 
 class UserController extends ApiController
 {
 
+    /**
+     *
+     * @var User
+     */
     private $user;
 
-    private $userRepository;
+    /**
+     *
+     * @var UserService
+     */
+    private $userService;
 
     public function __construct(
-        UserRepositoryInterface $userRepository,
+        UserService $userService,
         User $user
     ) {
-        $this->userRepository = $userRepository;
+        $this->userService = $userService;
         $this->user = $user;
+        $this->tablePermissions = 'users';
     }
 
     /**
@@ -32,13 +40,18 @@ class UserController extends ApiController
      */
     public function index()
     {
-        $this->userRepository->getResourceCollectionModel();
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->user
+        );
 
-        if ($this->userRepository->transactionIsSuccessfully) {
+        $this->userService->getResourceCollectionModel();
 
-            $this->setSuccessResponse($this->userRepository->responseFromTransaction);
+        if ($this->userService->transactionIsSuccessfully) {
+
+            $this->setSuccessResponse($this->userService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->userRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->userService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -63,21 +76,25 @@ class UserController extends ApiController
      */
     public function store(UserRegisterRequest $request)
     {
-        $this->authorize('create', $this->user);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->user
+        );
+
 
         $requestValidated = $request->validated();
 
-        $this->userRepository->create($requestValidated);
+        $this->userService->create($requestValidated);
 
-        if ($this->userRepository->transactionIsSuccessfully) {
+        if ($this->userService->transactionIsSuccessfully) {
             $userCreated =
-                $this->userRepository->getResourceModel($this->userRepository->responseFromTransaction);
+                $this->userService->getResourceModel($this->userService->responseFromTransaction);
 
             $this->setSuccessResponse($userCreated, 'user', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->userRepository->resourceName]
+                ['resource' => $this->userService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -93,9 +110,15 @@ class UserController extends ApiController
     public function show(User $user)
     {
         $this->user = $user;
-        $this->authorize('view', $this->user);
 
-        return $this->userRepository->getResourceModel($user);
+        $this->canPerformActionOrResourceBelongsToUser(
+            $this->makeNameActionFromTable('view'),
+            $this->user->id,
+            $this->user
+        );
+
+
+        return $this->userService->getResourceModel($user);
     }
 
     /**
@@ -120,22 +143,27 @@ class UserController extends ApiController
     {
         $this->user = $user;
 
-        $this->authorize('update',  $this->user);
+        $this->canPerformActionOrResourceBelongsToUser(
+            $this->makeNameActionFromTable('update'),
+            $this->user->id,
+            $this->user
+        );
+
 
         $requestValidated = $request->validated();
 
-        $this->userRepository->update($requestValidated, $this->user);
+        $this->userService->update($requestValidated, $this->user);
 
-        if ($this->userRepository->transactionIsSuccessfully) {
+        if ($this->userService->transactionIsSuccessfully) {
 
             $userUpdated =
-                $this->userRepository->getResourceModel($this->user);
+                $this->userService->getResourceModel($this->user);
 
             $this->setSuccessResponse($userUpdated, 'user', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->userRepository->resourceName]
+                ['resource' => $this->userService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -152,17 +180,21 @@ class UserController extends ApiController
     {
         $this->user = $user;
 
-        $this->authorize('delete',  $this->user);
+        $this->canPerformActionOrResourceBelongsToUser(
+            $this->makeNameActionFromTable('delete'),
+            $this->user->id,
+            $this->user
+        );
 
-        $this->userRepository->delete($this->user);
+        $this->userService->delete($this->user);
 
-        if ($this->userRepository->transactionIsSuccessfully) {
+        if ($this->userService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->userRepository->resourceName]
+                    ['resource' => $this->userService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -170,7 +202,7 @@ class UserController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->userRepository->resourceName
+                $this->userService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

@@ -4,7 +4,7 @@ services:
   apache:
     build:
       args:
-        versao_php: 7.2
+        PHP_VERSION: 7.2
       context: ./.apache
     container_name: sel-apache
     volumes:
@@ -26,13 +26,19 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: r15987
-      MYSQL_DATABASE: sel
-      MYSQL_USER: sel
-      MYSQL_PASSWORD: sel4631
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - sel-db:/var/lib/mysql
     networks:
       - network-sel
 
 networks:
   network-sel:
     driver: bridge
+
+volumes:
+  sel-db:
+    driver: local

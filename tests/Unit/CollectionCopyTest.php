@@ -8,9 +8,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class CollectionCopyTest extends TestCase
+class CollectionCopyTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -23,6 +23,9 @@ class CollectionCopyTest extends TestCase
     {
         $this->urlCollectionCopy = "{$this->url}collectionCopies";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('collection_copies');
     }
 
     /**
@@ -35,28 +38,25 @@ class CollectionCopyTest extends TestCase
 
     public function testViewAllCollectionCopyDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+
 
         $collectionCopy = factory(CollectionCopy::class)->create();
 
 
-        Passport::actingAs($userAdmin);
 
-        $this->assertAuthenticatedAs($userAdmin, 'api');
+        $this->createAndAuthenticateTheAdminUser();
+
 
         $response = $this->getJson($this->urlCollectionCopy);
 
         $response->assertOk();
 
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
 
-        $user = factory(User::class)->create();
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+                'idProfile' => $this->userProfile,
+            ]
+        );
 
         $response = $this->getJson($this->urlCollectionCopy);
 

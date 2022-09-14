@@ -5,23 +5,32 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Requests\LoanContainsCollectionCopy\LoanContainsCollectionCopyRegisterRequest;
 use App\Http\Requests\LoanContainsCollectionCopy\LoanContainsCollectionCopyUpdateRequest;
 use App\Models\LoanContainsCollectionCopy;
-use App\Repositories\Interfaces\LoanContainsCollectionCopyRepositoryInterface;
+use App\Services\LoanContainsCollectionCopyService;
 use Illuminate\Http\Response;
 
 class LoanContainsCollectionCopyController extends ApiController
 {
 
+    /**
+     *
+     * @var LoanContainsCollectionCopy
+     */
     private $loanContainsCollectionCopy;
 
-    private $loanContainsCollectionCopyRepository;
+    /**
+     *
+     * @var LoanContainsCollectionCopyService
+     */
+    private $loanContainsCollectionCopyService;
 
     public function __construct(
-        LoanContainsCollectionCopyRepositoryInterface $loanContainsCollectionCopyRepository,
+        LoanContainsCollectionCopyService $loanContainsCollectionCopyService,
         LoanContainsCollectionCopy $loanContainsCollectionCopy
     ) {
         $this->authorizeResource(LoanContainsCollectionCopy::class, 'loanContainsCollectionCopy');
-        $this->loanContainsCollectionCopyRepository = $loanContainsCollectionCopyRepository;
+        $this->loanContainsCollectionCopyService = $loanContainsCollectionCopyService;
         $this->loanContainsCollectionCopy = $loanContainsCollectionCopy;
+        $this->tablePermissions = 'loan_contains_collection_copies';
     }
 
     /**
@@ -31,13 +40,18 @@ class LoanContainsCollectionCopyController extends ApiController
      */
     public function index()
     {
-        $this->loanContainsCollectionCopyRepository->getResourceCollectionModel();
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->loanContainsCollectionCopy
+        );
 
-        if ($this->loanContainsCollectionCopyRepository->transactionIsSuccessfully) {
+        $this->loanContainsCollectionCopyService->getResourceCollectionModel();
 
-            $this->setSuccessResponse($this->loanContainsCollectionCopyRepository->responseFromTransaction);
+        if ($this->loanContainsCollectionCopyService->transactionIsSuccessfully) {
+
+            $this->setSuccessResponse($this->loanContainsCollectionCopyService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->loanContainsCollectionCopyRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->loanContainsCollectionCopyService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -63,19 +77,24 @@ class LoanContainsCollectionCopyController extends ApiController
     public function store(LoanContainsCollectionCopyRegisterRequest $request)
     {
 
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('store'),
+            $this->loanContainsCollectionCopy
+        );
+
         $requestValidated = $request->validated();
 
-        $this->loanContainsCollectionCopyRepository->create($requestValidated);
+        $this->loanContainsCollectionCopyService->create($requestValidated);
 
-        if ($this->loanContainsCollectionCopyRepository->transactionIsSuccessfully) {
+        if ($this->loanContainsCollectionCopyService->transactionIsSuccessfully) {
             $loanContainsCollectionCopyCreated =
-                $this->loanContainsCollectionCopyRepository->getResourceModel($this->loanContainsCollectionCopyRepository->responseFromTransaction);
+                $this->loanContainsCollectionCopyService->getResourceModel($this->loanContainsCollectionCopyService->responseFromTransaction);
 
             $this->setSuccessResponse($loanContainsCollectionCopyCreated, 'loanContainsCollectionCopy', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->loanContainsCollectionCopyRepository->resourceName]
+                ['resource' => $this->loanContainsCollectionCopyService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -90,7 +109,12 @@ class LoanContainsCollectionCopyController extends ApiController
      */
     public function show(LoanContainsCollectionCopy $loanContainsCollectionCopy)
     {
-        return $this->loanContainsCollectionCopyRepository->getResourceModel($loanContainsCollectionCopy);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->loanContainsCollectionCopy
+        );
+
+        return $this->loanContainsCollectionCopyService->getResourceModel($loanContainsCollectionCopy);
     }
 
     /**
@@ -115,21 +139,25 @@ class LoanContainsCollectionCopyController extends ApiController
     {
         $this->loanContainsCollectionCopy = $loanContainsCollectionCopy;
 
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->loanContainsCollectionCopy
+        );
 
         $requestValidated = $request->validated();
 
-        $this->loanContainsCollectionCopyRepository->update($requestValidated, $this->loanContainsCollectionCopy);
+        $this->loanContainsCollectionCopyService->update($requestValidated, $this->loanContainsCollectionCopy);
 
-        if ($this->loanContainsCollectionCopyRepository->transactionIsSuccessfully) {
+        if ($this->loanContainsCollectionCopyService->transactionIsSuccessfully) {
 
             $loanContainsCollectionCopyUpdated =
-                $this->loanContainsCollectionCopyRepository->getResourceModel($this->loanContainsCollectionCopy);
+                $this->loanContainsCollectionCopyService->getResourceModel($this->loanContainsCollectionCopy);
 
             $this->setSuccessResponse($loanContainsCollectionCopyUpdated, 'loanContainsCollectionCopy', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->loanContainsCollectionCopyRepository->resourceName]
+                ['resource' => $this->loanContainsCollectionCopyService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -146,16 +174,20 @@ class LoanContainsCollectionCopyController extends ApiController
     {
         $this->loanContainsCollectionCopy = $loanContainsCollectionCopy;
 
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->loanContainsCollectionCopy
+        );
 
-        $this->loanContainsCollectionCopyRepository->delete($this->loanContainsCollectionCopy);
+        $this->loanContainsCollectionCopyService->delete($this->loanContainsCollectionCopy);
 
-        if ($this->loanContainsCollectionCopyRepository->transactionIsSuccessfully) {
+        if ($this->loanContainsCollectionCopyService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->loanContainsCollectionCopyRepository->resourceName]
+                    ['resource' => $this->loanContainsCollectionCopyService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -163,7 +195,7 @@ class LoanContainsCollectionCopyController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->loanContainsCollectionCopyRepository->resourceName
+                $this->loanContainsCollectionCopyService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

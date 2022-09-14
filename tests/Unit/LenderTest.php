@@ -7,9 +7,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class LenderTest extends TestCase
+class LenderTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -22,6 +22,9 @@ class LenderTest extends TestCase
     {
         $this->urlLender = "{$this->url}lenders";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('lenders');
     }
 
     /**
@@ -115,17 +118,9 @@ class LenderTest extends TestCase
 
     public function testViewLenderDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
 
+        $this->createAndAuthenticateTheAdminUser();
         $lender = factory(Lender::class)->create();
-
-
-        Passport::actingAs($userAdmin);
-        $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson(
             $this->urlWithParameter($this->urlLender, $lender->idLender)
@@ -134,10 +129,12 @@ class LenderTest extends TestCase
         $response->assertOk();
 
 
-        $user = factory(User::class)->create();
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
 
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+                'idProfile' => $this->userProfile,
+            ]
+        );
 
         $response = $this->getJson(
             $this->urlWithParameter($this->urlLender, $lender->idLender)

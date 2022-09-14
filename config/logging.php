@@ -36,7 +36,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => (env('APP_ENV') == 'testing')?['tests','daily']: 'daily',
+            'channels' => (env('APP_ENV') == 'testing') ? ['html', 'daily'] : 'daily',
             'ignore_exceptions' => false,
         ],
 
@@ -53,7 +53,7 @@ return [
             'days' => 14,
         ],
 
-        'tests' => [
+        'html' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.html'),
             'level' => 'debug',

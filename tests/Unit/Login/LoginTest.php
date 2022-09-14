@@ -6,9 +6,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class LoginTest extends TestCase
+class LoginTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -36,13 +36,13 @@ class LoginTest extends TestCase
     {
         $userAdmin = factory(User::class)->create(
             [
-                'isAdmin' => 1
+                'isAdmin' => 1,
             ]
         );
 
         $credentials = [
             'email' => $userAdmin->email,
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_admin')
         ];
 
         $response = $this->postJson($this->urlLogin . 'admin', $credentials);
@@ -56,7 +56,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'email' => $userIsNotAdmin->email,
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_not_admin')
         ];
 
         $response = $this->postJson($this->urlLogin . 'admin', $credentials);
@@ -68,7 +68,7 @@ class LoginTest extends TestCase
     {
         $credentials = [
             'email' => 'admin',
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_admin')
         ];
 
         $response = $this->postJson($this->urlLogin . 'admin', $credentials);
@@ -104,7 +104,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'email' => $userAdmin->email,
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_admin')
         ];
 
         $response = $this->postJson($this->urlLogin . 'admin', $credentials);
@@ -129,7 +129,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'cpf' => $userNotAdmin->cpf,
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_not_admin')
         ];
 
         $response = $this->postJson($this->urlLogin . '/', $credentials);
@@ -143,7 +143,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'email' => $userNotAdmin->email,
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_not_admin')
         ];
 
         $response = $this->postJson($this->urlLogin . '/', $credentials);
@@ -157,7 +157,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'name' => $userNotAdmin->name,
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_not_admin')
         ];
 
         $response = $this->postJson($this->urlLogin . '/', $credentials);
@@ -185,7 +185,7 @@ class LoginTest extends TestCase
 
         $credentials = [
             'cpf' => $userNotAdmin->cpf,
-            'password' => env('DEFAULT_PASSWORD_ADMIN')
+            'password' => config('user.default_password_not_admin')
         ];
 
         $response = $this->postJson($this->urlLogin, $credentials);

@@ -7,9 +7,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class CollectionCategoryTest extends TestCase
+class CollectionCategoryTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -22,6 +22,9 @@ class CollectionCategoryTest extends TestCase
     {
         $this->urlCollectionCategory = "{$this->url}collectionCategories";
         parent::setUp();
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('collection_categories');
     }
 
     /**
@@ -34,29 +37,17 @@ class CollectionCategoryTest extends TestCase
 
     public function testViewAllCollectionCategoryDataSuccessfully()
     {
-        $userAdmin = factory(User::class)->create(
-            [
-                'isAdmin' => 1
-            ]
-        );
+        $this->createAndAuthenticateTheAdminUser();
 
         $collectionCategory = factory(CollectionCategory::class)->create();
-
-
-        Passport::actingAs($userAdmin);
-
-        $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson($this->urlCollectionCategory);
 
         $response->assertOk();
 
-
-        $user = factory(User::class)->create();
-
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
-
+        $this->createAndAuthenticateTheAdminUser([
+            'idProfile' => $this->userProfile
+        ]);
         $response = $this->getJson($this->urlCollectionCategory);
 
         $response->assertOk();

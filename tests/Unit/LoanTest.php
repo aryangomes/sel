@@ -8,9 +8,9 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Tests\TestCase;
+use Tests\BaseTest;
 
-class LoanTest extends TestCase
+class LoanTest extends BaseTest
 {
     use RefreshDatabase, WithFaker;
 
@@ -23,6 +23,10 @@ class LoanTest extends TestCase
     {
         $this->urlLoan = "{$this->url}loans";
         parent::setUp();
+
+        $this->generateProfile();
+
+        $this->generateProfilePermissions('loans');
     }
 
     /**
@@ -130,11 +134,19 @@ class LoanTest extends TestCase
 
         $response->assertOk();
 
+        $this->createAndAuthenticateTheUserNotAdmin(
+            [
+                'idProfile' => $this->userProfile
+            ]
+        );
 
-        $user = factory(User::class)->create();
 
-        Passport::actingAs($user);
-        $this->assertAuthenticatedAs($user, 'api');
+        $loan = factory(Loan::class)->create(
+            [
+                'idBorrowerUser' => $this->userNotAdmin->id
+            ]
+        );
+
 
         $response = $this->getJson(
             $this->urlWithParameter($this->urlLoan, $loan->idLoan)

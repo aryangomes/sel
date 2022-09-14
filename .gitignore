@@ -10,9 +10,8 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-.docker/.db/
-dbsel Session.sql
 docs/*
-.docker/.db/sel/
+.docker/
 .vscode/*
 .env.testing
+*.code-workspace

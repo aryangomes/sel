@@ -3,6 +3,7 @@
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class UsersTableSeeder extends Seeder
@@ -27,12 +28,12 @@ class UsersTableSeeder extends Seeder
             = factory(User::class)->make(
                 [
                     'email' => 'user@email.com',
-                    'isAdmin' => 0,
+
                 ]
             )->toArray();
 
-        $userAdmin['password'] = bcrypt(env('DEFAULT_PASSWORD_ADMIN'));
-        $userNotAdmin['password'] = bcrypt(env('DEFAULT_PASSWORD_ADMIN'));
+        $userAdmin['password'] = Hash::make(config('user.default_password_admin'));
+        $userNotAdmin['password'] = Hash::make(config('user.default_password_not_admin'));
 
 
         $this->insertUserDatabase($userAdmin);

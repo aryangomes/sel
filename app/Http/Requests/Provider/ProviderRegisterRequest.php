@@ -15,7 +15,7 @@ class ProviderRegisterRequest extends FormRequest
      */
     public function authorize()
     {
-        return User::userMayToDoThisAction();
+        return true;
     }
 
     /**

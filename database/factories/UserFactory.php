@@ -4,9 +4,10 @@
 
 use App\Models\Utils\Regex;
 use App\Models\User;
-use App\Models\UserProfile;
+use App\Models\Profile;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,7 @@ use Faker\Generator as Faker;
 */
 
 $factory->define(User::class, function (Faker $faker) {
+
     return [
         'id' => Str::uuid(),
         'name' => $faker->name,
@@ -31,9 +33,9 @@ $factory->define(User::class, function (Faker $faker) {
         'cpf' => $faker->regexify(Regex::CPF),
         'email' => $faker->unique()->safeEmail,
         'email_verified_at' => now(),
-        'password' => bcrypt(env('DEFAULT_PASSWORD_ADMIN')),
+        'password' => Hash::make(config('user.default_password_not_admin')),
         'remember_token' => Str::random(10),
         'isAdmin' => 0,
-        'idUserProfile' => factory(UserProfile::class),
+        'idProfile' => factory(Profile::class),
     ];
 });

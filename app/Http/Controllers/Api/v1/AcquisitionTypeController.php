@@ -2,27 +2,33 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\AcquisitionType\AcquisitionTypeRegisterRequest;
 use App\Http\Requests\AcquisitionType\AcquisitionTypeUpdateRequest;
 use App\Models\AcquisitionType;
-use App\Repositories\Interfaces\AcquisitionTypeRepositoryInterface;
-
+use App\Services\AcquisitionTypeService;
 use Illuminate\Http\Response;
 
 class AcquisitionTypeController extends ApiController
 {
-
+    /**
+     *
+     * @var AcquisitionType
+     */
     private $acquisitionType;
 
-    private $acquisitionTypeRepository;
+    /**
+     *
+     * @var AcquisitionTypeService
+     */
+    private $acquisitionTypeService;
 
     public function __construct(
-        AcquisitionTypeRepositoryInterface $acquisitionTypeRepository,
+        AcquisitionTypeService $acquisitionTypeService,
         AcquisitionType $acquisitionType
     ) {
-        $this->acquisitionTypeRepository = $acquisitionTypeRepository;
+        $this->acquisitionTypeService = $acquisitionTypeService;
         $this->acquisitionType = $acquisitionType;
+        $this->tablePermissions = 'acquisition_types';
     }
 
     /**
@@ -32,13 +38,18 @@ class AcquisitionTypeController extends ApiController
      */
     public function index()
     {
-        $this->acquisitionTypeRepository->getResourceCollectionModel();
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->acquisitionType
+        );
 
-        if ($this->acquisitionTypeRepository->transactionIsSuccessfully) {
+        $this->acquisitionTypeService->getResourceCollectionModel();
 
-            $this->setSuccessResponse($this->acquisitionTypeRepository->responseFromTransaction);
+        if ($this->acquisitionTypeService->transactionIsSuccessfully) {
+
+            $this->setSuccessResponse($this->acquisitionTypeService->responseFromTransaction);
         } else {
-            $this->logErrorFromException($this->acquisitionTypeRepository->exceptionFromTransaction);
+            $this->logErrorFromException($this->acquisitionTypeService->exceptionFromTransaction);
             $this->setErrorResponse();
         }
 
@@ -63,21 +74,24 @@ class AcquisitionTypeController extends ApiController
      */
     public function store(AcquisitionTypeRegisterRequest $request)
     {
-        $this->authorize('create', $this->acquisitionType);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('create'),
+            $this->acquisitionType
+        );
 
         $requestValidated = $request->validated();
 
-        $this->acquisitionTypeRepository->create($requestValidated);
+        $this->acquisitionTypeService->create($requestValidated);
 
-        if ($this->acquisitionTypeRepository->transactionIsSuccessfully) {
+        if ($this->acquisitionTypeService->transactionIsSuccessfully) {
             $acquisitionTypeCreated =
-                $this->acquisitionTypeRepository->getResourceModel($this->acquisitionTypeRepository->responseFromTransaction);
+                $this->acquisitionTypeService->getResourceModel($this->acquisitionTypeService->responseFromTransaction);
 
             $this->setSuccessResponse($acquisitionTypeCreated, 'acquisitionType', Response::HTTP_CREATED);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.created.error',
-                ['resource' => $this->acquisitionTypeRepository->resourceName]
+                ['resource' => $this->acquisitionTypeService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -117,22 +131,25 @@ class AcquisitionTypeController extends ApiController
     {
         $this->acquisitionType = $acquisitionType;
 
-        $this->authorize('update',  $this->acquisitionType);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('update'),
+            $this->acquisitionType
+        );
 
         $requestValidated = $request->validated();
 
-        $this->acquisitionTypeRepository->update($requestValidated, $this->acquisitionType);
+        $this->acquisitionTypeService->update($requestValidated, $this->acquisitionType);
 
-        if ($this->acquisitionTypeRepository->transactionIsSuccessfully) {
+        if ($this->acquisitionTypeService->transactionIsSuccessfully) {
 
             $acquisitionTypeUpdated =
-                $this->acquisitionTypeRepository->getResourceModel($this->acquisitionType);
+                $this->acquisitionTypeService->getResourceModel($this->acquisitionType);
 
             $this->setSuccessResponse($acquisitionTypeUpdated, 'acquisitionType', Response::HTTP_OK);
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.updated.error',
-                ['resource' => $this->acquisitionTypeRepository->resourceName]
+                ['resource' => $this->acquisitionTypeService->resourceName]
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -149,17 +166,20 @@ class AcquisitionTypeController extends ApiController
     {
         $this->acquisitionType = $acquisitionType;
 
-        $this->authorize('delete',  $this->acquisitionType);
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('delete'),
+            $this->acquisitionType
+        );
 
-        $this->acquisitionTypeRepository->delete($this->acquisitionType);
+        $this->acquisitionTypeService->delete($acquisitionType);
 
-        if ($this->acquisitionTypeRepository->transactionIsSuccessfully) {
+        if ($this->acquisitionTypeService->transactionIsSuccessfully) {
 
 
             $this->setSuccessResponse(
                 __(
                     'httpResponses.deleted.success',
-                    ['resource' => $this->acquisitionTypeRepository->resourceName]
+                    ['resource' => $this->acquisitionTypeService->resourceName]
                 ),
                 ApiController::KEY_SUCCESS_CONTENT,
                 Response::HTTP_OK
@@ -167,7 +187,7 @@ class AcquisitionTypeController extends ApiController
         } else {
             $this->setErrorResponse(__(
                 'httpResponses.deleted.error',
-                $this->acquisitionTypeRepository->resourceName
+                $this->acquisitionTypeService->resourceName
             ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
