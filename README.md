@@ -10,7 +10,7 @@ Welcome to SEL's Documentation .
 - Docker
 - Docker-Composer
 
-## Download e Docker Image's Installation
+## Download and Docker Image's Installation
 
 Enter the command in the folder of your preference:
 
@@ -51,7 +51,7 @@ Enter the command in the folder of your preference:
    `composer install`
 
 3. Generate the Laravel local application key:  
-   `php artisan key: generate`
+   `php artisan key:generate`
 
 4. Link storage directory:  
    `php artisan storage:link`
@@ -69,8 +69,9 @@ Enter the command in the folder of your preference:
    `DB_PASSWORD=`
    `MYSQL_ROOT_PASSWORD=`
 
-2. Copy and paste as variable settings from the default password of users (how default passwords can be changed):  
-   `APP_URL = http://localhost:8042`
+2. Copy and paste as variable settings from the default password of users (default passwords can be changed):  
+   `DEFAULT_PASSWORD_ADMIN=`
+   `DEFAULT_PASSWORD_NOT_ADMIN=`
 
 3. Run the command to generate the database with some information already prepared:  
    `php artisan migrate --seed`
@@ -82,16 +83,17 @@ Enter the command in the folder of your preference:
 ## Useful Commands
 
 - Delete and re-create the database:  
-     `php artisan migrate: fresh`
+     `php artisan migrate:fresh`
 
 - Delete and re-create the database, populating the bank with some previously registered information:  
      `php artisan migrate --seed`
 
 - Populate the database with some previously registered information:  
-     `php artisan db: seed`
+     `php artisan db:seed`
 
 - Give read and write permission for mass storage:  
-     `chmod o+w /var/www/html/storage/ -R`
+  - `chmod o+w /var/www/html/storage/ -R`
+  - `chmod -R 775 /var/www/html/storage/`
 
 # Changelog
 
