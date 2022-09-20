@@ -2,7 +2,7 @@ ARG PHP_VERSION
 
 FROM php:"$PHP_VERSION"-apache
 
-ENV USER sel
+ENV USER www-data
 ENV UID 1000
 
 # replace shell with bash so we can source files
@@ -62,7 +62,11 @@ RUN yes | pecl install xdebug \
    && echo "xdebug.remote_connect_back=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
    && echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/xdebug.ini \
    && echo "xdebug.remote_log=/var/log/xdebug.log" >> /usr/local/etc/php/conf.d/xdebug.ini \
-   && echo "xdebug.default_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini
+   && echo "xdebug.default_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.discover_client_host=true" >> /usr/local/etc/php/conf.d/xdebug.ini \ 
+   && echo "xdebug.mode=develop,coverage,debug,profile" >> /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/xdebug.ini \
+   && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 # composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -93,8 +97,9 @@ RUN  echo "* * * * * cd /var/www/html && sudo php artisan schedule:run >> /dev/n
 RUN sudo service apache2 restart
 
 
-
-RUN useradd -G www-data,root -u $UID -d /home/${USER} ${USER}
+RUN userdel ${USER}
+RUN groupadd -g ${UID} ${USER}
+RUN useradd -g ${UID} -g root -u $UID -d /home/${USER} ${USER}
 RUN mkdir -p /home/${USER}/.composer && \
    chown -R ${USER}:${USER} /home/${USER}
 
