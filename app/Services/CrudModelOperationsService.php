@@ -45,25 +45,25 @@ class CrudModelOperationsService
 	 * 
 	 * @var GetAll
 	 */
-	private $getAll;
+	protected $getAll;
 
 	/**
 	 * 
 	 * @var Create
 	 */
-	private $create;
+	protected $create;
 
 	/**
 	 * 
 	 * @var Update
 	 */
-	private $update;
+	protected $update;
 
 	/**
 	 * 
 	 * @var Delete
 	 */
-	private $delete;
+	protected $delete;
 
 
 	public function __construct(Model $model)
@@ -96,10 +96,10 @@ class CrudModelOperationsService
 
 
 	/**
-	 * @param $id
+	 * @param string $id
 	 * @return void
 	 */
-	public function findById($id)
+	public function findById(string $id)
 	{
 		$this->transactionIsSuccessfully = true;
 
@@ -157,7 +157,7 @@ class CrudModelOperationsService
 	 * @param Model $model
 	 * @return void
 	 */
-	public function delete($model)
+	public function delete(Model $model)
 	{
 		$this->transactionIsSuccessfully = true;
 

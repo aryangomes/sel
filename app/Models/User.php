@@ -75,6 +75,11 @@ class User extends Authenticatable
         return $tokenAccess;
     }
 
+    /**
+     * 
+     * @param string $newPassword
+     * @return void
+     */
     public function setNewPassword($newPassword)
     {
         $newPasswordIsSet = isset($newPassword);

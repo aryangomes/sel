@@ -6,6 +6,24 @@
 
 - :tada: **Features**
 - :recycle: **Refactor**
+- :wrench: **Fix**
+- :building_construction: **Build**
+
+---
+
+## Version 0.2.2 - _(2022-09-21)_
+
+### **Feature**
+
+- :tada: Add required validation to password
+
+### **Fix**
+
+- :wrench: Add hashing process to user password on Create/Update User
+
+### **Build**
+
+- :building_construction: Fix xdebug.ini in Dockerfile
 
 ---
 

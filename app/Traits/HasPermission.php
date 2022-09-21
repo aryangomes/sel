@@ -28,9 +28,11 @@ trait HasPermission
     {
         $permission = null;
 
-        $permission = $this->profile->permissions
-            ->where('permission.permission', $action)->first();
 
+        if ($this->profile != null) {
+            $permission = $this->profile->permissions
+                ->where('permission.permission', $action)->first();
+        }
 
         return $permission;
     }
