@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UserUpdateRequest extends FormRequest
 {
-   /**
+    /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
@@ -27,6 +27,7 @@ class UserUpdateRequest extends FormRequest
         return [
             'name' => 'sometimes|string',
             'email' => 'sometimes|email',
+            'password' => 'sometimes|confirmed|min:8',
             'streetAddress' => 'sometimes|string',
             'neighborhoodAddress' => 'sometimes|string',
             'numberAddress' => 'sometimes|string',

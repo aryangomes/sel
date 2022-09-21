@@ -27,7 +27,7 @@ class UserRegisterRequest extends FormRequest
         return [
             'name' => 'required|max:200',
             'email' => 'email',
-            'password' => 'confirmed|min:8',
+            'password' => 'required|confirmed|min:8',
             'streetAddress' => 'string|max:200',
             'neighborhoodAddress' => 'string|max:200',
             'numberAddress' => 'string|max:30',
