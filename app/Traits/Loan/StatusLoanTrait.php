@@ -14,10 +14,10 @@ trait StatusLoanTrait
     static public function status()
     {
         $statusOfLoan = [
-            self::$PENDING,
-            self::$IN_LOAN,
-            self::$RETURNED,
-            self::$CANCELED,
+            self::$PENDING => self::$PENDING,
+            self::$IN_LOAN => self::$IN_LOAN,
+            self::$RETURNED => self::$RETURNED,
+            self::$CANCELED => self::$CANCELED,
         ];
 
         return $statusOfLoan;

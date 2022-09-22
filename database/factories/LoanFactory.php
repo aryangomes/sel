@@ -14,7 +14,7 @@ $factory->define(Loan::class, function (Faker $faker) {
         'returnDate' => $faker->dateTimeInInterval('now', '+6 days'),
         'expectedReturnDate' => $faker->dateTimeInInterval('now', '+7 days'),
         'observation' => $faker->text(),
-        'status' => Loan::status()[0],
+        'status' => Loan::status()['pending'],
         'idOperatorUser' => factory(User::class),
         'idBorrowerUser' => factory(User::class),
     ];

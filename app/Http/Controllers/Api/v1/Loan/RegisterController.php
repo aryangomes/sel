@@ -70,7 +70,7 @@ class RegisterController extends ApiController
         if (key_exists('status', $request)) {
             unset($request['status']);
         }
-        $request['status'] = Loan::status()[0];
+        $request['status'] = Loan::status()['pending'];
 
         return $request;
     }
