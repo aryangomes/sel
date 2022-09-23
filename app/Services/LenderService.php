@@ -26,7 +26,7 @@ class LenderService extends CrudModelOperationsService
 	 * 
 	 * @return LenderResource
 	 */
-	public function getResourceLenderModel()
+	public function getResourceCollection()
 	{
 
 		$this->getAll();
