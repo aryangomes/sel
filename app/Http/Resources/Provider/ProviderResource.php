@@ -23,6 +23,7 @@ class ProviderResource extends JsonResource
         $juridicPerson = JuridicPerson::where('idProvider', $this->idProvider)->first();
 
         return [
+            'idProvider' => $this->idProvider,
             'name' => $this->name,
             'email' =>  $this->email,
             'streetAddress' => $this->streetAddress,
