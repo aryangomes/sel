@@ -110,7 +110,14 @@ class CollectionTypeController extends ApiController
      */
     public function show(CollectionType $collectionType)
     {
-        //
+        $this->collectionType = $collectionType;
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->collectionType
+        );
+
+        return $this->collectionTypeService->getResourceModel($collectionType);
     }
 
     /**
