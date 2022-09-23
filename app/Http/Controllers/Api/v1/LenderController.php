@@ -42,7 +42,22 @@ class LenderController extends ApiController
      */
     public function index()
     {
-        //
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->lender
+        );
+
+        $this->lenderService->getResourceCollection();
+
+        if ($this->lenderService->transactionIsSuccessfully) {
+
+            $this->setSuccessResponse($this->lenderService->responseFromTransaction);
+        } else {
+            $this->logErrorFromException($this->lenderService->exceptionFromTransaction);
+            $this->setErrorResponse();
+        }
+
+        return $this->responseWithJson();
     }
 
     /**

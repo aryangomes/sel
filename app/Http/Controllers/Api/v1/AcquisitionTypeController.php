@@ -106,7 +106,14 @@ class AcquisitionTypeController extends ApiController
      */
     public function show(AcquisitionType $acquisitionType)
     {
-        //
+        $this->acquisitionType = $acquisitionType;
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->acquisitionType
+        );
+
+        return $this->acquisitionTypeService->getResourceModel($acquisitionType);
     }
 
     /**

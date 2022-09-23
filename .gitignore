@@ -15,5 +15,5 @@ docs/*
 .vscode/*
 .env.testing
 *.code-workspace
-thunder-client/*
+thunder*
 storage/*

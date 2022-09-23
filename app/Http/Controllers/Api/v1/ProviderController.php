@@ -45,7 +45,22 @@ class ProviderController extends ApiController
      */
     public function index()
     {
-        //
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('index'),
+            $this->provider
+        );
+
+        $this->providerService->getResourceCollectionModel();
+
+        if ($this->providerService->transactionIsSuccessfully) {
+
+            $this->setSuccessResponse($this->providerService->responseFromTransaction);
+        } else {
+            $this->logErrorFromException($this->providerService->exceptionFromTransaction);
+            $this->setErrorResponse();
+        }
+
+        return $this->responseWithJson();
     }
 
     /**

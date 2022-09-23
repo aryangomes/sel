@@ -25,7 +25,7 @@ class AcquisitionTypeRegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => 'required|max:100'
+            'type' => 'required|max:100|unique:acquisition_types,type'
         ];
     }
 }

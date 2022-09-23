@@ -97,7 +97,14 @@ class AcquisitionController extends ApiController
      */
     public function show(Acquisition $acquisition)
     {
-        //
+        $this->acquisition = $acquisition;
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->acquisition
+        );
+
+        return $this->acquisitionService->getResourceModel($acquisition);
     }
 
     /**

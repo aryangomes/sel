@@ -15,6 +15,7 @@ class LenderResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'idLender' => $this->idLender,
             'name' => $this->name,
             'email' => $this->email,
             'streetAddress' => $this->streetAddress,

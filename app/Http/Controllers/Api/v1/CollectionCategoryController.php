@@ -107,7 +107,14 @@ class CollectionCategoryController extends ApiController
      */
     public function show(CollectionCategory $collectionCategory)
     {
-        //
+        $this->collectionCategory = $collectionCategory;
+
+        $this->canPerformAction(
+            $this->makeNameActionFromTable('view'),
+            $this->collectionCategory
+        );
+
+        return $this->collectionCategoryService->getResourceModel($collectionCategory);
     }
 
     /**
