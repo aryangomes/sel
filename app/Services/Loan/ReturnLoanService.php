@@ -44,21 +44,11 @@ class ReturnLoanService
 
             $this->loanService->update($dataToUpdate, $this->loanService->loan);
 
-            // $this->loanService->loan->setStatusLoanToReturned();
-
             $this->unlockCollectionCopies(
                 $this->loanService->loan,
                 $this->loanService->loan->containCopies
             );
 
-            info(
-                get_class($this),
-                [
-                    'loan' => $this->loanService->loan,
-                    'copies' => $this->loanService->loan->containCopies,
-
-                ]
-            );
 
             if ($this->loanService->transactionIsSuccessfully) {
 
@@ -89,12 +79,6 @@ class ReturnLoanService
 
 
             $this->unlockCollectionCopy($loan, $collectionCopy);
-            info(
-                get_class($this),
-                [
-                    'unlockCollectionCopy' => $collectionCopy->collectionCopy
-                ]
-            );
         }
     }
 }

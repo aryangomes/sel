@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1\Loan;
 use App\Http\Controllers\Api\v1\ApiController;
 use App\Http\Requests\Loan\LoanReturnRequest;
 use App\Models\Loan\Loan;
+use App\Rules\Loan\ReturnDateIsEqualOrLessExpectedReturnDateRule;
 use App\Services\Loan\ReturnLoanService;
 use App\Services\LoanService;
 use Illuminate\Http\Response;
@@ -20,11 +21,24 @@ class ReturnLoanController extends ApiController
         $this->tablePermissions = 'loans';
     }
 
-    public function __invoke(LoanReturnRequest $request)
+    public function __invoke(Loan $loan)
     {
-        $requestValidated = $request->validated();
+        $this->loan = $loan;
 
-        $this->loan = Loan::find($requestValidated['idLoan']);
+        $verifyReturnDateIsEqualOrLessExpectedReturnDateRule =
+            new ReturnDateIsEqualOrLessExpectedReturnDateRule();
+
+        if (!$verifyReturnDateIsEqualOrLessExpectedReturnDateRule
+            ->passes('idLoan', $loan->idLoan)) {
+            $this->setErrorResponse(
+                $verifyReturnDateIsEqualOrLessExpectedReturnDateRule->message(),
+                'error',
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+
+
+            return $this->responseWithJson();
+        }
 
         $this->canPerformAction(
             $this->makeNameActionFromTable('update'),
