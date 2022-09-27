@@ -70,7 +70,7 @@ abstract class BaseTest extends BaseTestCase
 
     protected function generateProfilePermissions($table, $profile = null)
     {
-        if($profile == null && $this->userProfile != null){
+        if ($profile == null && $this->userProfile != null) {
             $profile = $this->userProfile;
         }
         $this->seed(PermissionsTableSeeder::class);

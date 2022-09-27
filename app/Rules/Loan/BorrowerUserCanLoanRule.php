@@ -22,13 +22,20 @@ class BorrowerUserCanLoanRule implements Rule
     /**
      * Determine if the validation rule passes.
      *
+     * The value is the Id of the User that is borrowing of the copy
+     * 
      * @param  string  $attribute
-     * @param  mixed  $value
+     * @param  mixed  $value 
      * @return bool
      */
     public function passes($attribute, $value)
     {
-        $this->getBorrowerUser($value);
+        $this->borrowerUser = User::find($value);
+
+        if ($this->borrowerUser == null) {
+            return false;
+        }
+
 
         return $this->borrowerUserCanLoan();
     }
@@ -42,14 +49,10 @@ class BorrowerUserCanLoanRule implements Rule
     {
         $message = 'User is not allowed to realize the Loan.';
 
-        if (isset($this->borrowerUser)) {
+        if ($this->borrowerUser != null) {
             $message = "User {$this->borrowerUser->name} is not allowed to realize the Loan.";
         }
         return $message;
-    }
-    private function getBorrowerUser($idUser)
-    {
-        $this->borrowerUser = User::find($idUser);
     }
 
     public function borrowerUserCanLoan()
