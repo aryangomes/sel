@@ -10,7 +10,7 @@ use App\Services\LoanService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class RegisterController extends ApiController
+class RegisterLoanController extends ApiController
 {
     private $loanService;
     private $loan;
@@ -34,11 +34,9 @@ class RegisterController extends ApiController
     {
 
         $this->canPerformAction(
-            $this->makeNameActionFromTable('store'),
+            $this->makeNameActionFromTable('register'),
             $this->loan
         );
-
-
 
         $requestValidated = $request->validated();
 
