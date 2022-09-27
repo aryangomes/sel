@@ -37,11 +37,6 @@ class BaseLoanTest extends BaseTest
         parent::tearDown();
     }
 
-    public function testBase()
-    {
-        $this->assertTrue(true);
-    }
-
 
     protected function generatePermissionsLoanProfileToUserNotAdmin($canMadeAction = 0)
     {
@@ -49,8 +44,7 @@ class BaseLoanTest extends BaseTest
             [
                 'index',
                 'view',
-                'create',
-                'store',
+                'register',
                 'edit',
                 'update',
                 'delete',
@@ -58,15 +52,15 @@ class BaseLoanTest extends BaseTest
 
         $permissions = [];
 
-        foreach ($crud as $key => $value) {
+        foreach ($crud as $action) {
             array_push($permissions, factory(Permission::class)->create(
                 [
-                    'permission' => "loans-{$value}"
+                    'permission' => "loans-{$action}"
                 ]
             ));
         }
 
-        foreach ($permissions as $key => $permission) {
+        foreach ($permissions as $permission) {
             factory(ProfileHasPermission::class)->create([
                 'idProfile' => $this->userProfile,
                 'idPermission' => $permission->idPermission,
