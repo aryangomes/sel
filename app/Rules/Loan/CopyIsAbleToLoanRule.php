@@ -30,17 +30,17 @@ class CopyIsAbleToLoanRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $copyCanBeBorrowed = false;
 
-        $collectionCopy = $this->getCollectionCopyFromValue($value);
+        $this->collectionCopy = CollectionCopy::find($value);
 
-        if (key_exists('idCollectionCopy', $collectionCopy)) {
 
-            $this->collectionCopy = CollectionCopy::find($collectionCopy['idCollectionCopy']);
-
-            $copyCanBeBorrowed = $this->collectionHasCopiesAvailable() &&
-                $this->copyIsAbleToLoan();
+        if ($this->collectionCopy == null) {
+            return false;
         }
+
+        $copyCanBeBorrowed = $this->collectionHasCopiesAvailable() &&
+            $this->copyIsAbleToLoan();
+
         return $copyCanBeBorrowed;
     }
 
@@ -51,10 +51,10 @@ class CopyIsAbleToLoanRule implements Rule
      */
     public function message()
     {
-        $message = 'Copy is not available';
+        $message = 'Copy is not available to loan.';
 
         if ($this->collection) {
-            $message = "Copy of {$this->collection->title} is not available";
+            $message = "Copy of {$this->collection->title} is not available to loan.";
         }
         return $message;
     }

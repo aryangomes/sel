@@ -5,6 +5,7 @@ namespace App\Http\Requests\Loan;
 use App\Rules\Loan\BorrowerUserCanLoanRule;
 use App\Rules\Loan\CopyIsAbleToLoanRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class LoanRegisterRequest extends FormRequest
 {
@@ -25,6 +26,7 @@ class LoanRegisterRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
             'returnDate' => 'nullable|after_or_equal:today',
             'expectedReturnDate' => 'after_or_equal:today',
@@ -35,8 +37,16 @@ class LoanRegisterRequest extends FormRequest
                 'required', 'exists:users,id',
                 new BorrowerUserCanLoanRule()
             ],
-            'collectionCopy' => ['required', 'array', new CopyIsAbleToLoanRule()],
-            'idCollectionCopy.*' => ['required', 'exists:collection_copies,idCollectionCopy'],
+            'collectionCopy' => [
+                Rule::requiredIf(!$this->has('idCollectionCopy')),
+                'array'
+            ],
+            'collectionCopy.*.idCollectionCopy' => ['required_with:collectionCopy', 'exists:collection_copies,idCollectionCopy', new CopyIsAbleToLoanRule()],
+
+            'idCollectionCopy' => [
+                Rule::requiredIf(!$this->has('collectionCopy')),
+                'exists:collection_copies,idCollectionCopy', new CopyIsAbleToLoanRule()
+            ],
         ];
     }
 }

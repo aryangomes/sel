@@ -13,10 +13,23 @@ use App\Services\LoanService;
 
 class RegisterLoanService
 {
-    private $verifyBorrowerUserCanLoan;
-    private $verifyCopyIsAbleToLoan;
+    /**
+     * 
+     * @property LoanService $loanService
+     */
     private $loanService;
+
+    /**
+     * 
+     * @property array $dataToRegisterLoan
+     */
     private $dataToRegisterLoan;
+
+
+    /**
+     * @property string $keyIndexCollectionCopy
+     */
+    private $keyIndexCollectionCopy;
 
     public function __construct(
 
@@ -69,9 +82,18 @@ class RegisterLoanService
 
     private function verifyIfHasCollectionCopy()
     {
-        $verifyIfHasCollectionCopy = key_exists('collectionCopy', $this->dataToRegisterLoan);
 
-        return $verifyIfHasCollectionCopy;
+        if (key_exists('collectionCopy', $this->dataToRegisterLoan)) {
+            $this->keyIndexCollectionCopy = 'collectionCopy';
+            return true;
+        }
+
+        if (key_exists('idCollectionCopy', $this->dataToRegisterLoan)) {
+            $this->keyIndexCollectionCopy = 'idCollectionCopy';
+            return true;
+        }
+
+        return false;
     }
 
     private function verifyIfHasIdCollectionCopy($collectionCopy)
@@ -83,6 +105,9 @@ class RegisterLoanService
 
     private function getCollectionCopyFromInputValue($inputValue)
     {
+        if (!is_array($inputValue)) {
+            return $inputValue;
+        }
         return key_exists(0, $inputValue) ? $inputValue[0] : $inputValue;
     }
 
@@ -92,9 +117,14 @@ class RegisterLoanService
 
         if ($this->verifyIfHasCollectionCopy()) {
 
-            $collectionCopies = $this->dataToRegisterLoan['collectionCopy'];
 
-            unset($this->dataToRegisterLoan['collectionCopy']);
+            if ($this->collectionCopyFieldIsArray()) {
+                $collectionCopies = $this->dataToRegisterLoan[$this->keyIndexCollectionCopy];
+            } else {
+                $collectionCopies[][$this->keyIndexCollectionCopy] = $this->dataToRegisterLoan[$this->keyIndexCollectionCopy];
+            }
+
+            unset($this->dataToRegisterLoan[$this->keyIndexCollectionCopy]);
         }
 
 
@@ -114,15 +144,13 @@ class RegisterLoanService
     private function lockingCollectionCopies($loan, $collectionCopies)
     {
 
-        $collectionCopy =
-            $this->getCollectionCopyFromInputValue($collectionCopies);
 
 
-        $collectionCopiesIsArray = key_exists(0, $collectionCopies);
-
-        if ($collectionCopiesIsArray) {
+        if (is_array($collectionCopies)) {
             $this->lockCollectionCopies($loan, $collectionCopies);
         } else {
+            $collectionCopy =
+                $this->getCollectionCopyFromInputValue($collectionCopies);
 
             $this->lockCollectionCopy($loan, $collectionCopy);
         }
@@ -130,6 +158,14 @@ class RegisterLoanService
 
     private function registerLoan()
     {
+
+        $this->dataToRegisterLoan = array_merge(
+            $this->dataToRegisterLoan,
+            [
+                'expectedReturnDate' =>
+                today()->addDays(config('loan.expectedReturnDays', 7))
+            ]
+        );
 
         $this->loanService->create($this->dataToRegisterLoan);
 
@@ -154,5 +190,10 @@ class RegisterLoanService
 
             $this->lockCollectionCopy($loan, $collectionCopy);
         }
+    }
+
+    private function collectionCopyFieldIsArray()
+    {
+        return $this->keyIndexCollectionCopy == 'collectionCopy';
     }
 }
