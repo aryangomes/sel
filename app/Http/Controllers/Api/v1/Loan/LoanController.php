@@ -75,30 +75,9 @@ class LoanController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(LoanRegisterRequest $request)
+    public function store()
     {
-        $this->canPerformAction(
-            $this->makeNameActionFromTable('store'),
-            $this->loan
-        );
-
-        $requestValidated = $request->validated();
-
-        $this->loanService->create($requestValidated);
-
-        if ($this->loanService->transactionIsSuccessfully) {
-            $loanCreated =
-                $this->loanService->getResourceModel($this->loanService->responseFromTransaction);
-
-            $this->setSuccessResponse($loanCreated, 'loan', Response::HTTP_CREATED);
-        } else {
-            $this->setErrorResponse(__(
-                'httpResponses.created.error',
-                ['resource' => $this->loanService->resourceName]
-            ), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        return $this->responseWithJson();
+        return $this->routeNotImplemented();
     }
 
     /**

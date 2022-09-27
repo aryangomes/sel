@@ -23,7 +23,10 @@ class ApiController extends Controller
 
     protected function responseWithJson()
     {
-        return response()->json($this->requestResponse, $this->codeStatusResponse);
+        return response()->json(
+            $this->requestResponse,
+            $this->codeStatusResponse
+        );
     }
 
     protected function setSuccessResponse(
@@ -95,5 +98,12 @@ class ApiController extends Controller
     public function makeNameActionFromTable($actionWithoutTablePermission = '')
     {
         return Str::slug("{$this->tablePermissions} {$actionWithoutTablePermission}");
+    }
+
+    protected function routeNotImplemented()
+    {
+        $this->requestResponse = ['message' => 'Route not implemented.'];
+        $this->codeStatusResponse = Response::HTTP_METHOD_NOT_ALLOWED;
+        return $this->responseWithJson();
     }
 }
