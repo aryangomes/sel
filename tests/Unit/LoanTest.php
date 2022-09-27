@@ -23,7 +23,6 @@ class LoanTest extends BaseTest
      */
     public function setUp(): void
     {
-        $this->urlLoan = "{$this->url}loans";
         parent::setUp();
 
         $this->generateProfile();
@@ -61,7 +60,10 @@ class LoanTest extends BaseTest
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
-        $response = $this->postJson($this->urlLoan, $postLoan);
+        $response = $this->postJson(
+            route('loans.register'),
+            $postLoan
+        );
 
         $response->assertCreated();
     }
@@ -89,7 +91,7 @@ class LoanTest extends BaseTest
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
-        $response = $this->postJson($this->urlLoan, $postLoan);
+        $response = $this->postJson(route('loans.register'), $postLoan);
 
         $response->assertStatus(422);
     }
@@ -112,8 +114,9 @@ class LoanTest extends BaseTest
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
+
         $response = $this->putJson(
-            $this->urlWithParameter($this->urlLoan, $loan->idLoan),
+            route('loans.update', $loan->idLoan),
             $dataUpdateForLoan
         );
 
@@ -140,7 +143,10 @@ class LoanTest extends BaseTest
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
         $response = $this->getJson(
-            $this->urlWithParameter($this->urlLoan, $loan->idLoan)
+            route('loans.show', [
+                'loan' => $loan->idLoan
+            ])
+
         );
 
         $response->assertOk();
@@ -159,9 +165,7 @@ class LoanTest extends BaseTest
         );
 
 
-        $response = $this->getJson(
-            $this->urlWithParameter($this->urlLoan, $loan->idLoan)
-        );
+        $response = $this->getJson(route('loans.show', $loan->idLoan));
 
         $response->assertOk();
     }
@@ -180,9 +184,7 @@ class LoanTest extends BaseTest
         Passport::actingAs($userAdmin);
         $this->assertAuthenticatedAs($userAdmin, 'api');
 
-        $response = $this->deleteJson(
-            $this->urlWithParameter($this->urlLoan, $loan->idLoan)
-        );
+        $response = $this->deleteJson(route('loans.destroy', $loan->idLoan));
 
         $response->assertOk();
 
@@ -201,9 +203,8 @@ class LoanTest extends BaseTest
         Passport::actingAs($user);
         $this->assertAuthenticatedAs($user, 'api');
 
-        $response = $this->deleteJson(
-            $this->urlWithParameter($this->urlLoan, $loan->idLoan)
-        );
+        $response = $this->deleteJson(route('loans.destroy', $loan->idLoan));
+
 
         $response->assertForbidden();
     }

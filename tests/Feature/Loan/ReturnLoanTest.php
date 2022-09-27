@@ -49,12 +49,17 @@ class ReturnLoanTest extends BaseLoanTest
 
         $this->assertTrue((bool) $this->loan->isInLoan());
 
-        $idLoan = ['idLoan' => $this->loan->idLoan];
-
         $response = $this->patchJson(
-            $this->generateUrl($this->loan->idLoan),
-            $idLoan
+            route(
+                'loans.return',
+                [
+                    'loan' => $this->loan->idLoan
+                ]
+            )
+
         );
+
+
 
         $response->assertOk();
 
@@ -81,12 +86,16 @@ class ReturnLoanTest extends BaseLoanTest
 
         $this->assertTrue((bool) $loan->isInLoan());
 
-        $idLoan = ['idLoan' => $loan->idLoan];
-
         $response = $this->patchJson(
-            $this->generateUrl($loan->idLoan),
-            $idLoan
+            route(
+                'loans.return',
+                [
+                    'loan' => $loan->idLoan
+                ]
+            )
+
         );
+
 
         $response->assertStatus(422);
 
@@ -125,7 +134,7 @@ class ReturnLoanTest extends BaseLoanTest
 
         $postLoan = array_merge($postLoan, $postCollectionCopyArray);
 
-        $response = $this->postJson("{$this->urlLoan}register", $postLoan);
+        $response = $this->postJson(route('loans.register'), $postLoan);
 
         $response->assertCreated();
 

@@ -24,10 +24,12 @@ Route::prefix('login')->group(function () {
 
 Route::middleware('auth:api')->group(function () {
 
-    Route::prefix('loan')->group(function () {
-        Route::post('/register', 'Api\v1\Loan\RegisterController');
+    Route::prefix('loans')->group(function () {
+        Route::post('/register', 'Api\v1\Loan\RegisterLoanController')
+            ->name('loans.register');
 
-        Route::patch('{loan}/return', 'Api\v1\Loan\ReturnLoanController');
+        Route::patch('{loan}/return', 'Api\v1\Loan\ReturnLoanController')
+            ->name('loans.return');
     });
 
     Route::resource('/users', 'Api\v1\UserController');
